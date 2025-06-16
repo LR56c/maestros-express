@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AuthMethod {
+  EMAIL @map("email")
+  GOOGLE @map("google")
+}
+
+enum QuotationStatus {
+  PENDING @map("pending")
+  ACCEPTED @map("accepted")
+  CANCELED @map("canceled")
+}
+
+enum NotificationType {
+  FIREBASE @map("firebase")
+}
+
+enum StoryType {
+  IMAGE @map("image")
+  VIDEO @map("video")
+}
+
+enum ReviewType {
+  SERVICE @map("service")
+  PACKAGE @map("package")
+}
+
+enum PaymentType{
+  SERVICE @map("service")
+  PACKAGE @map("package")
+}
+
+enum PaymentStatus {
+  PENDING @map("pending")
+  COMPLETED @map("completed")
+}
+
+enum MessageStatus {
+  SENDING @map("sending")
+  SENT @map("sent")
+  READ @map("read")
+  CANCELED @map("canceled")
+  ACCEPTED @map("accepted")
+}
+
+enum MessageType {
+  SUBJECT @map("subject")
+  IMAGE @map("image")
+  TEXT @map("text")
+  QUOTATION @map("quotation")
+}
+
+enum PackageDocumentType {
+  IMAGE @map("image")
+  VIDEO @map("video")
+  FILE @map("file")
+  PDF @map("pdf")
+}
+
+enum WorkerScheduleStatus {
+  ACTIVE @map("active")
+  INACTIVE @map("inactive")
+}
+
+enum WorkerBookingStatus {
+  AVAILABLE @map("available")
+  BOOKED @map("booked")
+}
+
+enum WorkerEmbeddingType {
+  STORY @map("story")
+  WORKER @map("worker")
+}
+
+enum CertificateType {
+  PDF @map("pdf")
+  IMAGE @map("image")
+}
