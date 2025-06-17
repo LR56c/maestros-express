@@ -9,12 +9,12 @@ datasource db {
 }
 
 enum AuthMethod {
-  EMAIL @map("email")
+  EMAIL  @map("email")
   GOOGLE @map("google")
 }
 
 enum QuotationStatus {
-  PENDING @map("pending")
+  PENDING  @map("pending")
   ACCEPTED @map("accepted")
   CANCELED @map("canceled")
 }
@@ -33,54 +33,101 @@ enum ReviewType {
   PACKAGE @map("package")
 }
 
-enum PaymentType{
+enum PaymentType {
   SERVICE @map("service")
   PACKAGE @map("package")
 }
 
 enum PaymentStatus {
-  PENDING @map("pending")
+  PENDING   @map("pending")
   COMPLETED @map("completed")
 }
 
 enum MessageStatus {
-  SENDING @map("sending")
-  SENT @map("sent")
-  READ @map("read")
+  SENDING  @map("sending")
+  SENT     @map("sent")
+  READ     @map("read")
   CANCELED @map("canceled")
   ACCEPTED @map("accepted")
 }
 
 enum MessageType {
-  SUBJECT @map("subject")
-  IMAGE @map("image")
-  TEXT @map("text")
+  SUBJECT   @map("subject")
+  IMAGE     @map("image")
+  TEXT      @map("text")
   QUOTATION @map("quotation")
 }
 
 enum PackageDocumentType {
   IMAGE @map("image")
   VIDEO @map("video")
-  FILE @map("file")
-  PDF @map("pdf")
+  FILE  @map("file")
+  PDF   @map("pdf")
 }
 
 enum WorkerScheduleStatus {
-  ACTIVE @map("active")
+  ACTIVE   @map("active")
   INACTIVE @map("inactive")
 }
 
 enum WorkerBookingStatus {
   AVAILABLE @map("available")
-  BOOKED @map("booked")
+  BOOKED    @map("booked")
 }
 
 enum WorkerEmbeddingType {
-  STORY @map("story")
+  STORY  @map("story")
   WORKER @map("worker")
 }
 
 enum CertificateType {
-  PDF @map("pdf")
+  PDF   @map("pdf")
   IMAGE @map("image")
+}
+
+model User {
+  id                 String               @id @db.Uuid
+  email              String               @unique
+  name               String
+  surname            String
+  avatar             String?
+  usersRoles         UsersRoles[]
+  Notification       Notification[]
+  NotificationConfig NotificationConfig[]
+  createdAt          DateTime             @default(now()) @map("created_at") @db.Timestamptz
+
+  @@map("user")
+}
+
+model Role {
+  id        BigInt    @id
+  name      String    @unique
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime? @map("updated_at") @db.Timestamptz
+
+  usersRoles UsersRoles[]
+
+  @@map("role")
+}
+
+/// Tabla de relación explícita entre User y Role
+model UsersRoles {
+  userId String @map("user_id") @db.Uuid
+  roleId BigInt @map("role_id")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([userId, roleId])
+  @@map("users_roles")
+}
+
+model Audit {
+  auditId   String   @id @default(uuid()) @map("audit_id") @db.Uuid
+  tableName String   @map("table_name")
+  operation String   @map("operation")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  data      Json     @map("data")
+
+  @@map("audit")
 }
