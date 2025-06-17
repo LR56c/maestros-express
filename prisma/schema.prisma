@@ -85,6 +85,35 @@ enum CertificateType {
   IMAGE @map("image")
 }
 
+model Notification {
+  id        String    @id @default(uuid()) @db.Uuid
+  data      Json
+  isEnabled Boolean   @map("is_enabled")
+  viewedAt  DateTime? @map("viewed_at")
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+
+  userId    String    @map("user_id") @db.Uuid
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([userId])
+  @@map("notification")
+}
+
+model NotificationConfig {
+  id               String           @id @default(uuid()) @db.Uuid
+  data             Json
+  deviceToken      String           @unique @map("device_token")
+  notificationType NotificationType @map("notification_type")
+  createdAt        DateTime         @default(now()) @map("created_at") @db.Timestamptz
+
+  userId           String           @map("user_id") @db.Uuid
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([userId])
+  @@index([deviceToken])
+  @@map("notification_config")
+}
+
 model User {
   id                 String               @id @db.Uuid
   email              String               @unique
@@ -95,12 +124,23 @@ model User {
   Notification       Notification[]
   NotificationConfig NotificationConfig[]
   createdAt          DateTime             @default(now()) @map("created_at") @db.Timestamptz
+  Payment            Payment[]
+  Message            Message[]
+  ClientChats        Chat[]               @relation("ClientChats")
+  WorkerChats        Chat[]               @relation("WorkerChats")
 
-  @@map("user")
+  FromUserReport Report[]    @relation("FromUserReports")
+  ToUserReport   Report[]    @relation("ToUserReports")
+  Review         Review[]
+  Quotation      Quotation[]
+
+  Worker Worker[]
+
+  Client Client[]
 }
 
 model Role {
-  id        BigInt    @id
+  id        String    @id @default(uuid()) @db.Uuid
   name      String    @unique
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
   updatedAt DateTime? @map("updated_at") @db.Timestamptz
@@ -110,10 +150,408 @@ model Role {
   @@map("role")
 }
 
+model NationalIdentity {
+  id         String   @id @default(uuid()) @db.Uuid
+  type       String   @map("type")
+  identifier String   @map("identifier")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  countryId  String   @map("country_id") @db.Uuid
+  country Country  @relation(fields: [countryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  Worker  Worker[]
+
+  @@map("national_identity")
+}
+
+model Speciality {
+  id               String             @id @default(uuid()) @db.Uuid
+  name             String             @unique
+  createdAt        DateTime           @default(now()) @map("created_at") @db.Timestamptz
+  WorkerSpeciality WorkerSpeciality[]
+
+  @@map("speciality")
+}
+
+model Story {
+  id          String    @id @default(uuid()) @db.Uuid
+  name        String @map("name")
+  description String @map("description")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime? @map("updated_at") @db.Timestamptz
+
+  workerId    String    @map("worker_id") @db.Uuid
+  worker        Worker          @relation(fields: [workerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  StoryDocument StoryDocument[]
+
+  @@index([workerId])
+  @@map("story")
+}
+
+model StoryDocument {
+  id        String              @id @default(uuid()) @db.Uuid
+  type      PackageDocumentType @map("type")
+  url       String              @map("url")
+  createdAt DateTime            @default(now()) @map("created_at") @db.Timestamptz
+
+  storyId   String              @map("story_id") @db.Uuid
+  story Story @relation(fields: [storyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([storyId])
+  @@map("story_document")
+}
+
+model Package {
+  id            String   @id @default(uuid()) @db.Uuid
+  name          String   @map("name")
+  description   String?  @map("description")
+  specification String   @map("specification")
+  total         Float    @map("total")
+  valueFormat   String   @map("value_format")
+  coverUrl      String   @map("cover_url")
+  reviewCount   Int      @default(0) @map("review_count")
+  reviewAverage Float    @default(0) @map("review_average")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  workerId      String   @db.Uuid
+  Worker          Worker            @relation(fields: [workerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  PackageDocument PackageDocument[]
+
+  @@map("package")
+}
+
+model PackageDocument {
+  id        String              @id @default(uuid()) @db.Uuid
+  type      PackageDocumentType @map("type")
+  url       String              @map("url")
+  createdAt DateTime            @default(now()) @map("created_at") @db.Timestamptz
+
+  packageId String              @map("package_id") @db.Uuid
+  package Package @relation(fields: [packageId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([packageId])
+  @@map("package_document")
+}
+
+model Quotation {
+  id            String          @id @default(uuid()) @db.Uuid
+  title         String          @map("title")
+  total         Float           @map("total")
+  estimatedTime DateTime        @map("estimated_time") @db.Timestamptz
+  status        QuotationStatus @map("status")
+  valueFormat   String          @map("value_format")
+  createdAt     DateTime        @default(now()) @map("created_at") @db.Timestamptz
+
+  workerId String @map("worker_id") @db.Uuid
+  worker   Worker @relation(fields: [workerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  clientId String @map("client_id") @db.Uuid
+  client   User   @relation(fields: [clientId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  chatId String @map("chat_id") @db.Uuid
+  chat   Chat   @relation(fields: [chatId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  QuotationDetail QuotationDetail[]
+
+  @@map("quotation")
+}
+
+model QuotationDetail {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @map("name")
+  description String?  @map("description")
+  value       Float    @map("value")
+  valueFormat String   @map("value_format")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  quotationId String    @map("quotation_id") @db.Uuid
+  quotation   Quotation @relation(fields: [quotationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@map("quotation_detail")
+}
+
+model Review {
+  id          String     @id @default(uuid()) @db.Uuid
+  serviceId   String     @map("service_id") @db.Uuid
+  serviceType ReviewType @map("service_type")
+  description String     @map("description")
+  value       Int        @map("value")
+  createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamptz
+
+  userId String @map("user_id") @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([userId])
+  @@index([serviceId])
+  @@map("review")
+}
+
+model WorkerSpeciality {
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  workerId String @map("worker_id") @db.Uuid
+  worker   Worker @relation(fields: [workerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  specialityId String     @map("speciality_id") @db.Uuid
+  speciality   Speciality @relation(fields: [specialityId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([workerId])
+  @@index([specialityId])
+  @@map("worker_speciality")
+}
+
+model Certificate {
+  id                String              @id @default(uuid()) @db.Uuid
+  type              CertificateType     @map("type")
+  url               String              @map("url")
+  name              String              @map("name")
+  createdAt         DateTime            @default(now()) @map("created_at") @db.Timestamptz
+  WorkerCertificate WorkerCertificate[]
+
+  @@map("certificate")
+}
+
+model WorkerCertificate {
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  workerId String @map("worker_id") @db.Uuid
+  worker   Worker @relation(fields: [workerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  certificateId String      @map("certificate_id") @db.Uuid
+  certificate   Certificate @relation(fields: [certificateId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([workerId])
+  @@index([certificateId])
+  @@map("worker_certificate")
+}
+
+model WorkerBooking {
+  id        String              @id @default(uuid()) @db.Uuid
+  status    WorkerBookingStatus @map("status")
+  date      DateTime            @map("date") @db.Timestamptz
+  createdAt DateTime            @default(now()) @map("created_at") @db.Timestamptz
+
+  workerId String @map("worker_id") @db.Uuid
+  worker   Worker @relation(fields: [workerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  clientId String @map("client_id") @db.Uuid
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([workerId])
+  @@map("worker_booking")
+}
+
+model WorkerSchedule {
+  id                 String               @id @default(uuid()) @db.Uuid
+  weekDay            Int                  @map("week_day")
+  status             WorkerScheduleStatus @map("status")
+  startTime          DateTime             @map("start_time") @db.Timestamptz
+  endTime            DateTime             @map("end_time") @db.Timestamptz
+  recurrentStartTime DateTime?            @map("recurrent_start_time") @db.Timestamptz
+  recurrentEndTime   DateTime?            @map("recurrent_end_time") @db.Timestamptz
+  createdAt          DateTime             @default(now()) @map("created_at") @db.Timestamptz
+
+  workerId String @map("worker_id") @db.Uuid
+  worker   Worker @relation(fields: [workerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([workerId])
+  @@map("worker_schedule")
+}
+
+model WorkerTax {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @map("name")
+  valueFormat String   @map("value_format")
+  value       Float    @map("value")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  workerId String @map("worker_id") @db.Uuid
+  worker   Worker @relation(fields: [workerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([workerId])
+  @@map("worker_tax")
+}
+
+model Worker {
+  id            String   @id @default(uuid()) @db.Uuid
+  birhtDate     DateTime @map("birth_date") @db.Timestamptz
+  description   String?  @map("description")
+  reviewCount   Int      @default(0) @map("review_count")
+  reviewAverage Float    @default(0) @map("review_average")
+  location      String?  @map("location")
+  verified      Boolean  @default(false) @map("verified")
+
+  user User @relation(fields: [id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  nationalIdentityId String           @map("national_identity") @db.Uuid
+  nationalIdentity   NationalIdentity @relation(fields: [nationalIdentityId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  Zone              Zone[]
+  WorkerEmbedding   WorkerEmbedding[]
+  WorkerSpeciality  WorkerSpeciality[]
+  WorkerCertificate WorkerCertificate[]
+  WorkerBooking     WorkerBooking[]
+  WorkerSchedule    WorkerSchedule[]
+  WorkerTax         WorkerTax[]
+  Story             Story[]
+  Package           Package[]
+  Quotation         Quotation[]
+}
+
+model Client {
+  id            String          @id @default(uuid()) @db.Uuid
+  createdAt     DateTime        @default(now()) @map("created_at") @db.Timestamptz
+  WorkerBooking WorkerBooking[]
+
+  user User @relation(fields: [id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@map("client")
+}
+
+model Report {
+  id        String   @id @default(uuid()) @db.Uuid
+  reason    String   @map("reason")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  fromUserId String @map("from_user_id") @db.Uuid
+  fromUser   User   @relation("FromUserReports", fields: [fromUserId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  toUserId String @map("to_user_id") @db.Uuid
+  toUser   User   @relation("ToUserReports", fields: [toUserId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([fromUserId])
+  @@index([toUserId])
+  @@map("report")
+}
+
+model WorkerEmbedding {
+  id        String                      @id @default(uuid()) @db.Uuid
+  type      WorkerEmbeddingType         @map("type")
+  content   String
+  embedding Unsupported("vector(1536)")
+  createdAt DateTime                    @default(now()) @map("created_at") @db.Timestamptz
+
+  workerId String @map("worker_id") @db.Uuid
+  worker   Worker @relation(fields: [workerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([workerId])
+  @@map("worker_embedding")
+}
+
+model Country {
+  id               String             @id @default(uuid()) @db.Uuid
+  name             String             @unique
+  code             String             @unique
+  createdAt        DateTime           @default(now()) @map("created_at") @db.Timestamptz
+  Region           Region[]
+  NationalIdentity NationalIdentity[]
+
+  @@map("country")
+}
+
+model Region {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @unique
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  countryId String   @map("country_id") @db.Uuid
+  country   Country  @relation(fields: [countryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  Sector    Sector[]
+
+  @@index([countryId])
+  @@map("region")
+}
+
+model Sector {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @unique
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  regionId String @map("region_id") @db.Uuid
+  region   Region @relation(fields: [regionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  Zone     Zone[]
+
+  @@map("sector")
+}
+
+model Zone {
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  sectorId String @map("sector_id") @db.Uuid
+  sector   Sector @relation(fields: [sectorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  workerId String @map("worker_id") @db.Uuid
+  worker   Worker @relation(fields: [workerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([sectorId])
+  @@map("zone")
+}
+
+model Message {
+  id        String        @id @default(uuid()) @db.Uuid
+  status    MessageStatus @map("status")
+  type      MessageType   @map("type")
+  content   String?       @map("content")
+  createdAt DateTime      @default(now()) @map("created_at") @db.Timestamptz
+
+  userId String @map("user_id") @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  chatId String @map("chat_id") @db.Uuid
+  Chat   Chat   @relation(fields: [chatId], references: [id])
+
+  @@index([userId])
+  @@map("message")
+}
+
+model Chat {
+  id                String    @id @default(uuid()) @db.Uuid
+  subject           String?   @map("subject")
+  quotationAccepted String?   @map("quotation_accepted") @db.Uuid
+  acceptedDate      DateTime? @map("accepted_date") @db.Timestamptz
+  workerArchived    DateTime? @map("worker_archived") @db.Timestamptz
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz
+
+  workerId String @map("worker_id") @db.Uuid
+  worker   User   @relation("WorkerChats", fields: [workerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  clientId String @map("client_id") @db.Uuid
+  client   User   @relation("ClientChats", fields: [clientId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  messages  Message[]
+  Quotation Quotation[]
+
+  @@index([workerId])
+  @@index([clientId])
+  @@map("chat")
+}
+
+model Payment {
+  id          String        @id @default(uuid()) @db.Uuid
+  serviceId   String        @map("service_id") @db.Uuid
+  serviceType PaymentType   @map("service_type")
+  status      PaymentStatus @map("status")
+  token       String        @map("token")
+  total       Float         @map("amount")
+  valueFormat String        @map("value_format")
+  createdAt   DateTime      @default(now()) @map("created_at") @db.Timestamptz
+
+  userId String @map("user_id") @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([userId])
+  @@map("payment")
+}
+
 /// Tabla de relación explícita entre User y Role
 model UsersRoles {
   userId String @map("user_id") @db.Uuid
-  roleId BigInt @map("role_id")
+  roleId String @map("role_id") @db.Uuid
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   role Role @relation(fields: [roleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
