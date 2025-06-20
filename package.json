@@ -19,6 +19,7 @@
     "fp-ts": "^2.16.10",
     "lucide-react": "^0.513.0",
     "next": "15.3.3",
+    "next-safe-action": "^8.0.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.58.0",

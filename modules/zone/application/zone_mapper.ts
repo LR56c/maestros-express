@@ -34,7 +34,7 @@ export class ZoneMapper {
   static fromJSON( zone: Record<string, any> ): ZoneDTO | Errors {
     const errors = []
 
-    const id = wrapType<UUID, InvalidUUIDException>(
+    const id = wrapType(
       () => UUID.from( zone.id ) )
 
     if ( id instanceof BaseException ) {
