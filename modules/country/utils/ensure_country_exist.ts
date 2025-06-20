@@ -1,7 +1,7 @@
-import { type Either, isLeft, left } from "fp-ts/Either"
+import { type Either, isLeft, left, right } from "fp-ts/Either"
 import {
   BaseException
-}                                    from "@/modules/shared/domain/exceptions/base_exception"
+}                                           from "@/modules/shared/domain/exceptions/base_exception"
 import { CountryDAO } from "@/modules/country/domain/country_dao"
 import { Country } from "@/modules/country/domain/country"
 import {

@@ -32,7 +32,6 @@ export class AddRegion {
   }
 
   async execute( dto: RegionDTO ): Promise<Either<BaseException[], boolean>> {
-
     const exist = await ensureRegionExist( this.dao, dto.id )
 
     if ( isLeft( exist ) ) {
@@ -41,7 +40,7 @@ export class AddRegion {
       }
     }
 
-    const country = await this.searchCountry.execute( { id: dto.country }, 1 )
+    const country = await this.searchCountry.execute( { id: dto.country.id }, 1 )
 
     if ( isLeft( country ) ) {
       return left( country.left )

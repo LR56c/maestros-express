@@ -4,11 +4,9 @@ import { Either, isLeft, left, right } from "fp-ts/Either"
 import {
   BaseException
 }                                      from "@/modules/shared/domain/exceptions/base_exception"
-import { RegionDTO }                   from "@/modules/region/application/region_dto"
 import {
-  ensureCountryExist
-}                                      from "@/modules/country/utils/ensure_country_exist"
-import { Country }                     from "@/modules/country/domain/country"
+  RegionDTO
+}                                      from "@/modules/region/application/region_dto"
 import {
   ensureRegionExist
 }                                      from "@/modules/region/utils/ensure_region_exist"
@@ -47,8 +45,5 @@ export class UpdateRegion {
     }
 
     return right(true)
-
-
   }
-
 }

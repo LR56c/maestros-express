@@ -23,9 +23,60 @@ import {
 import {
   queryMerger
 }                                   from "@/modules/shared/infrastructure/prisma_query_utils"
+import {
+  UUID
+}                                   from "@/modules/shared/domain/value_objects/uuid"
 
 export class PrismaSectorData implements SectorDAO {
   constructor( private readonly db: PrismaClient ) {
+  }
+
+  async add( sector: Sector ): Promise<Either<BaseException, boolean>> {
+    try {
+      await this.db.sector.create( {
+        data: {
+          id       : sector.id.value,
+          name     : sector.name.value,
+          regionId : sector.region.id.value,
+          createdAt: sector.createdAt.toString()
+        }
+      } )
+      return right( true )
+    }
+    catch ( e ) {
+      return left( new InfrastructureException() )
+    }
+  }
+
+  async remove( id: UUID ): Promise<Either<BaseException, boolean>> {
+    try {
+      await this.db.sector.delete( {
+        where: {
+          id: id.value
+        }
+      } )
+      return right( true )
+    }
+    catch ( e ) {
+      return left( new InfrastructureException() )
+    }
+  }
+
+  async update( sector: Sector ): Promise<Either<BaseException, boolean>> {
+    try {
+      await this.db.sector.update( {
+        where: {
+          id: sector.id.value
+        },
+        data: {
+          name     : sector.name.value,
+        }
+      } )
+      return right( true )
+    }
+    catch ( e ) {
+      return left( new InfrastructureException() )
+    }
   }
 
   async search( query: Record<string, any>, limit?: ValidInteger,
