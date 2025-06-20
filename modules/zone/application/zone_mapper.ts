@@ -62,7 +62,7 @@ export class ZoneMapper {
   }
 
   static toDomain( json: Record<string, any> ): Zone | Errors {
-    const sector = SectorMapper.toDomain( json.region )
+    const sector = SectorMapper.toDomain( json.sector )
 
     if ( sector instanceof Errors ) {
       return sector

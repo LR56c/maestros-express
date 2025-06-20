@@ -1,47 +1,67 @@
-import { PrismaClient }   from "@/lib/generated/prisma"
-import { ZoneDAO }        from "@/modules/zone/domain/zone_dao"
-import {
-  ValidInteger
-}                         from "@/modules/shared/domain/value_objects/valid_integer"
-import {
-  ValidString
-}                              from "@/modules/shared/domain/value_objects/valid_string"
+import { PrismaClient }             from "@/lib/generated/prisma"
+import { ZoneDAO }                  from "@/modules/zone/domain/zone_dao"
 import { type Either, left, right } from "fp-ts/Either"
 import {
   BaseException
-}                              from "@/modules/shared/domain/exceptions/base_exception"
-import { Zone }           from "@/modules/zone/domain/zone"
+}                                   from "@/modules/shared/domain/exceptions/base_exception"
+import { Zone }                     from "@/modules/zone/domain/zone"
 import {
   InfrastructureException
-} from "@/modules/shared/domain/exceptions/infrastructure_exception"
-import * as changeCase from "change-case"
-import { Sector } from "@/modules/sector/domain/sector"
-import { Country } from "@/modules/country/domain/country"
-import { Region } from "@/modules/region/domain/region"
-import { Errors } from "@/modules/shared/domain/exceptions/errors"
+}                                   from "@/modules/shared/domain/exceptions/infrastructure_exception"
+import { Sector }                   from "@/modules/sector/domain/sector"
+import { Country }                  from "@/modules/country/domain/country"
+import { Region }                   from "@/modules/region/domain/region"
+import {
+  Errors
+}                                   from "@/modules/shared/domain/exceptions/errors"
+import {
+  UUID
+}                                   from "@/modules/shared/domain/value_objects/uuid"
 
 export class PrismaZoneData implements ZoneDAO {
   constructor( private readonly db: PrismaClient ) {
   }
 
-  async search( query: Record<string, any>, limit?: ValidInteger, skip?: ValidString,
-    sortBy?: ValidString,
-    sortType?: ValidString ): Promise<Either<BaseException[], Zone[]>> {
-    try{
-      const where = {}
-      const orderBy = {}
-      if ( sortBy ) {
-        const key    = changeCase.camelCase( sortBy.value )
-        // @ts-ignore
-        orderBy[key] = sortType ? sortType.value : "desc"
-      }
+  async addBulk( workerId: UUID,
+    zones: Zone[] ): Promise<Either<BaseException, boolean>> {
+    try {
+      const data = zones.map( z => ( {
+        id       : z.id.value,
+        workerId : workerId.value,
+        sectorId : z.sector.id.value,
+        createdAt: z.createdAt.toString()
+      } ) )
 
-      const offset   = skip ? parseInt( skip.value ) : 0
+      await this.db.zone.createMany( {
+        data: data
+      } )
+      return right( true )
+    }
+    catch ( e ) {
+      return left( new InfrastructureException() )
+    }
+  }
+
+  async removeBulk( ids: UUID[] ): Promise<Either<BaseException, boolean>> {
+    try {
+      await this.db.zone.deleteMany( {
+        where: {
+          id: {
+            in: ids.map( id => id.value )
+          }
+        }
+      } )
+      return right( true )
+    }
+    catch ( e ) {
+      return left( new InfrastructureException() )
+    }
+  }
+
+  async getByWorker( workerId: UUID ): Promise<Either<BaseException[], Zone[]>> {
+    try {
       const response = await this.db.zone.findMany( {
-        where  : where,
-        orderBy: orderBy,
-        skip   : offset,
-        take   : limit?.value,
+        where  : { workerId: workerId.value },
         include: {
           sector: {
             include: {
@@ -65,22 +85,20 @@ export class PrismaZoneData implements ZoneDAO {
           country_db.createdAt )
         const r          = Region.fromPrimitivesThrow( region_db.id.toString(),
           region_db.name, c as Country, region_db.createdAt )
-        const s     = Sector.fromPrimitives( e.id.toString(), sector_db.name,
+        const s          = Sector.fromPrimitives( e.id.toString(),
+          sector_db.name,
           r as Region, sector_db.createdAt )
-        const mapped = Zone.fromPrimitives( e.id.toString(), e.workerId,
-          s as Sector, e.createdAt)
+        const mapped     = Zone.fromPrimitives( e.id.toString(), e.workerId,
+          s as Sector, e.createdAt )
         if ( mapped instanceof Errors ) {
           return left( mapped.values )
         }
         result.push( mapped )
       }
-      return right(result
-      )
+      return right( result )
     }
     catch ( e ) {
-      return left([ new  InfrastructureException()])
+      return left( [new InfrastructureException()] )
     }
   }
-
-
 }
