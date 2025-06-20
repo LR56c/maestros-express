@@ -15,22 +15,30 @@ import {
 import {
   ensureSpecialityExist
 }                                      from "@/modules/speciality/utils/ensure_speciality_exist"
+import {
+  containError
+}                                      from "@/modules/shared/utils/contain_error"
+import {
+  DataNotFoundException
+}                                      from "@/modules/shared/domain/exceptions/data_not_found_exception"
 
 export class AddSpeciality {
-  constructor(private readonly dao : SpecialityDAO) {
+  constructor( private readonly dao: SpecialityDAO ) {
   }
 
 
-  async execute( speciality: SpecialityDTO ): Promise<Either<BaseException[], boolean>>{
-    const existResult = await ensureSpecialityExist(this.dao, speciality.name )
+  async execute( speciality: SpecialityDTO ): Promise<Either<BaseException[], boolean>> {
+    const existResult = await ensureSpecialityExist( this.dao, speciality.name )
 
     if ( isLeft( existResult ) ) {
-      return left( existResult.left )
+      if ( !containError( existResult.left, new DataNotFoundException() ) ) {
+        return left( existResult.left )
+      }
     }
 
     const newSpeciality = Speciality.create(
       speciality.id,
-      speciality.name,
+      speciality.name
     )
 
     if ( newSpeciality instanceof Errors ) {

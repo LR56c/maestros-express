@@ -19,18 +19,72 @@ import {
 }                                   from "@/modules/shared/domain/exceptions/infrastructure_exception"
 import { Country }                  from "@/modules/country/domain/country"
 import { PrismaClient }             from "@/lib/generated/prisma"
+import {
+  UUID
+}                                   from "@/modules/shared/domain/value_objects/uuid"
 
 export class PrismaRegionData implements RegionDAO {
   constructor( private readonly db: PrismaClient ) {
   }
 
-  async search( query: Record<string, any>, limit?: ValidInteger,
-    skip?: ValidString,
-    sortBy?: ValidString,
-    sortType?: ValidString ): Promise<Either<BaseException[], Region[]>> {
+  async add( region: Region ): Promise<Either<BaseException, boolean>> {
+    try {
+      await this.db.region.create( {
+        data: {
+          id       : region.id.value,
+          name     : region.name.value,
+          countryId: region.country.id.value,
+          createdAt: region.createdAt.toString()
+        }
+      } )
+      return right( true )
+    }
+    catch ( e ) {
+      return left( new InfrastructureException() )
+    }
+  }
+
+  async remove( id: UUID ): Promise<Either<BaseException, boolean>> {
+    try {
+      await this.db.region.delete( {
+        where: {
+          id: id.value
+        }
+      } )
+      return right( true )
+    }
+    catch ( e ) {
+      return left( new InfrastructureException() )
+    }
+  }
+
+  async update( region: Region ): Promise<Either<BaseException, boolean>> {
+    try {
+      await this.db.region.update( {
+        where: {
+          id: region.id.value
+        },
+        data : {
+          name: region.name.value
+        }
+      } )
+      return right( true )
+    }
+    catch ( e ) {
+      return left( new InfrastructureException() )
+    }
+  }
+
+  async search( query: Record<string, any>, limit ?: ValidInteger,
+    skip ?: ValidString,
+    sortBy ?: ValidString,
+    sortType ?: ValidString
+  ): Promise<Either<BaseException[], Region[]>> {
     try {
       const where = {}
-      if ( query.id ) {
+      if ( query.id
+      )
+      {
         // @ts-ignore
         where["id"] = {
           equals: query.id
@@ -86,7 +140,11 @@ export class PrismaRegionData implements RegionDAO {
       }
       return right( result )
     }
-    catch ( e ) {
+    catch
+      (
+      e
+      )
+    {
       return left( [new InfrastructureException()] )
     }
 

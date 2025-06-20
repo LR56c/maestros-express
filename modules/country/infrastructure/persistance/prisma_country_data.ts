@@ -1,4 +1,3 @@
-import { PrismaClient }             from "@prisma/client"
 import { type Either, left, right } from "fp-ts/Either"
 import { Country }                  from "@/modules/country/domain/country"
 import {
@@ -21,10 +20,63 @@ import * as changeCase              from "change-case"
 import {
   ValidTSID
 }                                   from "@/modules/shared/domain/value_objects/valid_TSID"
+import { PrismaClient }             from "@/lib/generated/prisma"
+import {
+  UUID
+}                                   from "@/modules/shared/domain/value_objects/uuid"
 
 
 export class PrismaCountryData implements CountryDAO {
   constructor( private readonly db: PrismaClient ) {
+  }
+
+  async add( country: Country ): Promise<Either<BaseException, boolean>> {
+    try {
+      await this.db.country.create( {
+        data: {
+          id       : country.id.toString(),
+          name     : country.name.value,
+          code     : country.code.value,
+          createdAt: country.createdAt.toString()
+        }
+      } )
+      return right( true )
+    }
+    catch ( e ) {
+      return left( new InfrastructureException() )
+    }
+  }
+
+  async remove( id: UUID ): Promise<Either<BaseException, boolean>> {
+    try {
+      await this.db.country.delete( {
+        where: {
+          id: id.toString()
+        }
+      } )
+      return right( true )
+    }
+    catch ( e ) {
+      return left( new InfrastructureException() )
+    }
+  }
+
+  async update( country: Country ): Promise<Either<BaseException, boolean>> {
+    try {
+      await this.db.country.update( {
+        where: {
+          id: country.id.toString()
+        },
+        data : {
+          name: country.name.value,
+          code: country.code.value
+        }
+      } )
+      return right( true )
+    }
+    catch ( e ) {
+      return left( new InfrastructureException() )
+    }
   }
 
   async search( query: Record<string, any>, limit?: ValidInteger,
