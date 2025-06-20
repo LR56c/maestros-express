@@ -1,20 +1,20 @@
-import { RegionMapper } from "@/modules/region/application/region_mapper"
-import { ZoneDTO }      from "@/modules/zone/application/zone_dto"
-import { Zone }         from "@/modules/zone/domain/zone"
-import { Errors }       from "@/modules/shared/domain/exceptions/errors"
-import { wrapType }     from "@/modules/shared/utils/wrap_type"
+import { ZoneDTO }   from "@/modules/zone/application/zone_dto"
+import { Zone }      from "@/modules/zone/domain/zone"
+import { Errors }    from "@/modules/shared/domain/exceptions/errors"
+import { wrapType }  from "@/modules/shared/utils/wrap_type"
 import {
   UUID
-}                       from "@/modules/shared/domain/value_objects/uuid"
+}                    from "@/modules/shared/domain/value_objects/uuid"
 import {
   InvalidUUIDException
-}                       from "@/modules/shared/domain/exceptions/invalid_uuid_exception"
+}                    from "@/modules/shared/domain/exceptions/invalid_uuid_exception"
 import {
   BaseException
-}                       from "@/modules/shared/domain/exceptions/base_exception"
-import { RegionDTO }    from "@/modules/region/application/region_dto"
-import { SectorMapper } from "@/modules/sector/application/sector_mapper"
-import { SectorDTO }    from "@/modules/sector/application/sector_dto"
+}                    from "@/modules/shared/domain/exceptions/base_exception"
+import {
+  SectorMapper
+}                    from "@/modules/sector/application/sector_mapper"
+import { SectorDTO } from "@/modules/sector/application/sector_dto"
 
 export class ZoneMapper {
   static toDTO( zone: Zone ): ZoneDTO {
