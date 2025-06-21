@@ -1,8 +1,8 @@
-import { RegionDAO }            from "@/modules/region/domain/region_dao"
-import { Either, isLeft, left } from "fp-ts/Either"
+import { RegionDAO }                   from "@/modules/region/domain/region_dao"
+import { Either, isLeft, left, right } from "fp-ts/Either"
 import {
   BaseException
-}                               from "@/modules/shared/domain/exceptions/base_exception"
+}                                      from "@/modules/shared/domain/exceptions/base_exception"
 import {
   ValidInteger
 }                               from "@/modules/shared/domain/value_objects/valid_integer"
