@@ -30,6 +30,25 @@ export class PrismaNotificationConfigData implements NotificationConfigDAO {
   constructor( private readonly db: PrismaClient ) {
   }
 
+  async update( notificationConfig: NotificationConfig ): Promise<Either<BaseException, boolean>> {
+    try {
+      await this.db.notificationConfig.update( {
+        where: {
+          id: notificationConfig.id.toString()
+        },
+        data : {
+          deviceToken       : notificationConfig.deviceToken.value,
+          data              : notificationConfig.deviceData,
+          notificationType: notificationConfig.notificationSource.value,
+        }
+      } )
+      return right( true )
+    }
+    catch ( e ) {
+      return left( new InfrastructureException() )
+    }
+  }
+
   async add( notificationConfig: NotificationConfig ): Promise<Either<BaseException, boolean>> {
     try {
       await this.db.notificationConfig.create( {

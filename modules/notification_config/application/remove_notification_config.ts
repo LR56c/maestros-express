@@ -9,21 +9,22 @@ import {
 import {
   ValidInteger
 }                              from "@/modules/shared/domain/value_objects/valid_integer"
+import {
+  ensureNotificationConfigExist
+} from "@/modules/notification_config/utils/ensure_notification_config_exist"
 
 export class RemoveNotificationConfig {
   constructor( private readonly dao: NotificationConfigDAO ) {
   }
 
   async execute( id: string ): Promise<Either<BaseException[], boolean>> {
-    const exist = await this.dao.search( {
-      id: id
-    }, ValidInteger.from( 1 ) )
+    const exist = await ensureNotificationConfigExist(this.dao, id)
 
     if ( isLeft( exist ) ) {
       return left( exist.left )
     }
 
-    const result = await this.dao.remove( exist.right[0]!.id )
+    const result = await this.dao.remove( exist.right.id )
 
     if ( isLeft( result ) ) {
       return left( [result.left] )

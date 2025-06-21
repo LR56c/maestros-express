@@ -21,35 +21,27 @@ import {
 import type {
   NotificationConfigDTO
 }                              from "@/modules/notification_config/application/notification_config_dto"
+import {
+  ensureNotificationConfigExist
+} from "@/modules/notification_config/utils/ensure_notification_config_exist"
+import { containError } from "@/modules/shared/utils/contain_error"
+import {
+  DataNotFoundException
+} from "@/modules/shared/domain/exceptions/data_not_found_exception"
 
 export class AddNotificationConfig {
   constructor( private readonly dao: NotificationConfigDAO ) {
   }
 
-  private async ensureConfigExist( id: string ): Promise<Either<BaseException[], boolean>> {
-    const existResult = await this.dao.search( {
-      id: id
-    }, ValidInteger.from( 1 ) )
-
-    if ( isLeft( existResult ) ) {
-      return left( existResult.left )
-    }
-
-    if ( existResult.right.length > 0 &&
-      existResult.right[0]!.id.toString() === id )
-    {
-      return left( [new DataAlreadyExistException()] )
-    }
-    return right( true )
-  }
-
-
   async execute( dto: NotificationConfigDTO ): Promise<Either<BaseException[], boolean>> {
 
-    const notificationNotExist = await this.ensureConfigExist( dto.id )
+    const exist = await ensureNotificationConfigExist(this.dao, dto.id)
 
-    if ( isLeft( notificationNotExist ) ) {
-      return left( notificationNotExist.left )
+    if ( isLeft( exist ) ) {
+      if ( !containError( exist.left, new DataNotFoundException() ) ) {
+        return left( exist.left )
+      }
+      return left( exist.left )
     }
 
     const notificationConfig = NotificationConfig.create(

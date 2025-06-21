@@ -14,6 +14,8 @@ import { UUID }               from "@/modules/shared/domain/value_objects/uuid"
 export abstract class NotificationConfigDAO {
   abstract add( notificationConfig: NotificationConfig ): Promise<Either<BaseException, boolean>>
 
+  abstract update( notificationConfig: NotificationConfig ): Promise<Either<BaseException, boolean>>
+
   abstract remove( id: UUID ): Promise<Either<BaseException, boolean>>
 
   abstract search( query: Record<string, any>, limit: ValidInteger,
