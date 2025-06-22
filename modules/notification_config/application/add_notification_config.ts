@@ -12,22 +12,18 @@ import {
 import {
   Errors
 }                              from "@/modules/shared/domain/exceptions/errors"
-import {
-  ValidInteger
-}                              from "@/modules/shared/domain/value_objects/valid_integer"
-import {
-  DataAlreadyExistException
-}                              from "@/modules/shared/domain/exceptions/data_already_exist_exception"
 import type {
   NotificationConfigDTO
 }                              from "@/modules/notification_config/application/notification_config_dto"
 import {
   ensureNotificationConfigExist
-} from "@/modules/notification_config/utils/ensure_notification_config_exist"
-import { containError } from "@/modules/shared/utils/contain_error"
+}                              from "@/modules/notification_config/utils/ensure_notification_config_exist"
+import {
+  containError
+}                              from "@/modules/shared/utils/contain_error"
 import {
   DataNotFoundException
-} from "@/modules/shared/domain/exceptions/data_not_found_exception"
+}                              from "@/modules/shared/domain/exceptions/data_not_found_exception"
 
 export class AddNotificationConfig {
   constructor( private readonly dao: NotificationConfigDAO ) {
