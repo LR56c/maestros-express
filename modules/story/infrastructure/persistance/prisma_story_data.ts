@@ -51,6 +51,55 @@ export class PrismaStoryData implements StoryDAO {
     }
   }
 
+  async getById( id: UUID ): Promise<Either<BaseException[], Story>> {
+    try {
+      const response = await this.db.story.findUniqueOrThrow( {
+        where: {
+          id: id.value
+        },
+        include: {
+          StoryDocument: true
+        }
+      } )
+
+      const documents: StoryDocument[] = []
+      for ( const doc of response.StoryDocument ) {
+        const document = StoryDocument.fromPrimitives(
+          doc.id,
+          response.id,
+          doc.url,
+          doc.type,
+          doc.createdAt
+        )
+
+        if ( document instanceof Errors ) {
+          return left( document.values )
+        }
+
+        documents.push( document )
+      }
+
+      const story = Story.fromPrimitives(
+        response.id,
+        response.workerId,
+        response.name,
+        response.description,
+        documents,
+        response.createdAt,
+        response.updatedAt ? response.updatedAt : undefined
+      )
+
+      if ( story instanceof Errors ) {
+        return left( story.values )
+      }
+
+      return right( story )
+    }
+    catch ( e ) {
+      return left( [new InfrastructureException()] )
+    }
+  }
+
   async getByWorker( workerId: UUID ): Promise<Either<BaseException[], Story[]>> {
     try {
       const response = await this.db.story.findMany( {

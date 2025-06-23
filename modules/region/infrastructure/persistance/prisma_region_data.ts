@@ -140,13 +140,8 @@ export class PrismaRegionData implements RegionDAO {
       }
       return right( result )
     }
-    catch
-      (
-      e
-      )
-    {
+    catch ( e ) {
       return left( [new InfrastructureException()] )
     }
-
   }
 }

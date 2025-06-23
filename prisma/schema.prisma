@@ -241,7 +241,7 @@ model Quotation {
   id            String          @id @default(uuid()) @db.Uuid
   title         String          @map("title")
   total         Float           @map("total")
-  estimatedTime DateTime        @map("estimated_time") @db.Timestamptz
+  estimatedTime DateTime?        @map("estimated_time") @db.Timestamptz
   status        QuotationStatus @map("status")
   valueFormat   String          @map("value_format")
   createdAt     DateTime        @default(now()) @map("created_at") @db.Timestamptz
