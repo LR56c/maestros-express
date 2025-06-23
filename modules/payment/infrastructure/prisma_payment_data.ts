@@ -15,8 +15,6 @@ import {
   InfrastructureException
 }                              from "@/modules/shared/domain/exceptions/infrastructure_exception"
 import * as changeCase         from "change-case"
-import { Region }              from "@/modules/region/domain/region"
-import { Country }             from "@/modules/country/domain/country"
 import { Errors }              from "@/modules/shared/domain/exceptions/errors"
 
 export class PrismaPaymentData implements PaymentDAO {

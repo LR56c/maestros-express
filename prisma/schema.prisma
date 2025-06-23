@@ -500,7 +500,7 @@ model Message {
 
 model Chat {
   id                String    @id @default(uuid()) @db.Uuid
-  subject           String?   @map("subject")
+  subject           String   @map("subject")
   quotationAccepted String?   @map("quotation_accepted") @db.Uuid
   acceptedDate      DateTime? @map("accepted_date") @db.Timestamptz
   workerArchived    DateTime? @map("worker_archived") @db.Timestamptz
