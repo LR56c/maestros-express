@@ -17,9 +17,6 @@ import {
   ValidString
 }                                   from "@/modules/shared/domain/value_objects/valid_string"
 import * as changeCase              from "change-case"
-import {
-  ValidTSID
-}                                   from "@/modules/shared/domain/value_objects/valid_TSID"
 import { PrismaClient }             from "@/lib/generated/prisma"
 import {
   UUID
@@ -88,7 +85,7 @@ export class PrismaCountryData implements CountryDAO {
       if ( query.id ) {
         // @ts-ignore
         where["id"] = {
-          equals: ValidTSID.from( query.id ).toString( "bigint" )
+          equals: query.id
         }
       }
       if ( query.name ) {

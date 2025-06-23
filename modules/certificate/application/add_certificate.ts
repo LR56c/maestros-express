@@ -13,6 +13,12 @@ import {
 import {
   Errors
 }                                      from "@/modules/shared/domain/exceptions/errors"
+import {
+  containError
+}                                      from "@/modules/shared/utils/contain_error"
+import {
+  DataNotFoundException
+}                                      from "@/modules/shared/domain/exceptions/data_not_found_exception"
 
 export class AddCertificate {
   constructor(private readonly dao : CertificateDAO) {}
@@ -20,8 +26,10 @@ export class AddCertificate {
   async execute( dto : CertificateDTO ): Promise<Either<BaseException[], boolean>>{
     const exist = await ensureCertificateExist(this.dao, dto.id)
 
-    if ( isLeft(exist) ) {
-      return left(exist.left)
+    if ( isLeft( exist ) ) {
+      if ( !containError( exist.left, new DataNotFoundException() ) ) {
+        return left( exist.left )
+      }
     }
 
     const certificate = Certificate.create(
