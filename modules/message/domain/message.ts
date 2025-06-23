@@ -9,6 +9,7 @@ import {
 }                        from "@/modules/shared/domain/exceptions/base_exception"
 import { MessageType }   from "@/modules/message/domain/message_type"
 import { MessageStatus } from "@/modules/message/domain/message_status"
+import { wrapType }      from "@/modules/shared/utils/wrap_type"
 
 export class Message {
   private constructor(
@@ -117,13 +118,13 @@ export class Message {
     }
 
     return new Message(
-      idVO,
-      chatIdVO,
-      userIdVO,
-      contentVO,
-      typeVO,
-      statusVO,
-      createdAtVO
+      idVO as UUID,
+      chatIdVO as UUID,
+      userIdVO as UUID,
+      contentVO as ValidString,
+      typeVO as ValidString,
+      statusVO as ValidString,
+      createdAtVO as ValidDate
     )
   }
 }

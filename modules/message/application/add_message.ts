@@ -1,8 +1,8 @@
-import { MessageDAO }           from "@/modules/message/domain/message_dao"
-import { Either, isLeft, left } from "fp-ts/Either"
+import { MessageDAO }                  from "@/modules/message/domain/message_dao"
+import { Either, isLeft, left, right } from "fp-ts/Either"
 import {
   BaseException
-}                               from "@/modules/shared/domain/exceptions/base_exception"
+}                                      from "@/modules/shared/domain/exceptions/base_exception"
 import { MessageDTO } from "@/modules/message/application/message_dto"
 import {
   ensureMessageExist
@@ -21,7 +21,7 @@ export class AddMessage {
   async execute(
     chatId: string,
     userId: string,
-    message : MessageDTO ): Promise<Either<BaseException, boolean>>{
+    message : MessageDTO ): Promise<Either<BaseException[], boolean>>{
     const existResult = await ensureMessageExist( this.dao, message.id )
 
     if ( isLeft( existResult ) ) {
@@ -37,7 +37,6 @@ export class AddMessage {
       message.content,
       message.type,
       message.status,
-      message.created_at
     )
 
     if ( newMessage instanceof Errors ) {
@@ -47,7 +46,7 @@ export class AddMessage {
     const result = await this.dao.add( newMessage )
 
     if ( isLeft( result ) ) {
-      return left( result.left )
+      return left( [result.left] )
     }
 
     return right( true )
