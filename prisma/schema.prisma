@@ -59,6 +59,12 @@ enum MessageType {
   QUOTATION @map("quotation")
 }
 
+enum WorkerStatus {
+  INCOMPLETE @map("incomplete")
+  PENDING    @map("pending")
+  VERIFIED   @map("verified")
+}
+
 enum PackageDocumentType {
   IMAGE @map("image")
   VIDEO @map("video")
@@ -241,7 +247,7 @@ model Quotation {
   id            String          @id @default(uuid()) @db.Uuid
   title         String          @map("title")
   total         Float           @map("total")
-  estimatedTime DateTime?        @map("estimated_time") @db.Timestamptz
+  estimatedTime DateTime?       @map("estimated_time") @db.Timestamptz
   status        QuotationStatus @map("status")
   valueFormat   String          @map("value_format")
   createdAt     DateTime        @default(now()) @map("created_at") @db.Timestamptz
@@ -366,13 +372,13 @@ model WorkerTax {
 }
 
 model Worker {
-  id            String   @id @default(uuid()) @db.Uuid
-  birhtDate     DateTime @map("birth_date") @db.Timestamptz
-  description   String?  @map("description")
-  reviewCount   Int      @default(0) @map("review_count")
-  reviewAverage Float    @default(0) @map("review_average")
-  location      String?  @map("location")
-  verified      Boolean  @default(false) @map("verified")
+  id            String       @id @default(uuid()) @db.Uuid
+  birthDate     DateTime     @map("birth_date") @db.Timestamptz
+  description   String?      @map("description")
+  reviewCount   Int          @default(0) @map("review_count")
+  reviewAverage Float        @default(0) @map("review_average")
+  location      String?      @map("location")
+  status        WorkerStatus @map("status")
 
   user User @relation(fields: [id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
@@ -500,7 +506,7 @@ model Message {
 
 model Chat {
   id                String    @id @default(uuid()) @db.Uuid
-  subject           String   @map("subject")
+  subject           String    @map("subject")
   quotationAccepted String?   @map("quotation_accepted") @db.Uuid
   acceptedDate      DateTime? @map("accepted_date") @db.Timestamptz
   workerArchived    DateTime? @map("worker_archived") @db.Timestamptz
