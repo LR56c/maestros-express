@@ -91,7 +91,7 @@ export class StoryMapper {
   static toDomain( json: Record<string, any> ): Story | Errors {
 
     const docs: StoryDocument[] = []
-    for ( const doc of json.docs ) {
+    for ( const doc of json.documents ) {
       const docErrors = StoryDocumentMapper.toDomain( doc )
       if ( docErrors instanceof Errors ) {
         return docErrors
