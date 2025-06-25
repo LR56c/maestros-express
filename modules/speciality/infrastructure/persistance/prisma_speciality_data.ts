@@ -98,7 +98,7 @@ export class PrismaSpecialityData implements SpecialityDAO{
 
   async update( speciality: Speciality ): Promise<Either<BaseException, boolean>> {
     try {
-      await this.db.role.update( {
+      await this.db.speciality.update( {
         where: {
           id: speciality.id.toString()
         },

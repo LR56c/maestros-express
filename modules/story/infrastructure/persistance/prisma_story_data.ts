@@ -47,6 +47,7 @@ export class PrismaStoryData implements StoryDAO {
       return right( true )
     }
     catch ( e ) {
+      console.log( 'prisma story add',e )
       return left( new InfrastructureException() )
     }
   }
@@ -63,21 +64,21 @@ export class PrismaStoryData implements StoryDAO {
       } )
 
       const documents: StoryDocument[] = []
-      for ( const doc of response.StoryDocument ) {
-        const document = StoryDocument.fromPrimitives(
-          doc.id,
-          response.id,
-          doc.url,
-          doc.type,
-          doc.createdAt
-        )
-
-        if ( document instanceof Errors ) {
-          return left( document.values )
-        }
-
-        documents.push( document )
-      }
+      // for ( const doc of response.StoryDocument ) {
+      //   const document = StoryDocument.fromPrimitives(
+      //     doc.id,
+      //     response.id,
+      //     doc.url,
+      //     doc.type,
+      //     doc.createdAt
+      //   )
+      //
+      //   if ( document instanceof Errors ) {
+      //     return left( document.values )
+      //   }
+      //
+      //   documents.push( document )
+      // }
 
       const story = Story.fromPrimitives(
         response.id,
@@ -96,6 +97,8 @@ export class PrismaStoryData implements StoryDAO {
       return right( story )
     }
     catch ( e ) {
+      console.log( 'prisma story get',e )
+
       return left( [new InfrastructureException()] )
     }
   }
@@ -114,21 +117,21 @@ export class PrismaStoryData implements StoryDAO {
       const stories: Story[] = []
       for ( const story of response ) {
         const documents: StoryDocument[] = []
-        for ( const doc of story.StoryDocument ) {
-          const document = StoryDocument.fromPrimitives(
-            doc.id,
-            story.id,
-            doc.url,
-            doc.type,
-            doc.createdAt
-          )
-
-          if ( document instanceof Errors ) {
-            return left( document.values )
-          }
-
-          documents.push( document )
-        }
+        // for ( const doc of story.StoryDocument ) {
+        //   const document = StoryDocument.fromPrimitives(
+        //     doc.id,
+        //     story.id,
+        //     doc.url,
+        //     doc.type,
+        //     doc.createdAt
+        //   )
+        //
+        //   if ( document instanceof Errors ) {
+        //     return left( document.values )
+        //   }
+        //
+        //   documents.push( document )
+        // }
 
         const newStory = Story.fromPrimitives(
           story.id,

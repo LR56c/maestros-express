@@ -27,7 +27,7 @@ export class AddSpeciality {
   }
 
 
-  async execute( speciality: SpecialityDTO ): Promise<Either<BaseException[], boolean>> {
+  async execute( speciality: SpecialityDTO ): Promise<Either<BaseException[], Speciality>> {
     const existResult = await ensureSpecialityExist( this.dao, speciality.name )
 
     if ( isLeft( existResult ) ) {
@@ -51,7 +51,7 @@ export class AddSpeciality {
       return left( [result.left] )
     }
 
-    return right( true )
+    return right( newSpeciality )
   }
 
 }

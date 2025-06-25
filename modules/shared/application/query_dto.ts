@@ -1,5 +1,7 @@
 import { z } from "zod"
 
+
+
 export const querySchema = z
   .object( {
     limit    : z.coerce.number().optional(),
@@ -19,9 +21,3 @@ export const querySchema = z
   ) )
 
 export type QueryDTO = z.infer<typeof querySchema>
-
-// export interface QueryDTO {
-//   query : Record<string, any>
-//   limit : number
-//   skip ?: string
-// }

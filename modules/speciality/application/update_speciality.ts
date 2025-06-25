@@ -22,14 +22,14 @@ export class UpdateSpeciality {
 
 
   async execute( speciality: SpecialityDTO ): Promise<Either<BaseException[], Speciality>>{
-    const existResult = await ensureSpecialityExist(this.dao, speciality.name )
+    const existResult = await ensureSpecialityExist(this.dao, speciality.id )
 
     if ( isLeft(existResult) ) {
       return left( existResult.left )
     }
 
     const newSpeciality = Speciality.fromPrimitives(
-      speciality.id,
+      existResult.right.id.toString(),
       speciality.name,
       existResult.right.createdAt.toString()
     )
