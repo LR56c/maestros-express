@@ -10,6 +10,9 @@ import {
   InfrastructureException
 }                              from "@/modules/shared/domain/exceptions/infrastructure_exception"
 import { Errors }              from "@/modules/shared/domain/exceptions/errors"
+import {
+  DataNotFoundException
+} from "@/modules/shared/domain/exceptions/data_not_found_exception"
 
 export class PrismaReviewData implements ReviewDAO {
 
@@ -38,11 +41,15 @@ export class PrismaReviewData implements ReviewDAO {
 
   async getById( id: UUID ): Promise<Either<BaseException[], Review>> {
     try {
-      const response = await this.db.review.findUniqueOrThrow( {
+      const response = await this.db.review.findUnique( {
         where: {
           id: id.toString()
         }
       } )
+
+      if ( !response ) {
+        return left( [new DataNotFoundException()] )
+      }
 
       const mapped = Review.fromPrimitives(
         response.id,
@@ -61,6 +68,7 @@ export class PrismaReviewData implements ReviewDAO {
       return right( mapped )
     }
     catch ( e ) {
+      console.log("Error fetching review by ID:", e)
       return left( [new InfrastructureException()] )
     }
   }

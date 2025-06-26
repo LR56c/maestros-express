@@ -75,13 +75,13 @@ import {
 }                                    from "@/modules/worker_booking/application/worker_booking_dto"
 import {
   WorkerScheduleDTO
-}                                    from "@/modules/worker_schedule/application/worker_schedule_dto"
+} from "@/modules/worker_schedule/application/worker_schedule_dto"
 import {
-  PackageDTO
-}                                    from "@/modules/package/application/package_dto"
+  PackageResponse
+} from "@/modules/package/application/package_response"
 import {
   ReviewDTO
-}                                    from "@/modules/review/application/review_dto"
+} from "@/modules/review/application/review_dto"
 import {
   ValidDate
 }                                    from "@/modules/shared/domain/value_objects/valid_date"

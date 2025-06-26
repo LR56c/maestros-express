@@ -7,17 +7,32 @@ import { ReviewDTO } from "@/modules/review/application/review_dto"
 import { ensureReviewExist } from "@/modules/review/utils/ensure_review_exist"
 import { Review }               from "@/modules/review/domain/review"
 import { Errors }               from "@/modules/shared/domain/exceptions/errors"
+import {
+  containError
+}                                      from "@/modules/shared/utils/contain_error"
+import {
+  DataNotFoundException
+}                                      from "@/modules/shared/domain/exceptions/data_not_found_exception"
+import {
+  InfrastructureException
+}                                      from "@/modules/shared/domain/exceptions/infrastructure_exception"
 
 export class AddReview {
   constructor(private readonly dao: ReviewDAO) {
   }
 
-  async execute( dto : ReviewDTO ): Promise<Either<BaseException[], boolean>>{
+  async execute( dto : ReviewDTO ): Promise<Either<BaseException[], Review>>{
+
+    if(dto.user_id === dto.service_id){
+      return left([new InfrastructureException("User cannot review their own service")])
+    }
 
     const exist = await ensureReviewExist(this.dao, dto.id)
 
     if ( isLeft( exist ) ) {
-      return left( exist.left )
+      if ( !containError( exist.left, new DataNotFoundException() ) ) {
+        return left( exist.left )
+      }
     }
 
     const review = Review.create(
@@ -39,6 +54,6 @@ export class AddReview {
       return left( [result.left] )
     }
 
-    return right(true)
+    return right(review)
   }
 }

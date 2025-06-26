@@ -1,10 +1,10 @@
-import { Package }  from "@/modules/package/domain/package"
+import { Package } from "@/modules/package/domain/package"
 import {
-  PackageDTO
-}                   from "@/modules/package/application/package_dto"
+  PackageResponse
+}                  from "@/modules/package/application/package_response"
 import {
   Errors
-}                   from "@/modules/shared/domain/exceptions/errors"
+}                  from "@/modules/shared/domain/exceptions/errors"
 import { wrapType } from "@/modules/shared/utils/wrap_type"
 import {
   UUID
@@ -32,7 +32,7 @@ import {
 }                   from "@/modules/package/modules/package_document/domain/package_document"
 
 export class PackageMapper {
-  static toDTO( entity: Package ): PackageDTO {
+  static toDTO( entity: Package ): PackageResponse {
     return {
       id            : entity.id.toString(),
       name          : entity.name.value,
@@ -48,7 +48,7 @@ export class PackageMapper {
     }
   }
 
-  static toJSON( dto: PackageDTO ): Record<string, any> {
+  static toJSON( dto: PackageResponse ): Record<string, any> {
     return {
       id            : dto.id,
       name          : dto.name,
@@ -64,7 +64,7 @@ export class PackageMapper {
     }
   }
 
-  static fromJSON( json: Record<string, any> ): PackageDTO | Errors {
+  static fromJSON( json: Record<string, any> ): PackageResponse | Errors {
     const errors = []
 
     const id = wrapType(

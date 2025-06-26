@@ -18,17 +18,17 @@ import { Package } from "@/modules/package/domain/package"
 export const ensurePackageExist = async ( dao: PackageDAO,
   countryId: string ): Promise<Either<BaseException[], Package>> => {
 
-  const package = await dao.search({
+  const packageFound = await dao.search({
     id: countryId
   }, ValidInteger.from(1))
 
-  if ( isLeft(package) ) {
-    return left(package.left)
+  if ( isLeft(packageFound) ) {
+    return left(packageFound.left)
   }
 
-  if ( package.right.length > 0 && package.right[0]!.id.value !== countryId ) {
+  if ( packageFound.right.length > 0 && packageFound.right[0]!.id.value !== countryId ) {
     return left( [new DataNotFoundException()] )
   }
 
-  return right(package.right[0])
+  return right(packageFound.right[0])
 }

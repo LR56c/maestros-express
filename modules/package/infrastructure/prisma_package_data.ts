@@ -114,20 +114,19 @@ export class PrismaPackageData implements PackageDAO {
       const packages: Package[] = []
       for ( const pkg of response ) {
         const documents: PackageDocument[] = []
-        // for ( const doc of pkg.PackageDocument ) {
-        //   const doc = PackageDocument.fromPrimitives(
-        //     doc.id.toString(),
-        //     doc.packageId.toString(),
-        //     doc.name,
-        //     doc.description,
-        //     doc.url,
-        //     doc.createdAt
-        //   )
-        //   if ( doc instanceof Errors ) {
-        //     return left( doc.values )
-        //   }
-        //   documents.push( doc )
-        // }
+        for ( const doc of pkg.PackageDocument ) {
+          const docMapped = PackageDocument.fromPrimitives(
+            doc.id.toString(),
+            doc.packageId.toString(),
+            doc.url,
+            doc.type,
+            doc.createdAt
+          )
+          if ( docMapped instanceof Errors ) {
+            return left( docMapped.values )
+          }
+          documents.push( docMapped )
+        }
 
         const mapped = Package.fromPrimitives(
           pkg.id.toString(),

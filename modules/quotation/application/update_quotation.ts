@@ -31,13 +31,13 @@ export class UpdateQuotation {
     oldDetails: QuotationDetail[],
     newDetails: QuotationDetailDTO[]
   ): Promise<Either<BaseException[], QuotationDetail[]>> {
-    const details: QuotationDetail[] = [...oldDetails]
+    const details = new Map<string, QuotationDetail>(oldDetails.map(
+      detail => [detail.id.toString(), detail]
+    ))
 
     for ( const e of newDetails ) {
-      const existingDocIndex = details.findIndex(
-        doc => doc.id.toString() === e.id
-      )
-      if ( existingDocIndex === -1 ) {
+      const existingDocIndex = details.get(e.id.toString() )
+      if ( !existingDocIndex ) {
 
         const detail = QuotationDetail.create(
           e.id,
@@ -51,11 +51,11 @@ export class UpdateQuotation {
         if ( detail instanceof Errors ) {
           return left( detail.values )
         }
-        details.push( detail )
+        details.set( e.id.toString(), detail )
       }
     }
 
-    return right( details )
+    return right( Array.from(details.values()) )
   }
 
   async execute(
@@ -71,7 +71,7 @@ export class UpdateQuotation {
 
     let details: QuotationDetail[] = []
     let total: number | undefined  = undefined
-    if ( quotation.details ) {
+    if ( quotation.details && quotation.details.length > 0 ) {
 
       const detailsResult = await this.combineDetails(
         oldQuotation.id.toString(),

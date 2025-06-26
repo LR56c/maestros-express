@@ -3,7 +3,7 @@ import {
   packageDocumentSchema
 } from "@/modules/package/modules/package_document/application/package_document_dto"
 
-export const packageSchema = z.object( {
+export const packageResponseSchema = z.object( {
   id           : z.string(),
   name         : z.string(),
   description  : z.string(),
@@ -17,5 +17,5 @@ export const packageSchema = z.object( {
   created_at    : z.date()
 } )
 
-export type PackageDTO = z.infer<typeof packageSchema>
+export type PackageResponse = z.infer<typeof packageResponseSchema>
 

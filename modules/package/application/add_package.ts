@@ -3,25 +3,33 @@ import { Either, isLeft, left, right } from "fp-ts/Either"
 import {
   BaseException
 }                                      from "@/modules/shared/domain/exceptions/base_exception"
-import { PackageDTO }  from "@/modules/package/application/package_dto"
 import {
   ensurePackageExist
-} from "@/modules/package/utils/ensure_package_exist"
-import { containError }   from "@/modules/shared/utils/contain_error"
+}                                      from "@/modules/package/utils/ensure_package_exist"
+import {
+  containError
+}                                      from "@/modules/shared/utils/contain_error"
 import {
   DataNotFoundException
-} from "@/modules/shared/domain/exceptions/data_not_found_exception"
-import { PackageDAO }           from "@/modules/package/domain/package_dao"
+}                                      from "@/modules/shared/domain/exceptions/data_not_found_exception"
+import {
+  PackageDAO
+}                                      from "@/modules/package/domain/package_dao"
 import {
   PackageDocument
-}                               from "@/modules/package/modules/package_document/domain/package_document"
-import { Errors } from "@/modules/shared/domain/exceptions/errors"
+}                                      from "@/modules/package/modules/package_document/domain/package_document"
+import {
+  Errors
+}                                      from "@/modules/shared/domain/exceptions/errors"
+import {
+  PackageRequest
+}                                      from "@/modules/package/application/package_request"
 
 export class AddPackage {
 
   constructor(private readonly dao : PackageDAO) {
   }
-  async execute( workerId: string,dto: PackageDTO ): Promise<Either<BaseException, boolean>>{
+  async execute( dto: PackageRequest ): Promise<Either<BaseException[], Package>>{
     const exist = await ensurePackageExist(this.dao, dto.id)
 
     if ( isLeft( exist ) ) {
@@ -49,7 +57,7 @@ export class AddPackage {
 
     const newPackage = Package.create(
       dto.id,
-      workerId,
+      dto.worker_id,
       dto.name,
       dto.description,
       dto.specification,
@@ -69,7 +77,7 @@ export class AddPackage {
       return left( [result.left] )
     }
 
-    return right( true )
+    return right( newPackage )
   }
 
 }
