@@ -29,14 +29,14 @@ export class UpdateStory {
     oldDocuments: StoryDocument[],
     newDocuments: StoryDocumentDTO[]
   ): Promise<Either<BaseException[], StoryDocument[]>> {
-    const combinedDocuments = [...oldDocuments]
+    const combinedDocuments = new Map<string, StoryDocument>(
+      oldDocuments.map( doc => [doc.id.toString(), doc] )
+    )
 
     for ( const newDoc of newDocuments ) {
-      const existingDocIndex = combinedDocuments.findIndex(
-        doc => doc.id.toString() === newDoc.id
-      )
+      const existingDocIndex = combinedDocuments.get(newDoc.id.toString() )
 
-      if ( existingDocIndex === -1 ) {
+      if ( !existingDocIndex  ) {
         const newStoryDocument = StoryDocument.create(
           newDoc.id,
           storyId,
@@ -48,14 +48,14 @@ export class UpdateStory {
           return left( newStoryDocument.values )
         }
 
-        combinedDocuments.push( newStoryDocument )
+        combinedDocuments.set( newDoc.id.toString(), newStoryDocument )
       }
     }
 
-    return right( combinedDocuments )
+    return right( Array.from(combinedDocuments.values()) )
   }
 
-  async execute( dto: StoryDTO ): Promise<Either<BaseException[], boolean>> {
+  async execute( dto: StoryDTO ): Promise<Either<BaseException[], Story>> {
     const exist = await ensureStoryExist( this.dao, dto.id )
 
     if ( isLeft( exist ) ) {
@@ -74,7 +74,7 @@ export class UpdateStory {
       return left( docs.left )
     }
 
-    const newStory = Story.fromPrimitives(
+    const updatedStory = Story.fromPrimitives(
       oldStory.id.toString(),
       oldStory.workerId.toString(),
       dto.name,
@@ -84,16 +84,16 @@ export class UpdateStory {
       oldStory.updatedAt?.value
     )
 
-    if ( newStory instanceof Errors ) {
-      return left( newStory.values )
+    if ( updatedStory instanceof Errors ) {
+      return left( updatedStory.values )
     }
 
-    const result = await this.dao.update( oldStory.workerId, newStory )
+    const result = await this.dao.update( oldStory.workerId, updatedStory )
 
     if ( isLeft( result ) ) {
       return left( [result.left] )
     }
 
-    return right( true )
+    return right( updatedStory )
   }
 }

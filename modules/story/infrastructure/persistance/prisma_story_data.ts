@@ -13,6 +13,9 @@ import { Errors }              from "@/modules/shared/domain/exceptions/errors"
 import {
   StoryDocument
 }                              from "@/modules/story/modules/story_document/domain/story_document"
+import {
+  DataNotFoundException
+} from "@/modules/shared/domain/exceptions/data_not_found_exception"
 
 export class PrismaStoryData implements StoryDAO {
   constructor( private readonly db: PrismaClient ) {
@@ -53,7 +56,7 @@ export class PrismaStoryData implements StoryDAO {
 
   async getById( id: UUID ): Promise<Either<BaseException[], Story>> {
     try {
-      const response = await this.db.story.findUniqueOrThrow( {
+      const response = await this.db.story.findUnique( {
         where: {
           id: id.value
         },
@@ -62,22 +65,26 @@ export class PrismaStoryData implements StoryDAO {
         }
       } )
 
+      if ( !response ) {
+        return left( [new DataNotFoundException()] )
+      }
+
       const documents: StoryDocument[] = []
-      // for ( const doc of response.StoryDocument ) {
-      //   const document = StoryDocument.fromPrimitives(
-      //     doc.id,
-      //     response.id,
-      //     doc.url,
-      //     doc.type,
-      //     doc.createdAt
-      //   )
-      //
-      //   if ( document instanceof Errors ) {
-      //     return left( document.values )
-      //   }
-      //
-      //   documents.push( document )
-      // }
+      for ( const doc of response.StoryDocument ) {
+        const document = StoryDocument.fromPrimitives(
+          doc.id,
+          response.id,
+          doc.url,
+          doc.type,
+          doc.createdAt
+        )
+
+        if ( document instanceof Errors ) {
+          return left( document.values )
+        }
+
+        documents.push( document )
+      }
 
       const story = Story.fromPrimitives(
         response.id,
@@ -114,21 +121,21 @@ export class PrismaStoryData implements StoryDAO {
       const stories: Story[] = []
       for ( const story of response ) {
         const documents: StoryDocument[] = []
-        // for ( const doc of story.StoryDocument ) {
-        //   const document = StoryDocument.fromPrimitives(
-        //     doc.id,
-        //     story.id,
-        //     doc.url,
-        //     doc.type,
-        //     doc.createdAt
-        //   )
-        //
-        //   if ( document instanceof Errors ) {
-        //     return left( document.values )
-        //   }
-        //
-        //   documents.push( document )
-        // }
+        for ( const doc of story.StoryDocument ) {
+          const document = StoryDocument.fromPrimitives(
+            doc.id,
+            story.id,
+            doc.url,
+            doc.type,
+            doc.createdAt
+          )
+
+          if ( document instanceof Errors ) {
+            return left( document.values )
+          }
+
+          documents.push( document )
+        }
 
         const newStory = Story.fromPrimitives(
           story.id,

@@ -68,7 +68,6 @@ export class PrismaReviewData implements ReviewDAO {
       return right( mapped )
     }
     catch ( e ) {
-      console.log("Error fetching review by ID:", e)
       return left( [new InfrastructureException()] )
     }
   }

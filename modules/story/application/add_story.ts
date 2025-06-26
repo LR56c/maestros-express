@@ -1,38 +1,38 @@
-import { StoryDAO } from "@/modules/story/domain/story_dao"
+import { StoryDAO }                    from "@/modules/story/domain/story_dao"
 import { Either, isLeft, left, right } from "fp-ts/Either"
 import {
   BaseException
-} from "@/modules/shared/domain/exceptions/base_exception"
+}                                      from "@/modules/shared/domain/exceptions/base_exception"
 import {
   StoryDTO
-} from "@/modules/story/application/story_dto"
+}                                      from "@/modules/story/application/story_dto"
 import {
   ensureStoryExist
-} from "@/modules/story/utils/ensure_story_exist"
-import { Story } from "@/modules/story/domain/story"
+}                                      from "@/modules/story/utils/ensure_story_exist"
+import { Story }                       from "@/modules/story/domain/story"
 import {
   StoryDocument
-} from "@/modules/story/modules/story_document/domain/story_document"
+}                                      from "@/modules/story/modules/story_document/domain/story_document"
 import {
   Errors
-} from "@/modules/shared/domain/exceptions/errors"
+}                                      from "@/modules/shared/domain/exceptions/errors"
 import {
   UUID
-} from "@/modules/shared/domain/value_objects/uuid"
-import { wrapType } from "@/modules/shared/utils/wrap_type"
+}                                      from "@/modules/shared/domain/value_objects/uuid"
+import { wrapType }                    from "@/modules/shared/utils/wrap_type"
 import {
   containError
-} from "@/modules/shared/utils/contain_error"
+}                                      from "@/modules/shared/utils/contain_error"
 import {
   DataNotFoundException
-} from "@/modules/shared/domain/exceptions/data_not_found_exception"
+}                                      from "@/modules/shared/domain/exceptions/data_not_found_exception"
 
 export class AddStory {
   constructor( private readonly dao: StoryDAO ) {
   }
 
   async execute( workerId: string,
-    dto: StoryDTO ): Promise<Either<BaseException[], boolean>> {
+    dto: StoryDTO ): Promise<Either<BaseException[], Story>> {
     const vWorkerId = wrapType( () => UUID.from( workerId ) )
 
     if ( vWorkerId instanceof BaseException ) {
@@ -42,12 +42,9 @@ export class AddStory {
     const exist = await ensureStoryExist( this.dao, dto.id )
 
     if ( isLeft( exist ) ) {
-
-      const r = containError( exist.left, new DataNotFoundException() )
-      // if ( !containError( exist.left, new DataNotFoundException() ) ) {
-      //   return left( exist.left )
-      // }
-      return left( exist.left )
+      if ( !containError( exist.left, new DataNotFoundException() ) ) {
+        return left( exist.left )
+      }
     }
 
     const storyDocuments: StoryDocument[] = []
@@ -85,6 +82,6 @@ export class AddStory {
       return left( [result.left] )
     }
 
-    return right( true )
+    return right( story )
   }
 }

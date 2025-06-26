@@ -58,7 +58,6 @@ export async function POST( request: NextRequest ) {
   }
 
   const result = await add.execute( data.right )
-  console.log("result", result)
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
