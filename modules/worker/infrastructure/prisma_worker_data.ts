@@ -1,23 +1,115 @@
-import { PrismaClient }        from "@/lib/generated/prisma"
-import { WorkerDAO }           from "@/modules/worker/domain/worker_dao"
-import { Either, left, right } from "fp-ts/Either"
+import { PrismaClient }                from "@/lib/generated/prisma"
+import { WorkerDAO }                   from "@/modules/worker/domain/worker_dao"
+import { Either, isLeft, left, right } from "fp-ts/Either"
 import {
   BaseException
-}                              from "@/modules/shared/domain/exceptions/base_exception"
+}                                      from "@/modules/shared/domain/exceptions/base_exception"
 import {
   ValidString
-}                              from "@/modules/shared/domain/value_objects/valid_string"
+}                                      from "@/modules/shared/domain/value_objects/valid_string"
 import {
   ValidInteger
-}                              from "@/modules/shared/domain/value_objects/valid_integer"
-import * as changeCase         from "change-case"
+}                                      from "@/modules/shared/domain/value_objects/valid_integer"
+import * as changeCase                 from "change-case"
 import {
   InfrastructureException
-}                              from "@/modules/shared/domain/exceptions/infrastructure_exception"
-import { Worker }              from "@/modules/worker/domain/worker"
+}                                      from "@/modules/shared/domain/exceptions/infrastructure_exception"
+import { Worker }                      from "@/modules/worker/domain/worker"
+import {
+  Errors
+}                                      from "@/modules/shared/domain/exceptions/errors"
+import { User }                        from "@/modules/user/domain/user"
+import { Country }                     from "@/modules/country/domain/country"
+import {
+  NationalIdentity
+}                                      from "@/modules/national_identity/domain/national_identity"
+import {
+  Speciality
+}                                      from "@/modules/speciality/domain/speciality"
+import {
+  WorkerTax
+}                                      from "@/modules/worker_tax/domain/worker_tax"
+
+type WorkerRelations = {
+  user: User,
+  nationalIdentity: NationalIdentity,
+  specialities: Speciality[],
+  taxes: WorkerTax[],
+  // workZones: Zone[],
+  // certificates: Certificate[],
+  // stories: Story[],
+  // bookings: WorkerBooking[],
+  // schedule: WorkerSchedule[],
+  // packages: Package[],
+  // reviews: Review[],
+}
 
 export class PrismaWorkerData implements WorkerDAO {
   constructor( private readonly db: PrismaClient ) {
+  }
+
+  private async mapWorkerRelations( w: any ): Promise<Either<BaseException[], WorkerRelations>> {
+    // const certificates: Certificate[] = []
+    // for ( const certificate of w.Certificate ) {
+    //   const cert = Certificate.fromPrimitives(
+    //     certificate.id.toString(),
+    //     certificate.workerId.toString(),
+    //     certificate.name,
+    //     certificate.url,
+    //     certificate.type,
+    //     certificate.createdAt
+    //   )
+    //   if ( cert instanceof Errors ) {
+    //     return left( cert.values )
+    //   }
+    //   certificates.push( cert )
+    // }
+    const userMapped = User.fromPrimitive(
+      w.user.id.toString(),
+      w.user.email,
+      w.user.name,
+      w.user.surname,
+      [],
+      w.user.createdAt,
+      w.user.avatar
+    )
+    if ( userMapped instanceof Errors ) {
+      return left( userMapped.values )
+    }
+    const nationalIdentityDatabase = w.nationalIdentity
+    const countryDatabase          = nationalIdentityDatabase.country
+    const country                  = Country.fromPrimitives(
+      countryDatabase.id.toString(),
+      countryDatabase.name,
+      countryDatabase.code,
+      countryDatabase.createdAt
+    )
+    if ( country instanceof Errors ) {
+      return left( country.values )
+    }
+    const nationalIdentity = NationalIdentity.fromPrimitives(
+      nationalIdentityDatabase.id.toString(),
+      nationalIdentityDatabase.identifier,
+      nationalIdentityDatabase.type,
+      country as Country,
+      nationalIdentityDatabase.createdAt
+    )
+    if ( nationalIdentity instanceof Errors ) {
+      return left( nationalIdentity.values )
+    }
+    return right( {
+      user            : userMapped,
+      nationalIdentity: nationalIdentity,
+      specialities    : [],
+      taxes           : [],
+      // certificates    : certificates,
+      // workZones       : [],
+      // bookings        : [],
+      // packages        : [],
+      // reviews         : [],
+      // schedule        : [],
+      // stories         : [],
+    } )
   }
 
   async add( worker: Worker ): Promise<Either<BaseException, boolean>> {
@@ -36,7 +128,7 @@ export class PrismaWorkerData implements WorkerDAO {
           data: {
             id                : worker.user.userId.toString(),
             birthDate         : worker.birthDate.toString(),
-            description       : worker.description.value,
+            description       : worker.description?.value,
             reviewCount       : worker.reviewCount.value,
             reviewAverage     : worker.reviewAverage.value,
             status            : worker.status.value,
@@ -48,7 +140,6 @@ export class PrismaWorkerData implements WorkerDAO {
       return right( true )
     }
     catch ( e ) {
-      console.log( "Error adding worker:", e )
       return left( new InfrastructureException() )
     }
   }
@@ -71,35 +162,59 @@ export class PrismaWorkerData implements WorkerDAO {
         // @ts-ignore
         orderBy[key] = sortType ? sortType.value : "desc"
       }
-      const offset   = skip ? parseInt( skip.value ) : 0
-      const response = await this.db.worker.findMany( {
+      const offset            = skip ? parseInt( skip.value ) : 0
+      const response          = await this.db.worker.findMany( {
         where  : where,
         orderBy: orderBy,
         skip   : offset,
-        take   : limit?.value
-        // include: {
-        //   Zone            : true,
-        //   WorkerEmbedding : true,
-        //   WorkerSpeciality: true,
-        //   WorkerBooking   : true,
-        //   WorkerSchedule  : true,
-        //   WorkerTax       : true,
-        //   Story           : true,
-        //   Package         : true,
-        //   Certificate     : true
-        // }
+        take   : limit?.value,
+        include: {
+          user            : {
+            include: {
+              usersRoles: {
+                include: {
+                  role: true
+                }
+              }
+            }
+          },
+          nationalIdentity: {
+            include: {
+              country: true
+            }
+          },
+          WorkerSpeciality: true,
+          WorkerTax       : true,
+        }
       } )
-      console.log( "Worker search response:", response )
       const workers: Worker[] = []
-      // for ( const w of response ) {
-      //
-      //   const mapped = Worker.fromPrimitives(
-      //   )
-      //   if ( mapped instanceof Errors ) {
-      //     return left( mapped.values )
-      //   }
-      //   workers.push( mapped )
-      // }
+      for ( const w of response ) {
+        console.log( "Mapping worker:", w )
+        const relationMapped = await this.mapWorkerRelations( w )
+
+        if ( isLeft( relationMapped ) ) {
+          return left( relationMapped.left )
+        }
+
+        const mapped = Worker.fromPrimitives(
+          relationMapped.right.user,
+          relationMapped.right.nationalIdentity,
+          w.birthDate,
+          w.reviewCount,
+          w.reviewAverage,
+          w.location,
+          w.status,
+          relationMapped.right.specialities,
+          relationMapped.right.taxes,
+          w.createdAt,
+          w.verifiedAt ? w.verifiedAt : undefined,
+          w.description ? w.description : undefined
+        )
+        if ( mapped instanceof Errors ) {
+          return left( mapped.values )
+        }
+        workers.push( mapped )
+      }
       return right( workers )
     }
     catch ( e ) {
@@ -115,7 +230,7 @@ export class PrismaWorkerData implements WorkerDAO {
           id: worker.user.userId.toString()
         },
         data : {
-          description  : worker.description.value,
+          description  : worker.description?.value,
           reviewCount  : worker.reviewCount.value,
           reviewAverage: worker.reviewAverage.value,
           status       : worker.status.value,

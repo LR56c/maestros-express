@@ -8,11 +8,12 @@ import {
 
 export const workerUpdateSchema = z.object( {
   user          : userResponseSchema,
-  description   : z.string(),
-  review_count  : z.number(),
-  review_average: z.number(),
-  status        : z.string(),
-  location      : z.string()
+  description   : z.string().optional(),
+  review_count  : z.number().optional(),
+  review_average: z.number().optional(),
+  status        : z.string().optional(),
+  location      : z.string().optional(),
+  verified      : z.boolean().optional()
 } )
 
 export type WorkerUpdateDTO = z.infer<typeof workerUpdateSchema>

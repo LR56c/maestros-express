@@ -266,7 +266,7 @@ model Worker {
   description        String?            @map("description")
   reviewCount        Int                @default(0) @map("review_count")
   reviewAverage      Float              @default(0) @map("review_average")
-  location           String?            @map("location")
+  location           String            @map("location")
   status             WorkerStatus       @map("status")
   nationalIdentityId String             @map("national_identity") @db.Uuid
   user               User               @relation(fields: [id], references: [id], onDelete: Cascade)
@@ -281,6 +281,8 @@ model Worker {
   WorkerSpeciality   WorkerSpeciality[]
   WorkerTax          WorkerTax[]
   Zone               Zone[]
+  createdAt          DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+  verifiedAt         DateTime?          @map("verified_at") @db.Timestamptz(6)
 }
 
 model Report {

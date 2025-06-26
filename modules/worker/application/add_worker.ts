@@ -14,6 +14,10 @@ import {
 }                               from "@/modules/country/application/search_country"
 import { Errors }               from "@/modules/shared/domain/exceptions/errors"
 import { WorkerRequest } from "@/modules/worker/application/worker_request"
+import { containError } from "@/modules/shared/utils/contain_error"
+import {
+  DataNotFoundException
+} from "@/modules/shared/domain/exceptions/data_not_found_exception"
 
 export class AddWorker {
   constructor(
@@ -26,14 +30,15 @@ export class AddWorker {
   async execute( worker: WorkerRequest ): Promise<Either<BaseException[], Worker>>{
     const exist = await ensureWorkerExist(this.dao, worker.user.user_id)
 
-    if ( isLeft(exist) ) {
-      return left(exist.left)
+    if ( isLeft( exist ) ) {
+      if ( !containError( exist.left, new DataNotFoundException() ) ) {
+        return left( exist.left )
+      }
     }
 
     const userSearchResult = await this.searchUser.execute({
       id: worker.user.user_id
     },1)
-    console.log("userSearchResult", userSearchResult)
 
     if ( isLeft(userSearchResult) ) {
       return left(userSearchResult.left)
@@ -64,9 +69,9 @@ export class AddWorker {
       user,
       nationalIdentity,
       worker.birth_date,
-      worker.description,
       worker.location,
       worker.status,
+      worker.description,
     )
 
     if ( newWorker instanceof Errors ) {

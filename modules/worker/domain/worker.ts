@@ -1,57 +1,52 @@
-import { ValidDate }    from "@/modules/shared/domain/value_objects/valid_date"
-import { User }         from "@/modules/user/domain/user"
+import { ValidDate }                 from "@/modules/shared/domain/value_objects/valid_date"
+import { User }                      from "@/modules/user/domain/user"
 import {
   NationalIdentity
-}                       from "@/modules/national_identity/domain/national_identity"
+}                                    from "@/modules/national_identity/domain/national_identity"
 import {
   ValidString
-}                       from "@/modules/shared/domain/value_objects/valid_string"
+}                                    from "@/modules/shared/domain/value_objects/valid_string"
 import {
   ValidDecimal
-}                       from "@/modules/shared/domain/value_objects/valid_decimal"
+}                                    from "@/modules/shared/domain/value_objects/valid_decimal"
 import {
-  ValidBool
-}                       from "@/modules/shared/domain/value_objects/valid_bool"
-import { Speciality }   from "@/modules/speciality/domain/speciality"
-import { Certificate }  from "@/modules/certificate/domain/certificate"
-import { Zone }         from "@/modules/zone/domain/zone"
-import { WorkerTax }    from "@/modules/worker_tax/domain/worker_tax"
-import { Story }        from "@/modules/story/domain/story"
+  Speciality
+}                                    from "@/modules/speciality/domain/speciality"
 import {
-  WorkerBooking
-}                       from "@/modules/worker_booking/domain/worker_booking"
+  WorkerTax
+}                                    from "@/modules/worker_tax/domain/worker_tax"
 import {
-  WorkerSchedule
-}                       from "@/modules/worker_schedule/domain/worker_schedule"
-import { Package }      from "@/modules/package/domain/package"
-import { Review }       from "@/modules/review/domain/review"
-import { Errors }       from "@/modules/shared/domain/exceptions/errors"
-import { wrapType }     from "@/modules/shared/utils/wrap_type"
+  Errors
+}                                    from "@/modules/shared/domain/exceptions/errors"
+import { wrapType, wrapTypeDefault } from "@/modules/shared/utils/wrap_type"
 import {
   BaseException
-}                       from "@/modules/shared/domain/exceptions/base_exception"
-import { WorkerStatus } from "@/modules/worker/domain/worker_status"
+}                                    from "@/modules/shared/domain/exceptions/base_exception"
+import {
+  WorkerStatus
+}                                    from "@/modules/worker/domain/worker_status"
 
 export class Worker {
   private constructor(
     readonly user: User,
     readonly nationalIdentity: NationalIdentity,
     readonly birthDate: ValidDate,
-    readonly description: ValidString,
     readonly reviewCount: ValidDecimal,
     readonly reviewAverage: ValidDecimal,
     readonly location: ValidString,
     readonly status: WorkerStatus,
     readonly specialities: Speciality[],
-    readonly certificates: Certificate[],
-    readonly workZones: Zone[],
     readonly taxes: WorkerTax[],
-    readonly stories: Story[],
-    readonly bookings: WorkerBooking[],
-    readonly schedule: WorkerSchedule[],
-    readonly packages: Package[],
-    readonly reviews: Review[],
-    readonly createdAt: ValidDate
+    // readonly workZones: Zone[],
+    // readonly certificates: Certificate[],
+    // readonly stories: Story[],
+    // readonly bookings: WorkerBooking[],
+    // readonly schedule: WorkerSchedule[],
+    // readonly packages: Package[],
+    // readonly reviews: Review[],
+    readonly createdAt: ValidDate,
+    readonly verifiedAt?: ValidDate,
+    readonly description?: ValidString,
   )
   {
   }
@@ -60,14 +55,14 @@ export class Worker {
     user: User,
     nationalIdentity: NationalIdentity,
     birthDate: Date | string,
-    description: string,
     location: string,
-    status: string
+    status: string,
+    description?: string,
   ): Worker | Errors {
     return Worker.fromPrimitives(
-      user, nationalIdentity, birthDate, description, 0,
+      user, nationalIdentity, birthDate, 0,
       0, location, status,
-      [], [], [], [], [], [], [], [], [], ValidDate.nowUTC()
+      [], [], ValidDate.nowUTC(), undefined, description
     )
   }
 
@@ -75,21 +70,22 @@ export class Worker {
     user: User,
     nationalIdentity: NationalIdentity,
     birthDate: Date | string,
-    description: string,
     reviewCount: number,
     reviewAverage: number,
     location: string,
     status: string,
     specialities: Speciality[],
-    certificates: Certificate[],
-    workZones: Zone[],
     taxes: WorkerTax[],
-    stories: Story[],
-    bookings: WorkerBooking[],
-    schedule: WorkerSchedule[],
-    packages: Package[],
-    reviews: Review[],
-    createdAt: Date | string
+    // workZones: Zone[],
+    // certificates: Certificate[],
+    // stories: Story[],
+    // bookings: WorkerBooking[],
+    // schedule: WorkerSchedule[],
+    // packages: Package[],
+    // reviews: Review[],
+    createdAt: Date | string,
+    verifiedAt?: Date | string,
+    description?: string,
   ): Worker | Errors {
     const errors = []
 
@@ -98,7 +94,7 @@ export class Worker {
       errors.push( birthDateVO )
     }
 
-    const descriptionVO = wrapType( () => ValidString.from( description ) )
+    const descriptionVO = wrapTypeDefault(undefined, (value) => ValidString.from( value ) ,description)
     if ( descriptionVO instanceof BaseException ) {
       errors.push( descriptionVO )
     }
@@ -129,6 +125,12 @@ export class Worker {
       errors.push( reviewAverageVO )
     }
 
+    const verifiedAtVO = wrapTypeDefault(undefined, (value) => ValidDate.from( value ), verifiedAt)
+
+    if ( verifiedAtVO instanceof BaseException ) {
+      errors.push( verifiedAtVO )
+    }
+
     if ( errors.length > 0 ) {
       return new Errors( errors )
     }
@@ -137,14 +139,15 @@ export class Worker {
       user,
       nationalIdentity,
       birthDateVO as ValidDate,
-      descriptionVO as ValidString,
       reviewCountVO as ValidDecimal,
       reviewAverageVO as ValidDecimal,
       locationVO as ValidString,
       workerStatusVO as WorkerStatus,
-      specialities, certificates, workZones,
-      taxes, stories, bookings, schedule, packages, reviews,
-      createdAtVO as ValidDate
+      specialities,
+      taxes,
+      createdAtVO as ValidDate,
+      verifiedAtVO as ValidDate | undefined,
+      descriptionVO as ValidString | undefined,
     )
   }
 
@@ -152,29 +155,31 @@ export class Worker {
     user: User,
     nationalIdentity: NationalIdentity,
     birthDate: Date | string,
-    description: string,
     reviewCount: number,
     reviewAverage: number,
     location: string,
     status: string,
     specialities: Speciality[],
-    certificates: Certificate[],
-    workZones: Zone[],
     taxes: WorkerTax[],
-    stories: Story[],
-    bookings: WorkerBooking[],
-    schedule: WorkerSchedule[],
-    packages: Package[],
-    reviews: Review[],
-    createdAt: Date | string
+    // certificates: Certificate[],
+    // workZones: Zone[],
+    // stories: Story[],
+    // bookings: WorkerBooking[],
+    // schedule: WorkerSchedule[],
+    // packages: Package[],
+    // reviews: Review[],
+    createdAt: Date | string,
+    description?: string,
+    verifiedAt?: Date | string
   ): Worker {
     return new Worker(
-      user, nationalIdentity, ValidDate.from( birthDate ),
-      ValidString.from( description ), ValidDecimal.from( reviewCount ),
+      user, nationalIdentity, ValidDate.from( birthDate ), ValidDecimal.from( reviewCount ),
       ValidDecimal.from( reviewAverage ), ValidString.from( location ),
-      WorkerStatus.from( status ), specialities, certificates, workZones,
-      taxes, stories, bookings, schedule, packages, reviews,
-      ValidDate.from( createdAt )
+      WorkerStatus.from( status ), specialities,
+      taxes,
+      ValidDate.from( createdAt ),
+      verifiedAt ? ValidDate.from( verifiedAt ) : undefined,
+      description ? ValidString.from( description ) : undefined
     )
   }
 

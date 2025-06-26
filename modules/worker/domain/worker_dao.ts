@@ -11,9 +11,7 @@ import {
 import { Worker }      from "@/modules/worker/domain/worker"
 
 export abstract class WorkerDAO {
-  abstract search( query: Record<string, any>, limit?: ValidInteger,
-    skip ?: ValidString, sortBy ?: ValidString,
-    sortType ?: ValidString ): Promise<Either<BaseException[], Worker[]>>
+  abstract search( query: Record<string, any>, limit?: ValidInteger, skip ?: ValidString, sortBy ?: ValidString, sortType ?: ValidString ): Promise<Either<BaseException[], Worker[]>>
 
   abstract update( worker: Worker ): Promise<Either<BaseException, boolean>>
 
