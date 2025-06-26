@@ -29,7 +29,7 @@ export class Sector {
   }
 
   get region(): Region {
-    return this.region
+    return this._region
   }
 
   static create(

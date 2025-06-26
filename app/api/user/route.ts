@@ -1,23 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import {
-  specialitySchema
-}                                    from "@/modules/speciality/application/speciality_dto"
-import {
-  AddSpeciality
-}                                    from "@/modules/speciality/application/add_speciality"
-import {
-  PrismaSpecialityData
-}                                    from "@/modules/speciality/infrastructure/persistance/prisma_speciality_data"
 import prisma                        from "@/lib/prisma"
-import {
-  RemoveSpeciality
-}                                    from "@/modules/speciality/application/remove_speciality"
-import {
-  UpdateSpeciality
-}                                    from "@/modules/speciality/application/update_speciality"
-import {
-  SearchSpeciality
-}                                    from "@/modules/speciality/application/search_speciality"
 import {
   querySchema
 }                                    from "@/modules/shared/application/query_dto"
@@ -26,18 +8,38 @@ import {
 }                                    from "@/modules/shared/application/parse_handlers"
 import { isLeft }                    from "fp-ts/Either"
 import {
-  SpecialityMapper
-}                                    from "@/modules/speciality/application/speciality_mapper"
+  PrismaUserData
+}                                    from "@/modules/user/infrastructure/persistance/prisma_user_data"
+import { AddUser }                   from "@/modules/user/application/add_user"
+import {
+  RemoveUser
+}                                    from "@/modules/user/application/remove_user"
+import {
+  UpdateUser
+}                                    from "@/modules/user/application/update_user"
+import {
+  SearchUser
+}                                    from "@/modules/user/application/search_user"
+import { searchRole }                from "@/app/api/role/route"
+import {
+  userRequestSchema
+}                                    from "@/modules/user/application/user_request"
+import {
+  UserMapper
+}                                    from "@/modules/user/application/user_mapper"
+import {
+  userUpdateSchema
+}                                    from "@/modules/user/application/user_update_dto"
 
-const dao    = new PrismaSpecialityData( prisma )
-const add    = new AddSpeciality( dao )
-const remove = new RemoveSpeciality( dao )
-const update = new UpdateSpeciality( dao )
-const search = new SearchSpeciality( dao )
+const dao               = new PrismaUserData( prisma )
+const add               = new AddUser( dao, searchRole )
+const remove            = new RemoveUser( dao )
+const update            = new UpdateUser( dao, searchRole )
+export const searchUser = new SearchUser( dao )
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
-  const data = parseData( specialitySchema, body )
+  const data = parseData( userRequestSchema, body )
 
   if ( isLeft( data ) ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
@@ -49,7 +51,7 @@ export async function POST( request: NextRequest ) {
     return NextResponse.json( { status: 500 } )
   }
 
-  return NextResponse.json( SpecialityMapper.toDTO( result.right ),
+  return NextResponse.json( UserMapper.toDTO( result.right ),
     { status: 201 } )
 }
 
@@ -71,19 +73,19 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await search.execute( data.right )
+  const result = await searchUser.execute( data.right )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
   }
 
-  return NextResponse.json( result.right.map( SpecialityMapper.toDTO ),
+  return NextResponse.json( result.right.map( UserMapper.toDTO ),
     { status: 200 } )
 }
 
 export async function PUT( request: NextRequest ) {
   const body = await request.json()
-  const data = parseData( specialitySchema, body )
+  const data = parseData( userUpdateSchema, body )
 
   if ( isLeft( data ) ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
@@ -95,7 +97,7 @@ export async function PUT( request: NextRequest ) {
     return NextResponse.json( { status: 500 } )
   }
 
-  return NextResponse.json( SpecialityMapper.toDTO( result.right ),
+  return NextResponse.json( UserMapper.toDTO( result.right ),
     { status: 200 } )
 }
 

@@ -18,7 +18,7 @@ export class UpdateWorker {
   ) {
   }
 
-  async execute( worker: WorkerUpdateDTO ): Promise<Either<BaseException[], boolean>> {
+  async execute( worker: WorkerUpdateDTO ): Promise<Either<BaseException[], Worker>> {
     const exist = await ensureWorkerExist(this.dao, worker.user.user_id)
 
     if ( isLeft(exist) ) {
@@ -58,7 +58,7 @@ export class UpdateWorker {
       return left([updated.left])
     }
 
-    return right( true )
+    return right( updatedWorker )
   }
 
 }

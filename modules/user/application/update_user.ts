@@ -58,9 +58,8 @@ export class UpdateUser {
   }
 
 
-  async execute( id: string,
-    dto: UserUpdateDTO ): Promise<Either<BaseException[], User>> {
-    const userResult = await this.ensureUserExist( id )
+  async execute( dto: UserUpdateDTO ): Promise<Either<BaseException[], User>> {
+    const userResult = await this.ensureUserExist( dto.id )
 
     if ( isLeft( userResult ) ) {
       return left( userResult.left )

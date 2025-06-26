@@ -24,7 +24,7 @@ export class AddSector {
   ) {
   }
 
-  async execute( dto: SectorDTO ): Promise<Either<BaseException[], boolean>>{
+  async execute( dto: SectorDTO ): Promise<Either<BaseException[], Sector>>{
     const exist = await ensureSectorExist( this.dao, dto.id )
 
     if ( isLeft( exist ) ) {
@@ -55,6 +55,6 @@ export class AddSector {
       return left( [result.left] )
     }
 
-    return right(true)
+    return right(sector)
   }
 }

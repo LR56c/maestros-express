@@ -20,7 +20,7 @@ export class UpdateRegion {
   ) {
   }
 
-  async execute( region: RegionDTO ): Promise<Either<BaseException[], boolean>>{
+  async execute( region: RegionDTO ): Promise<Either<BaseException[], Region>>{
     const exist = await ensureRegionExist(this.dao, region.id)
 
     if ( isLeft(exist) ) {
@@ -44,6 +44,6 @@ export class UpdateRegion {
       return left([result.left])
     }
 
-    return right(true)
+    return right(updatedRegion)
   }
 }

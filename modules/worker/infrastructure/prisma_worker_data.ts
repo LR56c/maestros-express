@@ -11,11 +11,6 @@ import {
   ValidInteger
 }                              from "@/modules/shared/domain/value_objects/valid_integer"
 import * as changeCase         from "change-case"
-import { Package }             from "@/modules/package/domain/package"
-import {
-  PackageDocument
-}                              from "@/modules/package/modules/package_document/domain/package_document"
-import { Errors }              from "@/modules/shared/domain/exceptions/errors"
 import {
   InfrastructureException
 }                              from "@/modules/shared/domain/exceptions/infrastructure_exception"
@@ -27,21 +22,33 @@ export class PrismaWorkerData implements WorkerDAO {
 
   async add( worker: Worker ): Promise<Either<BaseException, boolean>> {
     try {
-      await this.db.worker.create( {
-        data: {
-          id           : worker.user.userId.toString(),
-          birthDate    : worker.birthDate.toString(),
-          description  : worker.description.value,
-          reviewCount  : worker.reviewCount.value,
-          reviewAverage: worker.reviewAverage.value,
-          status       : worker.status.value,
-          location     : worker.location.value,
-          nationalIdentityId: worker.nationalIdentity.id.toString(),
-        }
-      } )
+      console.log( "Adding worker:", worker.user )
+      await this.db.$transaction( [
+        this.db.nationalIdentity.create( {
+          data: {
+            id        : worker.nationalIdentity.id.toString(),
+            identifier: worker.nationalIdentity.identifier.value,
+            type      : worker.nationalIdentity.type.value,
+            countryId : worker.nationalIdentity.country.id.toString()
+          }
+        } ),
+        this.db.worker.create( {
+          data: {
+            id                : worker.user.userId.toString(),
+            birthDate         : worker.birthDate.toString(),
+            description       : worker.description.value,
+            reviewCount       : worker.reviewCount.value,
+            reviewAverage     : worker.reviewAverage.value,
+            status            : worker.status.value,
+            location          : worker.location.value,
+            nationalIdentityId: worker.nationalIdentity.id.toString()
+          }
+        } )
+      ] )
       return right( true )
     }
     catch ( e ) {
+      console.log( "Error adding worker:", e )
       return left( new InfrastructureException() )
     }
   }
@@ -64,24 +71,25 @@ export class PrismaWorkerData implements WorkerDAO {
         // @ts-ignore
         orderBy[key] = sortType ? sortType.value : "desc"
       }
-      const offset            = skip ? parseInt( skip.value ) : 0
-      const response          = await this.db.worker.findMany( {
+      const offset   = skip ? parseInt( skip.value ) : 0
+      const response = await this.db.worker.findMany( {
         where  : where,
         orderBy: orderBy,
         skip   : offset,
-        take   : limit?.value,
-        include: {
-          Zone            : true,
-          WorkerEmbedding : true,
-          WorkerSpeciality: true,
-          WorkerBooking   : true,
-          WorkerSchedule  : true,
-          WorkerTax       : true,
-          Story           : true,
-          Package         : true,
-          Certificate     : true
-        }
+        take   : limit?.value
+        // include: {
+        //   Zone            : true,
+        //   WorkerEmbedding : true,
+        //   WorkerSpeciality: true,
+        //   WorkerBooking   : true,
+        //   WorkerSchedule  : true,
+        //   WorkerTax       : true,
+        //   Story           : true,
+        //   Package         : true,
+        //   Certificate     : true
+        // }
       } )
+      console.log( "Worker search response:", response )
       const workers: Worker[] = []
       // for ( const w of response ) {
       //
@@ -95,6 +103,7 @@ export class PrismaWorkerData implements WorkerDAO {
       return right( workers )
     }
     catch ( e ) {
+      console.log( "Error searching workers:", e )
       return left( [new InfrastructureException()] )
     }
   }

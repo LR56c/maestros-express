@@ -1,23 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import {
-  specialitySchema
-}                                    from "@/modules/speciality/application/speciality_dto"
-import {
-  AddSpeciality
-}                                    from "@/modules/speciality/application/add_speciality"
-import {
-  PrismaSpecialityData
-}                                    from "@/modules/speciality/infrastructure/persistance/prisma_speciality_data"
 import prisma                        from "@/lib/prisma"
-import {
-  RemoveSpeciality
-}                                    from "@/modules/speciality/application/remove_speciality"
-import {
-  UpdateSpeciality
-}                                    from "@/modules/speciality/application/update_speciality"
-import {
-  SearchSpeciality
-}                                    from "@/modules/speciality/application/search_speciality"
 import {
   querySchema
 }                                    from "@/modules/shared/application/query_dto"
@@ -26,18 +8,33 @@ import {
 }                                    from "@/modules/shared/application/parse_handlers"
 import { isLeft }                    from "fp-ts/Either"
 import {
-  SpecialityMapper
-}                                    from "@/modules/speciality/application/speciality_mapper"
+  PrismaRoleData
+}                                    from "@/modules/role/infrastructure/persistance/prisma_role_data"
+import { AddRole }                   from "@/modules/role/application/add_role"
+import {
+  RemoveRole
+}                                    from "@/modules/role/application/remove_role"
+import {
+  UpdateRole
+}                                    from "@/modules/role/application/update_role"
+import {
+  SearchRole
+}                                    from "@/modules/role/application/search_role"
+import { roleSchema }                from "@/modules/role/application/role_dto"
+import {
+  RoleMapper
+}                                    from "@/modules/role/application/role_mapper"
+import { z }                         from "zod"
 
-const dao    = new PrismaSpecialityData( prisma )
-const add    = new AddSpeciality( dao )
-const remove = new RemoveSpeciality( dao )
-const update = new UpdateSpeciality( dao )
-const search = new SearchSpeciality( dao )
+const dao               = new PrismaRoleData( prisma )
+const add               = new AddRole( dao )
+const remove            = new RemoveRole( dao )
+const update            = new UpdateRole( dao )
+export const searchRole = new SearchRole( dao )
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
-  const data = parseData( specialitySchema, body )
+  const data = parseData( roleSchema, body )
 
   if ( isLeft( data ) ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
@@ -49,8 +46,7 @@ export async function POST( request: NextRequest ) {
     return NextResponse.json( { status: 500 } )
   }
 
-  return NextResponse.json( SpecialityMapper.toDTO( result.right ),
-    { status: 201 } )
+  return NextResponse.json( { status: 201 } )
 }
 
 export async function GET( request: NextRequest ) {
@@ -71,32 +67,37 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await search.execute( data.right )
+  const result = await searchRole.execute( data.right )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
   }
 
-  return NextResponse.json( result.right.map( SpecialityMapper.toDTO ),
+  return NextResponse.json( result.right.map( RoleMapper.toDTO ),
     { status: 200 } )
 }
 
 export async function PUT( request: NextRequest ) {
   const body = await request.json()
-  const data = parseData( specialitySchema, body )
+  const data = parseData( z.object( {
+    prev_name: z.string(),
+    new_name : z.string()
+  } ), body )
 
   if ( isLeft( data ) ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await update.execute( data.right )
+  const result = await update.execute(
+    data.right.prev_name,
+    data.right.new_name
+  )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
   }
 
-  return NextResponse.json( SpecialityMapper.toDTO( result.right ),
-    { status: 200 } )
+  return NextResponse.json( { status: 200 } )
 }
 
 export async function DELETE( request: NextRequest ) {

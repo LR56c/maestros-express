@@ -9,10 +9,8 @@ import {
 export const workerRequestSchema = z.object( {
   user             : userResponseSchema,
   national_identity: nationalIdentifierSchema,
-  birth_date       : z.date(),
+  birth_date       : z.string().date(),
   description      : z.string(),
-  review_count     : z.number(),
-  review_average   : z.number(),
   status         : z.string(),
   location         : z.string(),
 } )

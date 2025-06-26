@@ -1,23 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import {
-  specialitySchema
-}                                    from "@/modules/speciality/application/speciality_dto"
-import {
-  AddSpeciality
-}                                    from "@/modules/speciality/application/add_speciality"
-import {
-  PrismaSpecialityData
-}                                    from "@/modules/speciality/infrastructure/persistance/prisma_speciality_data"
 import prisma                        from "@/lib/prisma"
-import {
-  RemoveSpeciality
-}                                    from "@/modules/speciality/application/remove_speciality"
-import {
-  UpdateSpeciality
-}                                    from "@/modules/speciality/application/update_speciality"
-import {
-  SearchSpeciality
-}                                    from "@/modules/speciality/application/search_speciality"
 import {
   querySchema
 }                                    from "@/modules/shared/application/query_dto"
@@ -26,18 +8,37 @@ import {
 }                                    from "@/modules/shared/application/parse_handlers"
 import { isLeft }                    from "fp-ts/Either"
 import {
-  SpecialityMapper
-}                                    from "@/modules/speciality/application/speciality_mapper"
+  PrismaSectorData
+}                                    from "@/modules/sector/infrastructure/persistance/prisma_sector_data"
+import {
+  AddSector
+}                                    from "@/modules/sector/application/add_sector"
+import {
+  RemoveSector
+}                                    from "@/modules/sector/application/remove_sector"
+import {
+  UpdateSector
+}                                    from "@/modules/sector/application/update_sector"
+import {
+  SearchSector
+}                                    from "@/modules/sector/application/search_sector"
+import { searchRegion }              from "@/app/api/region/route"
+import {
+  sectorSchema
+}                                    from "@/modules/sector/application/sector_dto"
+import {
+  SectorMapper
+}                                    from "@/modules/sector/application/sector_mapper"
 
-const dao    = new PrismaSpecialityData( prisma )
-const add    = new AddSpeciality( dao )
-const remove = new RemoveSpeciality( dao )
-const update = new UpdateSpeciality( dao )
-const search = new SearchSpeciality( dao )
+const dao    = new PrismaSectorData( prisma )
+const add    = new AddSector( dao, searchRegion )
+const remove = new RemoveSector( dao )
+const update = new UpdateSector( dao )
+const search = new SearchSector( dao )
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
-  const data = parseData( specialitySchema, body )
+  const data = parseData( sectorSchema, body )
 
   if ( isLeft( data ) ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
@@ -49,7 +50,7 @@ export async function POST( request: NextRequest ) {
     return NextResponse.json( { status: 500 } )
   }
 
-  return NextResponse.json( SpecialityMapper.toDTO( result.right ),
+  return NextResponse.json( SectorMapper.toDTO( result.right ),
     { status: 201 } )
 }
 
@@ -77,13 +78,13 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { status: 500 } )
   }
 
-  return NextResponse.json( result.right.map( SpecialityMapper.toDTO ),
+  return NextResponse.json( result.right.map( SectorMapper.toDTO ),
     { status: 200 } )
 }
 
 export async function PUT( request: NextRequest ) {
   const body = await request.json()
-  const data = parseData( specialitySchema, body )
+  const data = parseData( sectorSchema, body )
 
   if ( isLeft( data ) ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
@@ -95,7 +96,7 @@ export async function PUT( request: NextRequest ) {
     return NextResponse.json( { status: 500 } )
   }
 
-  return NextResponse.json( SpecialityMapper.toDTO( result.right ),
+  return NextResponse.json( SectorMapper.toDTO( result.right ),
     { status: 200 } )
 }
 

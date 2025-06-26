@@ -13,9 +13,9 @@ export class RemoveRole {
   constructor( private readonly dao: RoleDAO ) {
   }
 
-  async execute( name: string ): Promise<Either<BaseException[], boolean>> {
+  async execute( id: string ): Promise<Either<BaseException[], boolean>> {
     const exist = await this.dao.search( {
-      name: name
+      id: id
     }, ValidInteger.from( 1 ) )
 
     if ( isLeft( exist ) ) {

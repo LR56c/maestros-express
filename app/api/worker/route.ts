@@ -1,23 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import {
-  specialitySchema
-}                                    from "@/modules/speciality/application/speciality_dto"
-import {
-  AddSpeciality
-}                                    from "@/modules/speciality/application/add_speciality"
-import {
-  PrismaSpecialityData
-}                                    from "@/modules/speciality/infrastructure/persistance/prisma_speciality_data"
 import prisma                        from "@/lib/prisma"
-import {
-  RemoveSpeciality
-}                                    from "@/modules/speciality/application/remove_speciality"
-import {
-  UpdateSpeciality
-}                                    from "@/modules/speciality/application/update_speciality"
-import {
-  SearchSpeciality
-}                                    from "@/modules/speciality/application/search_speciality"
 import {
   querySchema
 }                                    from "@/modules/shared/application/query_dto"
@@ -26,30 +8,50 @@ import {
 }                                    from "@/modules/shared/application/parse_handlers"
 import { isLeft }                    from "fp-ts/Either"
 import {
-  SpecialityMapper
-}                                    from "@/modules/speciality/application/speciality_mapper"
+  PrismaWorkerData
+}                                    from "@/modules/worker/infrastructure/prisma_worker_data"
+import {
+  AddWorker
+}                                    from "@/modules/worker/application/add_worker"
+import { searchUser }                from "@/app/api/user/route"
+import { searchCountry }             from "@/app/api/country/route"
+import {
+  UpdateWorker
+}                                    from "@/modules/worker/application/update_worker"
+import {
+  SearchWorker
+}                                    from "@/modules/worker/application/search_worker"
+import {
+  workerRequestSchema
+}                                    from "@/modules/worker/application/worker_request"
+import {
+  WorkerMapper
+}                                    from "@/modules/worker/application/worker_mapper"
+import {
+  workerUpdateSchema
+}                                    from "@/modules/worker/application/worker_update_dto"
 
-const dao    = new PrismaSpecialityData( prisma )
-const add    = new AddSpeciality( dao )
-const remove = new RemoveSpeciality( dao )
-const update = new UpdateSpeciality( dao )
-const search = new SearchSpeciality( dao )
+const dao    = new PrismaWorkerData( prisma )
+const add    = new AddWorker( dao, searchUser, searchCountry )
+const update = new UpdateWorker( dao )
+const search = new SearchWorker( dao )
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
-  const data = parseData( specialitySchema, body )
+  const data = parseData( workerRequestSchema, body )
 
   if ( isLeft( data ) ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
   const result = await add.execute( data.right )
+  // console.log("Worker add result:", result)
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
   }
 
-  return NextResponse.json( SpecialityMapper.toDTO( result.right ),
+  return NextResponse.json( WorkerMapper.toDTO( result.right ),
     { status: 201 } )
 }
 
@@ -77,13 +79,13 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { status: 500 } )
   }
 
-  return NextResponse.json( result.right.map( SpecialityMapper.toDTO ),
+  return NextResponse.json( result.right.map( WorkerMapper.toDTO ),
     { status: 200 } )
 }
 
 export async function PUT( request: NextRequest ) {
   const body = await request.json()
-  const data = parseData( specialitySchema, body )
+  const data = parseData( workerUpdateSchema, body )
 
   if ( isLeft( data ) ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
@@ -95,19 +97,6 @@ export async function PUT( request: NextRequest ) {
     return NextResponse.json( { status: 500 } )
   }
 
-  return NextResponse.json( SpecialityMapper.toDTO( result.right ),
+  return NextResponse.json( WorkerMapper.toDTO( result.right ),
     { status: 200 } )
-}
-
-export async function DELETE( request: NextRequest ) {
-  const { searchParams } = new URL( request.url )
-  const id               = searchParams.get( "id" )
-
-  const result = await remove.execute( id ?? "" )
-
-  if ( isLeft( result ) ) {
-    return NextResponse.json( { status: 500 } )
-  }
-
-  return NextResponse.json( { status: 200 } )
 }

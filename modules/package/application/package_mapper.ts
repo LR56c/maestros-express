@@ -110,7 +110,7 @@ export class PackageMapper {
     }
 
     const reviewAverage = wrapType(
-      () => ValidFloat.from( json.review_average ) )
+      () => ValidDecimal.from( json.review_average ) )
 
     if ( reviewAverage instanceof BaseException ) {
       errors.push( reviewAverage )
@@ -141,7 +141,7 @@ export class PackageMapper {
     for ( const document of json.documents ) {
       const documentResult = PackageDocumentMapper.fromJSON( document )
       if ( documentResult instanceof Errors ) {
-        errors.push( ...documentResult.errors )
+        errors.push( ...documentResult.values )
       }
       else {
         documents.push( documentResult )
@@ -200,6 +200,7 @@ export class PackageMapper {
 
     return Package.fromPrimitives(
       json.id,
+      json.worker_id,
       json.name,
       json.description,
       json.specification,
@@ -213,5 +214,3 @@ export class PackageMapper {
     )
   }
 }
-
-z

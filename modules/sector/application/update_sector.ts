@@ -16,30 +16,30 @@ export class UpdateSector {
   constructor(private  readonly dao : SectorDAO) {
   }
 
-  async execute( sector: SectorDTO ): Promise<Either<BaseException[], boolean>>{
+  async execute( sector: SectorDTO ): Promise<Either<BaseException[], Sector>>{
     const exist = await ensureSectorExist(this.dao, sector.id)
 
     if ( isLeft(exist) ) {
       return left(exist.left)
     }
 
-    const updatedRegion = Sector.fromPrimitives(
+    const updatedSector = Sector.fromPrimitives(
       sector.id,
       sector.name,
       exist.right.region,
       exist.right.createdAt.toString()
     )
 
-    if( updatedRegion instanceof Errors ) {
-      return left(updatedRegion.values)
+    if( updatedSector instanceof Errors ) {
+      return left(updatedSector.values)
     }
 
-    const result = await this.dao.update(updatedRegion)
+    const result = await this.dao.update(updatedSector)
 
     if ( isLeft(result) ) {
       return left([result.left])
     }
 
-    return right(true)
+    return right(updatedSector)
   }
 }

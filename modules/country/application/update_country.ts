@@ -16,7 +16,7 @@ export class UpdateCountry {
   constructor(private readonly dao : CountryDAO) {
   }
 
-  async execute( country: CountryDTO ): Promise<Either<BaseException[], boolean>>{
+  async execute( country: CountryDTO ): Promise<Either<BaseException[], Country>>{
     const exist = await ensureCountryExist(this.dao, country.id)
 
     if ( isLeft(exist) ) {
@@ -40,6 +40,6 @@ export class UpdateCountry {
       return left([result.left])
     }
 
-    return right(true)
+    return right(updatedCountry)
   }
 }

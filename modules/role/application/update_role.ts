@@ -44,8 +44,7 @@ export class UpdateRole {
   }
 
 
-  async execute( prevName: string,
-    newName: string ): Promise<Either<BaseException[], boolean>> {
+  async execute( prevName: string, newName: string ): Promise<Either<BaseException[], boolean>> {
     const vname = wrapType( () => ValidString.from( newName ) )
 
     if ( vname instanceof BaseException ) {

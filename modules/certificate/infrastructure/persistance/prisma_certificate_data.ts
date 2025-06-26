@@ -10,6 +10,9 @@ import {
   InfrastructureException
 }                              from "@/modules/shared/domain/exceptions/infrastructure_exception"
 import { Errors }              from "@/modules/shared/domain/exceptions/errors"
+import {
+  DataNotFoundException
+} from "@/modules/shared/domain/exceptions/data_not_found_exception"
 
 export class PrismaCertificateData implements CertificateDAO {
   constructor( private readonly db: PrismaClient ) {
@@ -30,17 +33,22 @@ export class PrismaCertificateData implements CertificateDAO {
       return right( true )
     }
     catch ( e ) {
+      console.log("Error adding certificate:", e)
       return left( new InfrastructureException() )
     }
   }
 
   async getById( id: UUID ): Promise<Either<BaseException[], Certificate>> {
     try {
-      const response = await this.db.certificate.findUniqueOrThrow( {
+      const response = await this.db.certificate.findUnique( {
         where: {
-          id: id.value
+          id: id.toString()
         }
       } )
+      console.log("Response from getById:", response)
+      if ( !response ) {
+        return left( [new DataNotFoundException()] )
+      }
 
       const certificate = Certificate.fromPrimitives(
         response.id,
@@ -58,6 +66,7 @@ export class PrismaCertificateData implements CertificateDAO {
       return right( certificate )
     }
     catch ( e ) {
+      // console.log("Error fetching certificate by ID:", e)
       return left( [new InfrastructureException()] )
     }
   }
@@ -92,6 +101,7 @@ export class PrismaCertificateData implements CertificateDAO {
       return right( certificates )
     }
     catch ( e ) {
+      console.log("Error fetching certificates by worker ID:", e)
       return left( [new InfrastructureException()] )
     }
   }
@@ -106,6 +116,7 @@ export class PrismaCertificateData implements CertificateDAO {
       return right( true )
     }
     catch ( e ) {
+      console.log("Error removing certificate:", e)
       return left( new InfrastructureException() )
     }
   }

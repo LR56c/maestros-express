@@ -199,6 +199,7 @@ export class PrismaSectorData implements SectorDAO {
         }
       } )
 
+      console.log( 'prisma response', response )
       const result: Sector[] = []
       for ( const e of response ) {
         const country_db = e.region.country

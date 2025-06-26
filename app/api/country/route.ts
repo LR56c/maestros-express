@@ -1,23 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import {
-  specialitySchema
-}                                    from "@/modules/speciality/application/speciality_dto"
-import {
-  AddSpeciality
-}                                    from "@/modules/speciality/application/add_speciality"
-import {
-  PrismaSpecialityData
-}                                    from "@/modules/speciality/infrastructure/persistance/prisma_speciality_data"
 import prisma                        from "@/lib/prisma"
-import {
-  RemoveSpeciality
-}                                    from "@/modules/speciality/application/remove_speciality"
-import {
-  UpdateSpeciality
-}                                    from "@/modules/speciality/application/update_speciality"
-import {
-  SearchSpeciality
-}                                    from "@/modules/speciality/application/search_speciality"
 import {
   querySchema
 }                                    from "@/modules/shared/application/query_dto"
@@ -26,18 +8,36 @@ import {
 }                                    from "@/modules/shared/application/parse_handlers"
 import { isLeft }                    from "fp-ts/Either"
 import {
-  SpecialityMapper
-}                                    from "@/modules/speciality/application/speciality_mapper"
+  PrismaCountryData
+}                                    from "@/modules/country/infrastructure/persistance/prisma_country_data"
+import {
+  AddCountry
+}                                    from "@/modules/country/application/add_country"
+import {
+  RemoveCountry
+}                                    from "@/modules/country/application/remove_country"
+import {
+  UpdateCountry
+}                                    from "@/modules/country/application/update_country"
+import {
+  SearchCountry
+}                                    from "@/modules/country/application/search_country"
+import {
+  countrySchema
+}                                    from "@/modules/country/application/country_dto"
+import {
+  CountryMapper
+}                                    from "@/modules/country/application/country_mapper"
 
-const dao    = new PrismaSpecialityData( prisma )
-const add    = new AddSpeciality( dao )
-const remove = new RemoveSpeciality( dao )
-const update = new UpdateSpeciality( dao )
-const search = new SearchSpeciality( dao )
+const dao                  = new PrismaCountryData( prisma )
+const add                  = new AddCountry( dao )
+const remove               = new RemoveCountry( dao )
+const update               = new UpdateCountry( dao )
+export const searchCountry = new SearchCountry( dao )
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
-  const data = parseData( specialitySchema, body )
+  const data = parseData( countrySchema, body )
 
   if ( isLeft( data ) ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
@@ -49,7 +49,7 @@ export async function POST( request: NextRequest ) {
     return NextResponse.json( { status: 500 } )
   }
 
-  return NextResponse.json( SpecialityMapper.toDTO( result.right ),
+  return NextResponse.json( CountryMapper.toDTO( result.right ),
     { status: 201 } )
 }
 
@@ -71,19 +71,19 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await search.execute( data.right )
+  const result = await searchCountry.execute( data.right )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
   }
 
-  return NextResponse.json( result.right.map( SpecialityMapper.toDTO ),
+  return NextResponse.json( result.right.map( CountryMapper.toDTO ),
     { status: 200 } )
 }
 
 export async function PUT( request: NextRequest ) {
   const body = await request.json()
-  const data = parseData( specialitySchema, body )
+  const data = parseData( countrySchema, body )
 
   if ( isLeft( data ) ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
@@ -95,7 +95,7 @@ export async function PUT( request: NextRequest ) {
     return NextResponse.json( { status: 500 } )
   }
 
-  return NextResponse.json( SpecialityMapper.toDTO( result.right ),
+  return NextResponse.json( CountryMapper.toDTO( result.right ),
     { status: 200 } )
 }
 

@@ -1,6 +1,7 @@
 import { z } from "zod"
 
 export const userUpdateSchema = z.object( {
+  id: z.string(),
   avatar : z.string().optional(),
   roles: z.union( [z.array( z.string() ).optional(), z.null()] )
 } ).refine( data =>

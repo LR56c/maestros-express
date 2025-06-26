@@ -23,7 +23,7 @@ export class AddWorker {
   ) {
   }
 
-  async execute( worker: WorkerRequest ): Promise<Either<BaseException[], boolean>>{
+  async execute( worker: WorkerRequest ): Promise<Either<BaseException[], Worker>>{
     const exist = await ensureWorkerExist(this.dao, worker.user.user_id)
 
     if ( isLeft(exist) ) {
@@ -33,6 +33,7 @@ export class AddWorker {
     const userSearchResult = await this.searchUser.execute({
       id: worker.user.user_id
     },1)
+    console.log("userSearchResult", userSearchResult)
 
     if ( isLeft(userSearchResult) ) {
       return left(userSearchResult.left)
@@ -78,6 +79,6 @@ export class AddWorker {
       return left([result.left])
     }
 
-    return right(true)
+    return right(newWorker)
   }
 }
