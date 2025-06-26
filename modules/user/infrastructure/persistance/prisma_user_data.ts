@@ -78,7 +78,6 @@ export class PrismaUserData implements UserDAO {
 
   async add( user: User ): Promise<Either<BaseException, boolean>> {
     try {
-      console.log("Adding user", user)
       await this.db.$transaction( [
         this.db.user.create( {
           data: {
@@ -103,7 +102,6 @@ export class PrismaUserData implements UserDAO {
     }
     catch ( e )
     {
-      console.log("Error adding user", e)
       return left( new InfrastructureException() )
     }
   }
@@ -205,7 +203,6 @@ export class PrismaUserData implements UserDAO {
           }
         }
       } )
-      console.log("search response", response)
 
       // if ( !response || response.length === 0 ) {
       //   return left( [new DataNotFoundException()] )
@@ -259,7 +256,6 @@ export class PrismaUserData implements UserDAO {
           }
         }
       } )
-      console.log("get response", response)
       if ( !response ) {
         return left( [new DataNotFoundException()] )
       }

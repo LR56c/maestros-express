@@ -29,6 +29,7 @@ import {
 import {
   WorkerTax
 }                                      from "@/modules/worker_tax/domain/worker_tax"
+import { Role }                        from "@/modules/role/domain/role"
 
 type WorkerRelations = {
   user: User,
@@ -64,12 +65,53 @@ export class PrismaWorkerData implements WorkerDAO {
     //   }
     //   certificates.push( cert )
     // }
+    const taxes: WorkerTax[] = []
+    for ( const tax of w.WorkerTax ) {
+      const taxMapped = WorkerTax.fromPrimitives(
+        tax.id.toString(),
+        tax.workerId.toString(),
+        tax.name,
+        tax.value,
+        tax.valueFormat,
+        tax.createdAt
+      )
+      if ( taxMapped instanceof Errors ) {
+        return left( taxMapped.values )
+      }
+      taxes.push( taxMapped )
+    }
+    const specialities: Speciality[] = []
+    for ( const ws of w.WorkerSpeciality ) {
+      const spec = Speciality.fromPrimitives(
+        ws.speciality.id.toString(),
+        ws.speciality.name,
+        ws.speciality.createdAt
+      )
+      if ( spec instanceof Errors ) {
+        return left( spec.values )
+      }
+      specialities.push( spec )
+    }
+
+    const roles : Role[] = []
+    for ( const ur of  w.user.usersRoles) {
+      const role = Role.fromPrimitives(
+        ur.role.id.toString(),
+        ur.role.name,
+        ur.role.createdAt,
+        ur.role.updatedAt
+      )
+      if ( role instanceof Errors ) {
+        return left( role.values )
+      }
+      roles.push( role )
+    }
     const userMapped = User.fromPrimitive(
       w.user.id.toString(),
       w.user.email,
       w.user.name,
       w.user.surname,
-      [],
+      roles,
       w.user.createdAt,
       w.user.avatar
     )
@@ -100,8 +142,8 @@ export class PrismaWorkerData implements WorkerDAO {
     return right( {
       user            : userMapped,
       nationalIdentity: nationalIdentity,
-      specialities    : [],
-      taxes           : [],
+      specialities    : specialities,
+      taxes           : taxes
       // certificates    : certificates,
       // workZones       : [],
       // bookings        : [],
@@ -114,7 +156,6 @@ export class PrismaWorkerData implements WorkerDAO {
 
   async add( worker: Worker ): Promise<Either<BaseException, boolean>> {
     try {
-      console.log( "Adding worker:", worker.user )
       await this.db.$transaction( [
         this.db.nationalIdentity.create( {
           data: {
@@ -183,15 +224,17 @@ export class PrismaWorkerData implements WorkerDAO {
               country: true
             }
           },
-          WorkerSpeciality: true,
-          WorkerTax       : true,
+          WorkerSpeciality: {
+            include: {
+              speciality: true
+            }
+          },
+          WorkerTax       : true
         }
       } )
       const workers: Worker[] = []
       for ( const w of response ) {
-        console.log( "Mapping worker:", w )
         const relationMapped = await this.mapWorkerRelations( w )
-
         if ( isLeft( relationMapped ) ) {
           return left( relationMapped.left )
         }
@@ -218,25 +261,39 @@ export class PrismaWorkerData implements WorkerDAO {
       return right( workers )
     }
     catch ( e ) {
-      console.log( "Error searching workers:", e )
       return left( [new InfrastructureException()] )
     }
   }
 
   async update( worker: Worker ): Promise<Either<BaseException, boolean>> {
     try {
-      await this.db.worker.update( {
-        where: {
-          id: worker.user.userId.toString()
-        },
-        data : {
-          description  : worker.description?.value,
-          reviewCount  : worker.reviewCount.value,
-          reviewAverage: worker.reviewAverage.value,
-          status       : worker.status.value,
-          location     : worker.location.value
-        }
-      } )
+      await this.db.$transaction( [
+        this.db.workerSpeciality.deleteMany( {
+          where: {
+            workerId: worker.user.userId.toString()
+          }
+        } ),
+        this.db.workerSpeciality.createMany( {
+          data: worker.specialities.map( e => {
+            return {
+              workerId    : worker.user.userId.toString(),
+              specialityId: e.id.toString()
+            }
+          } )
+        } ),
+        this.db.worker.update( {
+          where: {
+            id: worker.user.userId.toString()
+          },
+          data : {
+            description  : worker.description?.value,
+            reviewCount  : worker.reviewCount.value,
+            reviewAverage: worker.reviewAverage.value,
+            status       : worker.status.value,
+            location     : worker.location.value
+          }
+        } )
+      ] )
       return right( true )
     }
     catch ( e ) {

@@ -40,8 +40,7 @@ export class PrismaRoleData implements RoleDAO {
       }
       if ( query.ids ) {
         const arr: string[] = query.ids.split( "," )
-        const ids           = arr.map(
-          i => UUID.from( i ).toString(  ) )
+        const ids           = arr.map( i => UUID.from( i ).toString(  ) )
         // @ts-ignore
         where["id"]         = {
           in: ids

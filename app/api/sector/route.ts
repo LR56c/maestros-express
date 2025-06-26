@@ -72,7 +72,11 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await search.execute( data.right )
+  const result = await search.execute(     data.right.query,
+    data.right.limit,
+    data.right.skip,
+    data.right.sort_by,
+    data.right.sort_type, )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )

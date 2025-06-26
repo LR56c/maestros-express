@@ -47,7 +47,6 @@ export class PrismaStoryData implements StoryDAO {
       return right( true )
     }
     catch ( e ) {
-      console.log( 'prisma story add',e )
       return left( new InfrastructureException() )
     }
   }
@@ -97,8 +96,6 @@ export class PrismaStoryData implements StoryDAO {
       return right( story )
     }
     catch ( e ) {
-      console.log( 'prisma story get',e )
-
       return left( [new InfrastructureException()] )
     }
   }

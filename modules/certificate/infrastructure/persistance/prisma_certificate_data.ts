@@ -33,7 +33,6 @@ export class PrismaCertificateData implements CertificateDAO {
       return right( true )
     }
     catch ( e ) {
-      console.log("Error adding certificate:", e)
       return left( new InfrastructureException() )
     }
   }
@@ -45,7 +44,6 @@ export class PrismaCertificateData implements CertificateDAO {
           id: id.toString()
         }
       } )
-      console.log("Response from getById:", response)
       if ( !response ) {
         return left( [new DataNotFoundException()] )
       }
@@ -66,7 +64,6 @@ export class PrismaCertificateData implements CertificateDAO {
       return right( certificate )
     }
     catch ( e ) {
-      // console.log("Error fetching certificate by ID:", e)
       return left( [new InfrastructureException()] )
     }
   }
@@ -101,7 +98,6 @@ export class PrismaCertificateData implements CertificateDAO {
       return right( certificates )
     }
     catch ( e ) {
-      console.log("Error fetching certificates by worker ID:", e)
       return left( [new InfrastructureException()] )
     }
   }
@@ -116,7 +112,6 @@ export class PrismaCertificateData implements CertificateDAO {
       return right( true )
     }
     catch ( e ) {
-      console.log("Error removing certificate:", e)
       return left( new InfrastructureException() )
     }
   }

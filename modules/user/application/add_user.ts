@@ -68,7 +68,6 @@ export class AddUser {
     }
 
     const roleResult = await ensureRoles( this.searchRole, request.roles )
-    console.log("roleResult", roleResult)
     if ( isLeft( roleResult ) ) {
       return left( roleResult.left )
     }

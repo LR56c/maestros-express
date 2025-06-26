@@ -29,28 +29,44 @@ import {
   SpecialityMapper
 }                                    from "@/modules/speciality/application/speciality_mapper"
 import { z }                         from "zod"
+import {
+  PrismaWorkerTaxData
+}                                    from "@/modules/worker_tax/infrastructure/persistance/prisma_worker_tax_data"
+import {
+  UpsertWorkerTax
+}                                    from "@/modules/worker_tax/application/upsert_worker_tax"
+import {
+  GetByWorkerTax
+}                                    from "@/modules/worker_tax/application/get_by_worker_tax"
+import {
+  workerTaxSchema
+}                                    from "@/modules/worker_tax/application/worker_tax_dto"
+import {
+  WorkerTaxMapper
+}                                    from "@/modules/worker_tax/application/worker_tax_mapper"
 
-const dao    = new PrismaSpecialityData( prisma )
-const add    = new AddSpeciality( dao )
-const remove = new RemoveSpeciality( dao )
-const update                  = new UpdateSpeciality( dao )
-export const searchSpeciality = new SearchSpeciality( dao )
+const dao    = new PrismaWorkerTaxData( prisma )
+const upsert    = new UpsertWorkerTax( dao )
+const getWorkerTax = new GetByWorkerTax( dao )
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
-  const data = parseData( specialitySchema, body )
+  const data = parseData( workerTaxSchema.extend({
+    worker_id: z.string()
+  }), body )
 
   if ( isLeft( data ) ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await add.execute( data.right )
+  const { worker_id, ...rest } = data.right
+  const result = await upsert.execute( worker_id,rest )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
   }
 
-  return NextResponse.json( SpecialityMapper.toDTO( result.right ),
+  return NextResponse.json( WorkerTaxMapper.toDTO( result.right ),
     { status: 201 } )
 }
 
@@ -58,69 +74,24 @@ export async function GET( request: NextRequest ) {
   const { searchParams }                             = new URL( request.url )
   const paramsObject                                 = Object.fromEntries(
     searchParams.entries() )
-  const { limit, skip, sort_by, sort_type, ...rest } = paramsObject
+  const { id } = paramsObject
 
-  const data = parseData( querySchema, {
-    limit    : limit ? parseInt( limit as string ) : 10,
-    skip     : skip ?? undefined,
-    sort_by  : sort_by ?? undefined,
-    sort_type: sort_type ?? undefined,
-    ...rest
+  const data = parseData( z.object({
+    worker_id: z.string()
+  }), {
+    worker_id: id
   } )
 
   if ( isLeft( data ) ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await searchSpeciality.execute(
-    data.right.query,
-    data.right.limit,
-    data.right.skip,
-    data.right.sort_by,
-    data.right.sort_type,
-  )
+  const result = await getWorkerTax.execute(data.right.worker_id)
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
   }
 
-  return NextResponse.json( result.right.map( SpecialityMapper.toDTO ),
+  return NextResponse.json( result.right.map( WorkerTaxMapper.toDTO ),
     { status: 200 } )
-}
-
-export async function PUT( request: NextRequest ) {
-  const body = await request.json()
-  const data = parseData( z.object({
-    prev_name: z.string(),
-    new_name: z.string(),
-  }), body )
-
-  if ( isLeft( data ) ) {
-    return NextResponse.json( { error: data.left.message }, { status: 400 } )
-  }
-
-  const result = await update.execute(
-    data.right.prev_name,
-    data.right.new_name
-  )
-
-  if ( isLeft( result ) ) {
-    return NextResponse.json( { status: 500 } )
-  }
-
-  return NextResponse.json( SpecialityMapper.toDTO( result.right ),
-    { status: 200 } )
-}
-
-export async function DELETE( request: NextRequest ) {
-  const { searchParams } = new URL( request.url )
-  const id               = searchParams.get( "id" )
-
-  const result = await remove.execute( id ?? "" )
-
-  if ( isLeft( result ) ) {
-    return NextResponse.json( { status: 500 } )
-  }
-
-  return NextResponse.json( { status: 200 } )
 }

@@ -54,7 +54,6 @@
 //
 //   const add    = new AddStory( new PrismaStoryData( prisma ) )
 //   const result = await add.execute( body.worker_id, story )
-//   console.log( "Result of adding story:", result )
 //   return NextResponse.json( { status: 201 } )
 // }
 //

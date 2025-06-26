@@ -21,8 +21,8 @@ export class UpdateSpeciality {
   }
 
 
-  async execute( speciality: SpecialityDTO ): Promise<Either<BaseException[], Speciality>>{
-    const existResult = await ensureSpecialityExist(this.dao, speciality.id )
+  async execute( prevName: string, newName :string ): Promise<Either<BaseException[], Speciality>>{
+    const existResult = await ensureSpecialityExist(this.dao, prevName )
 
     if ( isLeft(existResult) ) {
       return left( existResult.left )
@@ -30,7 +30,7 @@ export class UpdateSpeciality {
 
     const newSpeciality = Speciality.fromPrimitives(
       existResult.right.id.toString(),
-      speciality.name,
+      newName,
       existResult.right.createdAt.toString()
     )
 

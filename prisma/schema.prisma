@@ -195,9 +195,9 @@ model Review {
 model WorkerSpeciality {
   id           String     @id @default(uuid()) @db.Uuid
   createdAt    DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
-  workerId     String     @map("worker_id") @db.Uuid
   specialityId String     @map("speciality_id") @db.Uuid
   speciality   Speciality @relation(fields: [specialityId], references: [id], onDelete: Cascade)
+  workerId     String     @map("worker_id") @db.Uuid
   worker       Worker     @relation(fields: [workerId], references: [id], onDelete: Cascade)
 
   @@index([workerId])

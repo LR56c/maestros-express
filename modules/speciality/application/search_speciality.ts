@@ -35,7 +35,6 @@ export class SearchSpeciality {
             validSortBy,
             validSortType
           } = searchParamsResult.right
-
     return this.dao.search( query, validLimit, validSkip, validSortBy,
       validSortType )
   }

@@ -1,25 +1,30 @@
-import { PrismaClient } from "@/lib/generated/prisma"
-import { SpecialityDAO } from "@/modules/speciality/domain/speciality_dao"
+import { PrismaClient }        from "@/lib/generated/prisma"
+import {
+  SpecialityDAO
+}                              from "@/modules/speciality/domain/speciality_dao"
 import { Speciality }          from "@/modules/speciality/domain/speciality"
 import { Either, left, right } from "fp-ts/Either"
 import {
   BaseException
 }                              from "@/modules/shared/domain/exceptions/base_exception"
-import { UUID } from "@/modules/shared/domain/value_objects/uuid"
+import {
+  UUID
+}                              from "@/modules/shared/domain/value_objects/uuid"
 import {
   ValidInteger
-} from "@/modules/shared/domain/value_objects/valid_integer"
-import { ValidString } from "@/modules/shared/domain/value_objects/valid_string"
+}                              from "@/modules/shared/domain/value_objects/valid_integer"
+import {
+  ValidString
+}                              from "@/modules/shared/domain/value_objects/valid_string"
 import {
   InfrastructureException
-} from "@/modules/shared/domain/exceptions/infrastructure_exception"
+}                              from "@/modules/shared/domain/exceptions/infrastructure_exception"
 import * as changeCase         from "change-case"
 import {
-  NotificationConfig
-}                              from "@/modules/notification_config/domain/notification_config"
-import { Errors }              from "@/modules/shared/domain/exceptions/errors"
+  Errors
+}                              from "@/modules/shared/domain/exceptions/errors"
 
-export class PrismaSpecialityData implements SpecialityDAO{
+export class PrismaSpecialityData implements SpecialityDAO {
   constructor( private readonly db: PrismaClient ) {
   }
 
@@ -27,9 +32,9 @@ export class PrismaSpecialityData implements SpecialityDAO{
     try {
       await this.db.speciality.create( {
         data: {
-          id                : speciality.id.toString(),
-          name              : speciality.name.value,
-          createdAt         : speciality.createdAt.toString()
+          id       : speciality.id.toString(),
+          name     : speciality.name.value,
+          createdAt: speciality.createdAt.toString()
         }
       } )
       return right( true )
@@ -53,17 +58,35 @@ export class PrismaSpecialityData implements SpecialityDAO{
     }
   }
 
-  async search( query: Record<string, any>, limit?: ValidInteger, skip?: ValidString,
+  async search( query: Record<string, any>, limit?: ValidInteger,
+    skip?: ValidString,
     sortBy?: ValidString,
     sortType?: ValidString ): Promise<Either<BaseException[], Speciality[]>> {
     try {
+      let idsCount : number | undefined = undefined
       const where = {}
       if ( query.id ) {
         // @ts-ignore
         where["id"] = {
-          equals:  query.id
+          equals: query.id
         }
       }
+      if ( query.name ) {
+        // @ts-ignore
+        where["name"] = {
+          contains: query.name
+        }
+      }
+      if ( query.ids ) {
+        const arr: string[] = query.ids.split( "," )
+        const ids           = arr.map( i => UUID.from( i ).toString() )
+        idsCount = ids.length
+        // @ts-ignore
+        where["id"]         = {
+          in: ids
+        }
+      }
+
       const orderBy = {}
       if ( sortBy ) {
         const key    = changeCase.camelCase( sortBy.value )
@@ -78,6 +101,10 @@ export class PrismaSpecialityData implements SpecialityDAO{
         skip   : offset,
         take   : limit?.value
       } )
+
+      if( idsCount && response.length !== idsCount ) {
+        return left( [new InfrastructureException( "Not all specialities found" )] )
+      }
 
       const result: Speciality[] = []
       for ( const e of response ) {
@@ -103,7 +130,7 @@ export class PrismaSpecialityData implements SpecialityDAO{
           id: speciality.id.toString()
         },
         data : {
-          name     : speciality.name.value,
+          name: speciality.name.value
         }
       } )
       return right( true )

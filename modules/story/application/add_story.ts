@@ -44,7 +44,6 @@ export class AddStory {
     if ( isLeft( exist ) ) {
 
       const r = containError( exist.left, new DataNotFoundException() )
-      console.log( "Error in AddStory", r )
       // if ( !containError( exist.left, new DataNotFoundException() ) ) {
       //   return left( exist.left )
       // }
@@ -79,7 +78,6 @@ export class AddStory {
       return left( story.values )
     }
 
-    console.log( "Adding story", story )
 
     const result = await this.dao.add( vWorkerId, story )
 
