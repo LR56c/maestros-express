@@ -1,5 +1,5 @@
-import { MessageDTO }    from "@/modules/message/application/message_dto"
-import { Message }       from "@/modules/message/domain/message"
+import { MessageResponse } from "@/modules/message/application/message_response"
+import { Message }         from "@/modules/message/domain/message"
 import { ZoneDTO }       from "@/modules/zone/application/zone_dto"
 import { Errors }        from "@/modules/shared/domain/exceptions/errors"
 import { wrapType }      from "@/modules/shared/utils/wrap_type"
@@ -16,7 +16,7 @@ import { MessageStatus } from "@/modules/message/domain/message_status"
 import { ValidDate }     from "@/modules/shared/domain/value_objects/valid_date"
 
 export class MessageMapper {
-  static toDTO( message: Message ): MessageDTO {
+  static toDTO( message: Message ): MessageResponse {
     return {
       id       : message.id.toString(),
       chatId   : message.chatId.toString(),
@@ -28,7 +28,7 @@ export class MessageMapper {
     }
   }
 
-  static toJSON( message: MessageDTO ): Record<string, any> {
+  static toJSON( message: MessageResponse ): Record<string, any> {
     return {
       id       : message.id,
       content  : message.content,
@@ -38,7 +38,7 @@ export class MessageMapper {
     }
   }
 
-  static fromJSON( json: Record<string, any> ): MessageDTO | Errors {
+  static fromJSON( json: Record<string, any> ): MessageResponse | Errors {
     const errors = []
 
     const id = wrapType(

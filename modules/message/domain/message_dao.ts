@@ -10,4 +10,5 @@ export abstract class MessageDAO {
   abstract update( message : Message ): Promise<Either<BaseException, boolean>>
   abstract getByUser( userId: UUID ): Promise<Either<BaseException[], Message[]>>
   abstract getById( id: UUID ): Promise<Either<BaseException[], Message>>
+  abstract getByChat( chatId: UUID ): Promise<Either<BaseException[], Message[]>>
 }

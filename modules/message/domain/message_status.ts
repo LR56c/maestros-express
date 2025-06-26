@@ -7,7 +7,7 @@ export enum MessageStatusEnum {
   SENDING = "SENDING",
   SENT = "SENT",
   READ = "READ",
-  CENCELED = "CENCELED",
+  CANCELED = "CANCELED",
   ACCEPTED = "ACCEPTED",
 }
 

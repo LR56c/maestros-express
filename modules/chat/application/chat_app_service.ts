@@ -1,7 +1,7 @@
-import { ChatDTO } from "@/modules/chat/application/chat_dto"
+import { ChatResponse } from "@/modules/chat/application/chat_response"
 
 export abstract class ChatAppService {
-  abstract add( chat : ChatDTO ): Promise<void>
-  abstract update( chat : ChatDTO ): Promise<void>
-  abstract getByUser( userId : string ): Promise<ChatDTO[]>
+  abstract add( chat : ChatResponse ): Promise<void>
+  abstract update( chat : ChatResponse ): Promise<void>
+  abstract getByUser( userId : string ): Promise<ChatResponse[]>
 }

@@ -1,15 +1,19 @@
 import { PrismaClient } from "@/lib/generated/prisma"
 import { MessageDAO }   from "@/modules/message/domain/message_dao"
-import { Message }      from "@/modules/message/domain/message"
-import { Either }       from "fp-ts/Either"
+import { Message }             from "@/modules/message/domain/message"
+import { Either, left, right } from "fp-ts/Either"
 import {
   BaseException
-}                       from "@/modules/shared/domain/exceptions/base_exception"
+}                              from "@/modules/shared/domain/exceptions/base_exception"
 import { UUID }         from "@/modules/shared/domain/value_objects/uuid"
 import {
   InfrastructureException
 }                       from "@/modules/shared/domain/exceptions/infrastructure_exception"
 import { Errors }       from "@/modules/shared/domain/exceptions/errors"
+import {
+  DataNotFoundException
+} from "@/modules/shared/domain/exceptions/data_not_found_exception"
+import { boolean }             from "fp-ts"
 
 export class PrismaMessageData implements MessageDAO {
   constructor( private readonly db: PrismaClient ) {
@@ -35,22 +39,62 @@ export class PrismaMessageData implements MessageDAO {
     }
   }
 
+  async getByChat( chatId: UUID ): Promise<Either<BaseException[], Message[]>> {
+    try {
+      const response = await this.db.message.findMany( {
+        where: {
+          chatId: chatId.toString()
+        }
+      } )
+
+      const messages: Message[] = []
+
+      for ( const message of response ) {
+        const msg = Message.fromPrimitives(
+          message.id,
+          message.chatId,
+          message.userId,
+          message.content,
+          message.type,
+          message.status,
+          message.createdAt,
+        )
+
+        if ( msg instanceof Errors ) {
+          return left( msg.values )
+        }
+
+        messages.push( msg )
+      }
+
+      return right( messages )
+    }
+    catch ( e ) {
+      return left( [new InfrastructureException()] )
+    }
+  }
+
+
   async getById( id: UUID ): Promise<Either<BaseException[], Message>> {
     try {
-      const response = await this.db.message.findUniqueOrThrow( {
+      const response = await this.db.message.findUnique( {
         where: {
           id: id.toString()
         }
       } )
 
+      if ( !response ) {
+        return left( [new DataNotFoundException()] )
+      }
+
       const message = Message.fromPrimitives(
         response.id,
-        response.userId,
         response.chatId,
-        response.createdAt,
+        response.userId,
         response.content,
+        response.type,
         response.status,
-        response.type
+        response.createdAt,
       )
 
       if ( message instanceof Errors ) {
@@ -77,12 +121,12 @@ export class PrismaMessageData implements MessageDAO {
       for ( const message of response ) {
         const msg = Message.fromPrimitives(
           message.id,
-          message.userId,
           message.chatId,
-          message.createdAt,
+          message.userId,
           message.content,
+          message.type,
           message.status,
-          message.type
+          message.createdAt,
         )
 
         if ( msg instanceof Errors ) {

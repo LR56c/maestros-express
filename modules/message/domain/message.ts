@@ -8,7 +8,10 @@ import {
   BaseException
 }                        from "@/modules/shared/domain/exceptions/base_exception"
 import { MessageType }   from "@/modules/message/domain/message_type"
-import { MessageStatus } from "@/modules/message/domain/message_status"
+import {
+  MessageStatus,
+  MessageStatusEnum
+} from "@/modules/message/domain/message_status"
 import { wrapType }      from "@/modules/shared/utils/wrap_type"
 
 export class Message {
@@ -17,8 +20,8 @@ export class Message {
     readonly chatId: UUID,
     readonly userId: UUID,
     readonly content: ValidString,
-    readonly type: ValidString,
-    readonly status: ValidString,
+    readonly type: MessageType,
+    readonly status: MessageStatus,
     readonly createdAt: ValidDate
   )
   {
@@ -30,7 +33,6 @@ export class Message {
     userId: string,
     content: string,
     type: string,
-    status: string
   ): Message | Errors {
     return Message.fromPrimitives(
       id,
@@ -38,7 +40,7 @@ export class Message {
       userId,
       content,
       type,
-      status,
+      MessageStatusEnum.SENT,
       ValidDate.nowUTC()
     )
   }
@@ -57,8 +59,8 @@ export class Message {
       UUID.from( chatId ),
       UUID.from( userId ),
       ValidString.from( content ),
-      ValidString.from( type ),
-      ValidString.from( status ),
+      MessageType.from( type ),
+      MessageStatus.from( status ),
       ValidDate.from( createdAt )
     )
   }
@@ -122,8 +124,8 @@ export class Message {
       chatIdVO as UUID,
       userIdVO as UUID,
       contentVO as ValidString,
-      typeVO as ValidString,
-      statusVO as ValidString,
+      typeVO as MessageType,
+      statusVO as MessageStatus,
       createdAtVO as ValidDate
     )
   }

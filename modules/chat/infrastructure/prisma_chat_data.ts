@@ -10,6 +10,9 @@ import {
   InfrastructureException
 }                              from "@/modules/shared/domain/exceptions/infrastructure_exception"
 import { Errors }              from "@/modules/shared/domain/exceptions/errors"
+import {
+  DataNotFoundException
+} from "@/modules/shared/domain/exceptions/data_not_found_exception"
 
 export class PrismaChatData implements ChatDAO {
   constructor( private readonly db: PrismaClient ) {
@@ -44,11 +47,15 @@ export class PrismaChatData implements ChatDAO {
 
   async getById( id: UUID ): Promise<Either<BaseException[], Chat>> {
     try {
-      const response = await this.db.chat.findUniqueOrThrow( {
+      const response = await this.db.chat.findUnique( {
         where: {
           id: id.toString()
         }
       } )
+
+      if ( !response ) {
+        return left( [new DataNotFoundException()] )
+      }
 
       const chat = Chat.fromPrimitives(
         response.id,

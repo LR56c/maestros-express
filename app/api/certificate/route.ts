@@ -54,7 +54,6 @@ export async function GET( request: NextRequest ) {
 
 
   const result = await get.execute( id ?? "" )
-  console.log("certificate get result", result)
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )

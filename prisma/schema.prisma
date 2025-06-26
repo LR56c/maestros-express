@@ -362,7 +362,7 @@ model Message {
   id        String        @id @default(uuid()) @db.Uuid
   status    MessageStatus @map("status")
   type      MessageType   @map("type")
-  content   String?       @map("content")
+  content   String       @map("content")
   createdAt DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
   userId    String        @map("user_id") @db.Uuid
   chatId    String        @map("chat_id") @db.Uuid

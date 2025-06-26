@@ -1,5 +1,7 @@
 import { Chat }                      from "@/modules/chat/domain/chat"
-import { ChatDTO }                   from "@/modules/chat/application/chat_dto"
+import {
+  ChatResponse
+}                                    from "@/modules/chat/application/chat_response"
 import {
   Errors
 }                                    from "@/modules/shared/domain/exceptions/errors"
@@ -18,7 +20,7 @@ import {
 }                                    from "@/modules/shared/domain/value_objects/valid_date"
 
 export class ChatMapper {
-  static toDTO( chat: Chat ): ChatDTO {
+  static toDTO( chat: Chat ): ChatResponse {
     return {
       id                : chat.id.toString(),
       subject           : chat.subject?.value,
@@ -29,7 +31,7 @@ export class ChatMapper {
     }
   }
 
-  static toJSON( chat: ChatDTO ): Record<string, any> {
+  static toJSON( chat: ChatResponse ): Record<string, any> {
     return {
       id                : chat.id,
       subject           : chat.subject,
@@ -40,7 +42,7 @@ export class ChatMapper {
     }
   }
 
-  static fromJSON( chat: Record<string, any> ): ChatDTO | Errors {
+  static fromJSON( chat: Record<string, any> ): ChatResponse | Errors {
     const errors = []
 
     const id = wrapType(
@@ -93,11 +95,21 @@ export class ChatMapper {
       id                : (
         id as UUID
       ).toString(),
-      subject           : subject ? (subject as ValidString).value : undefined,
-      accepted_date     : acceptedDate ? (acceptedDate as ValidDate).value : undefined,
-      quotation_accepted: quotationAccepted ? (quotationAccepted as UUID).value : undefined,
-      worker_archived   : workerArchived ? (workerArchived as ValidDate).value : undefined,
-      created_at        : (createdAt as ValidDate).value
+      subject           : (
+        subject as ValidString
+      ).value,
+      accepted_date     : acceptedDate ? (
+        acceptedDate as ValidDate
+      ).value : undefined,
+      quotation_accepted: quotationAccepted ? (
+        quotationAccepted as UUID
+      ).value : undefined,
+      worker_archived   : workerArchived ? (
+        workerArchived as ValidDate
+      ).value : undefined,
+      created_at        : (
+        createdAt as ValidDate
+      ).value
     }
   }
 

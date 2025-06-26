@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-export const messageSchema = z.object( {
+export const messageResponseSchema = z.object( {
   id        : z.string(),
   content   : z.string(),
   type      : z.string(),
@@ -8,5 +8,5 @@ export const messageSchema = z.object( {
   created_at: z.date()
 } )
 
-export type MessageDTO = z.infer<typeof messageSchema>
+export type MessageResponse = z.infer<typeof messageResponseSchema>
 

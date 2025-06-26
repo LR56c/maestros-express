@@ -32,9 +32,6 @@ export class Chat {
     workerId: string,
     clientId: string,
     subject: string,
-    acceptedDate?: Date | string,
-    quotationAccepted?: string,
-    workerArchived?: Date | string
   ): Chat | Errors {
     return Chat.fromPrimitives(
       id,
@@ -42,9 +39,9 @@ export class Chat {
       clientId,
       new Date(),
       subject,
-      acceptedDate,
-      quotationAccepted,
-      workerArchived
+      undefined,
+      undefined,
+      undefined
     )
   }
 

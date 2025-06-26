@@ -4,8 +4,8 @@ import {
   BaseException
 } from "@/modules/shared/domain/exceptions/base_exception"
 import {
-  ChatDTO
-} from "@/modules/chat/application/chat_dto"
+  ChatResponse
+} from "@/modules/chat/application/chat_response"
 import {
   ensureChatExist
 } from "@/modules/chat/utils/ensure_chat_exist"
@@ -13,12 +13,13 @@ import { Chat } from "@/modules/chat/domain/chat"
 import {
   Errors
 } from "@/modules/shared/domain/exceptions/errors"
+import { ChatUpdateDTO } from "@/modules/chat/application/chat_update_dto"
 
 export class UpdateChat {
   constructor( private readonly dao: ChatDAO ) {
   }
 
-  async execute( chat: ChatDTO ): Promise<Either<BaseException[], boolean>> {
+  async execute( chat: ChatUpdateDTO ): Promise<Either<BaseException[], Chat>> {
     const exist = await ensureChatExist( this.dao, chat.id )
 
     if ( isLeft( exist ) ) {
@@ -48,7 +49,7 @@ export class UpdateChat {
       return left( [result.left] )
     }
 
-    return right( true )
+    return right( updatedChat )
   }
 
 }

@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-export const chatSchema = z.object( {
+export const chatResponseSchema = z.object( {
   id                : z.string(),
   subject           : z.string(),
   accepted_date     : z.date().optional(),
@@ -9,5 +9,5 @@ export const chatSchema = z.object( {
   created_at        : z.date()
 } )
 
-export type ChatDTO = z.infer<typeof chatSchema>
+export type ChatResponse = z.infer<typeof chatResponseSchema>
 

@@ -78,7 +78,6 @@ export async function GET( request: NextRequest ) {
     data.right.skip,
     data.right.sort_by,
     data.right.sort_type, )
-  console.log("result", result)
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
