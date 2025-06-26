@@ -29,7 +29,7 @@ export class AddNotificationConfig {
   constructor( private readonly dao: NotificationConfigDAO ) {
   }
 
-  async execute( dto: NotificationConfigDTO ): Promise<Either<BaseException[], boolean>> {
+  async execute( dto: NotificationConfigDTO ): Promise<Either<BaseException[], NotificationConfig>> {
 
     const exist = await ensureNotificationConfigExist(this.dao, dto.id)
 
@@ -58,6 +58,6 @@ export class AddNotificationConfig {
       return left( [result.left] )
     }
 
-    return right( true )
+    return right( notificationConfig )
   }
 }

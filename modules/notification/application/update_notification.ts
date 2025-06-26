@@ -22,6 +22,9 @@ import {
 import {
   DataNotFoundException
 }                              from "@/modules/shared/domain/exceptions/data_not_found_exception"
+import {
+  NotificationUpdateDTO
+} from "@/modules/notification/application/notification_update_dto"
 
 export class UpdateNotification {
   constructor( private readonly repo: NotificationRepository ) {
@@ -45,16 +48,14 @@ export class UpdateNotification {
   }
 
 
-  async execute( id: string, props: {
-    viewed_at?: boolean
-  } ): Promise<Either<BaseException[], Notification>> {
-    const notificationResult = await this.ensureNotificationExist( id )
+  async execute( dto : NotificationUpdateDTO): Promise<Either<BaseException[], Notification>> {
+    const notificationResult = await this.ensureNotificationExist( dto.id )
 
     if ( isLeft( notificationResult ) ) {
       return left( notificationResult.left )
     }
     const viewedAt = wrapTypeDefault( undefined,
-      ( value ) => ValidBool.from( value ), props.viewed_at )
+      ( value ) => ValidBool.from( value ), dto.viewed_at )
 
     if ( viewedAt instanceof BaseException ) {
       return left( [viewedAt] )
