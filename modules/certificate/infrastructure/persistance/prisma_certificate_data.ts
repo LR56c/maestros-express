@@ -50,10 +50,10 @@ export class PrismaCertificateData implements CertificateDAO {
 
       const certificate = Certificate.fromPrimitives(
         response.id,
-        response.type,
         response.workerId,
-        response.url,
         response.name,
+        response.url,
+        response.type,
         response.createdAt
       )
 
@@ -81,10 +81,10 @@ export class PrismaCertificateData implements CertificateDAO {
       for ( const e of response ) {
         const certificate = Certificate.fromPrimitives(
           e.id,
-          e.type,
           e.workerId,
-          e.url,
           e.name,
+          e.url,
+          e.type,
           e.createdAt
         )
 

@@ -4,9 +4,6 @@ import {
   BaseException
 }                                      from "@/modules/shared/domain/exceptions/base_exception"
 import {
-  SpecialityDTO
-}                                      from "@/modules/speciality/application/speciality_dto"
-import {
   ensureSpecialityExist
 }                                      from "@/modules/speciality/utils/ensure_speciality_exist"
 import {

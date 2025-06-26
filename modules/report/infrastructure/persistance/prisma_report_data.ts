@@ -15,7 +15,6 @@ import {
   InfrastructureException
 }                              from "@/modules/shared/domain/exceptions/infrastructure_exception"
 import * as changeCase         from "change-case"
-import { Speciality }          from "@/modules/speciality/domain/speciality"
 import { Errors }              from "@/modules/shared/domain/exceptions/errors"
 
 export class PrismaReportData implements ReportDAO {

@@ -1,0 +1,103 @@
+import { NextRequest, NextResponse } from "next/server"
+import {
+  specialitySchema
+}                                    from "@/modules/speciality/application/speciality_dto"
+import {
+  AddSpeciality
+}                                    from "@/modules/speciality/application/add_speciality"
+import {
+  PrismaSpecialityData
+}                                    from "@/modules/speciality/infrastructure/persistance/prisma_speciality_data"
+import prisma                        from "@/lib/prisma"
+import {
+  RemoveSpeciality
+}                                    from "@/modules/speciality/application/remove_speciality"
+import {
+  UpdateSpeciality
+}                                    from "@/modules/speciality/application/update_speciality"
+import {
+  SearchSpeciality
+}                                    from "@/modules/speciality/application/search_speciality"
+import {
+  querySchema
+}                                    from "@/modules/shared/application/query_dto"
+import {
+  parseData
+}                                    from "@/modules/shared/application/parse_handlers"
+import { isLeft }                    from "fp-ts/Either"
+import {
+  SpecialityMapper
+}                                    from "@/modules/speciality/application/speciality_mapper"
+import { z }                         from "zod"
+import {
+  PrismaReportData
+}                                    from "@/modules/report/infrastructure/persistance/prisma_report_data"
+import {
+  AddReport
+}                                    from "@/modules/report/application/add_report"
+import {
+  SearchReport
+}                                    from "@/modules/report/application/search_report"
+import {
+  ReportMapper
+}                                    from "@/modules/report/application/report_mapper"
+import {
+  reportSchema
+}                                    from "@/modules/report/application/report_dto"
+import { searchUser }                from "@/app/api/user/route"
+
+const dao    = new PrismaReportData( prisma )
+const add    = new AddReport( dao,searchUser )
+const search = new SearchReport( dao )
+
+export async function POST( request: NextRequest ) {
+  const body = await request.json()
+  const data = parseData( reportSchema, body )
+
+  if ( isLeft( data ) ) {
+    return NextResponse.json( { error: data.left.message }, { status: 400 } )
+  }
+
+  const result = await add.execute( data.right )
+
+  if ( isLeft( result ) ) {
+    return NextResponse.json( { status: 500 } )
+  }
+
+  return NextResponse.json( ReportMapper.toDTO( result.right ),
+    { status: 201 } )
+}
+
+export async function GET( request: NextRequest ) {
+  const { searchParams }                             = new URL( request.url )
+  const paramsObject                                 = Object.fromEntries(
+    searchParams.entries() )
+  const { limit, skip, sort_by, sort_type, ...rest } = paramsObject
+
+  const data = parseData( querySchema, {
+    limit    : limit ? parseInt( limit as string ) : 10,
+    skip     : skip ?? undefined,
+    sort_by  : sort_by ?? undefined,
+    sort_type: sort_type ?? undefined,
+    ...rest
+  } )
+
+  if ( isLeft( data ) ) {
+    return NextResponse.json( { error: data.left.message }, { status: 400 } )
+  }
+
+  const result = await search.execute(
+    data.right.query,
+    data.right.limit,
+    data.right.skip,
+    data.right.sort_by,
+    data.right.sort_type,
+  )
+
+  if ( isLeft( result ) ) {
+    return NextResponse.json( { status: 500 } )
+  }
+
+  return NextResponse.json( result.right.map( ReportMapper.toDTO ),
+    { status: 200 } )
+}

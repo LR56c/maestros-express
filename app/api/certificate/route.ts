@@ -54,12 +54,13 @@ export async function GET( request: NextRequest ) {
 
 
   const result = await get.execute( id ?? "" )
+  console.log("certificate get result", result)
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
   }
 
-  return NextResponse.json( result.right.map( SpecialityMapper.toDTO ),
+  return NextResponse.json( result.right.map( CertificateMapper.toDTO ),
     { status: 200 } )
 }
 

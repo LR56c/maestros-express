@@ -50,21 +50,6 @@ export class PrismaWorkerData implements WorkerDAO {
   }
 
   private async mapWorkerRelations( w: any ): Promise<Either<BaseException[], WorkerRelations>> {
-    // const certificates: Certificate[] = []
-    // for ( const certificate of w.Certificate ) {
-    //   const cert = Certificate.fromPrimitives(
-    //     certificate.id.toString(),
-    //     certificate.workerId.toString(),
-    //     certificate.name,
-    //     certificate.url,
-    //     certificate.type,
-    //     certificate.createdAt
-    //   )
-    //   if ( cert instanceof Errors ) {
-    //     return left( cert.values )
-    //   }
-    //   certificates.push( cert )
-    // }
     const taxes: WorkerTax[] = []
     for ( const tax of w.WorkerTax ) {
       const taxMapped = WorkerTax.fromPrimitives(
@@ -229,10 +214,11 @@ export class PrismaWorkerData implements WorkerDAO {
               speciality: true
             }
           },
-          WorkerTax       : true
+          WorkerTax: true
         }
       } )
       const workers: Worker[] = []
+      console.log("Worker Response from DB: ", response)
       for ( const w of response ) {
         const relationMapped = await this.mapWorkerRelations( w )
         if ( isLeft( relationMapped ) ) {

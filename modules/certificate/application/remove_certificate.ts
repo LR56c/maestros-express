@@ -12,13 +12,13 @@ export class RemoveCertificate {
 
   async execute( id: string ): Promise<Either<BaseException[], boolean>>{
     const exist = await ensureCertificateExist(this.dao, id)
-
+    console.log("RemoveCertificate.execute", exist)
     if ( isLeft(exist) ) {
       return left(exist.left)
     }
 
     const result = await this.dao.remove(exist.right.id)
-
+    console.log("RemoveCertificate.execute result", result)
     if ( isLeft(result) ) {
       return left([result.left])
     }

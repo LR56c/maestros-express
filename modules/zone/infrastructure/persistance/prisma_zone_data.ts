@@ -17,46 +17,40 @@ import {
 import {
   UUID
 }                                   from "@/modules/shared/domain/value_objects/uuid"
+import { boolean }                  from "fp-ts"
+import { undefined }                from "zod"
 
 export class PrismaZoneData implements ZoneDAO {
   constructor( private readonly db: PrismaClient ) {
   }
 
-  async addBulk( workerId: UUID,
+  async upsert( workerId: UUID,
     zones: Zone[] ): Promise<Either<BaseException, boolean>> {
-    try {
-      const data = zones.map( z => ( {
-        id       : z.id.value,
-        workerId : workerId.value,
-        sectorId : z.sector.id.value,
-        createdAt: z.createdAt.toString()
-      } ) )
-
-      await this.db.zone.createMany( {
-        data: data
-      } )
-      return right( true )
-    }
-    catch ( e ) {
-      return left( new InfrastructureException() )
-    }
-  }
-
-  async removeBulk( ids: UUID[] ): Promise<Either<BaseException, boolean>> {
-    try {
-      await this.db.zone.deleteMany( {
-        where: {
-          id: {
-            in: ids.map( id => id.value )
+    try{
+      await this.db.$transaction([
+        this.db.zone.deleteMany( {
+          where: {
+            workerId: workerId.value
           }
-        }
-      } )
-      return right( true )
+        }),
+        this.db.zone.createMany( {
+          data: zones.map( z => {
+            return {
+              id       : z.id.toString(),
+              workerId : workerId.toString(),
+              sectorId : z.sector.id.toString(),
+              createdAt: z.createdAt.toString()
+            }
+          } )
+        })
+      ])
+      return right(true)
     }
     catch ( e ) {
       return left( new InfrastructureException() )
     }
   }
+
 
   async getByWorker( workerId: UUID ): Promise<Either<BaseException[], Zone[]>> {
     try {

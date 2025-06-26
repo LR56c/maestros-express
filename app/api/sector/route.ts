@@ -34,7 +34,7 @@ const dao    = new PrismaSectorData( prisma )
 const add    = new AddSector( dao, searchRegion )
 const remove = new RemoveSector( dao )
 const update = new UpdateSector( dao )
-const search = new SearchSector( dao )
+export const searchSector = new SearchSector( dao )
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
@@ -72,7 +72,7 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await search.execute(     data.right.query,
+  const result = await searchSector.execute(     data.right.query,
     data.right.limit,
     data.right.skip,
     data.right.sort_by,
