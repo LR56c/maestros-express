@@ -1,5 +1,5 @@
-import { QuotationDTO }              from "@/modules/quotation/application/quotation_dto"
-import { Quotation }                 from "@/modules/quotation/domain/quotation"
+import { QuotationResponse } from "@/modules/quotation/application/quotation_response"
+import { Quotation }         from "@/modules/quotation/domain/quotation"
 import {
   Errors
 }                                    from "@/modules/shared/domain/exceptions/errors"
@@ -25,7 +25,7 @@ import {
 }                                    from "@/modules/quotation/domain/quotation_status"
 
 export class QuotationMapper {
-  static toDTO( quotation: Quotation ): QuotationDTO {
+  static toDTO( quotation: Quotation ): QuotationResponse {
     return {
       id            : quotation.id.value,
       status        : quotation.status.value,
@@ -36,7 +36,7 @@ export class QuotationMapper {
     }
   }
 
-  static toJSON( quotation: QuotationDTO ): Record<string, any> {
+  static toJSON( quotation: QuotationResponse ): Record<string, any> {
     return {
       id            : quotation.id,
       status        : quotation.status,
@@ -47,7 +47,7 @@ export class QuotationMapper {
     }
   }
 
-  static fromJSON( quotation: Record<string, any> ): QuotationDTO | Errors {
+  static fromJSON( quotation: Record<string, any> ): QuotationResponse | Errors {
     const errors = []
 
     const id = wrapType(

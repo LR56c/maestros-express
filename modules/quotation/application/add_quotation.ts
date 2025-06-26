@@ -4,9 +4,6 @@ import {
   BaseException
 }                                      from "@/modules/shared/domain/exceptions/base_exception"
 import {
-  QuotationDTO
-}                                      from "@/modules/quotation/application/quotation_dto"
-import {
   ensureQuotationExist
 }                                      from "@/modules/quotation/utils/ensure_quotation_exist"
 import {
@@ -24,17 +21,19 @@ import {
 import {
   QuotationDetail
 }                                      from "@/modules/quotation/modules/quotation_detail/domain/quotation_detail"
+import {
+  QuotationRequest
+}                                      from "@/modules/quotation/application/quotation_request"
+import {
+  QuotationStatusEnum
+}                                      from "@/modules/quotation/domain/quotation_status"
 
 export class AddQuotation {
   constructor( private readonly dao: QuotationDAO ) {
   }
 
-  async execute(
-    userId: string,
-    chatId: string,
-    workerId: string,
-    quotation: QuotationDTO ): Promise<Either<BaseException[], boolean>> {
-    const exist = await ensureQuotationExist( this.dao, quotation.id )
+  async execute(dto: QuotationRequest ): Promise<Either<BaseException[], Quotation>> {
+    const exist = await ensureQuotationExist( this.dao, dto.id )
 
     if ( isLeft( exist ) ) {
       if ( !containError( exist.left, new DataNotFoundException() ) ) {
@@ -44,10 +43,11 @@ export class AddQuotation {
 
     const details : QuotationDetail[] = []
 
-    for ( const e of quotation.details ) {
+    let total = 0
+    for ( const e of dto.details ) {
       const detail = QuotationDetail.create(
         e.id,
-        quotation.id,
+        dto.id,
         e.name,
         e.value,
         e.value_format,
@@ -58,20 +58,21 @@ export class AddQuotation {
         return left( detail.values )
       }
 
+      total += detail.value.value
       details.push( detail )
     }
 
     const newQuotation = Quotation.create(
-      quotation.id,
-      userId,
-      chatId,
-      workerId,
-      quotation.title,
-      quotation.total,
-      quotation.status,
-      quotation.value_format,
+      dto.id,
+      dto.user_id,
+      dto.chat_id,
+      dto.worker_id,
+      dto.title,
+      total,
+      QuotationStatusEnum.PENDING,
+      details[0]!.valueFormat.value,
       details,
-      quotation.estimated_time
+      dto.estimated_time
     )
 
     if ( newQuotation instanceof Errors ) {
@@ -84,7 +85,7 @@ export class AddQuotation {
       return left( [result.left] )
     }
 
-    return right( true )
+    return right( newQuotation )
   }
 
 }

@@ -4,9 +4,6 @@ import {
   BaseException
 }                                      from "@/modules/shared/domain/exceptions/base_exception"
 import {
-  QuotationDTO
-}                                      from "@/modules/quotation/application/quotation_dto"
-import {
   ensureQuotationExist
 }                                      from "@/modules/quotation/utils/ensure_quotation_exist"
 import {
@@ -16,17 +13,14 @@ import {
   Errors
 }                                      from "@/modules/shared/domain/exceptions/errors"
 import {
-  StoryDocument
-}                                      from "@/modules/story/modules/story_document/domain/story_document"
-import {
-  StoryDocumentDTO
-}                                      from "@/modules/story/modules/story_document/application/story_document_dto"
-import {
   QuotationDetail
 }                                      from "@/modules/quotation/modules/quotation_detail/domain/quotation_detail"
 import {
   QuotationDetailDTO
 }                                      from "@/modules/quotation/modules/quotation_detail/application/quotation_detail_dto"
+import {
+  QuotationUpdateDTO
+}                                      from "@/modules/quotation/application/quotation_update_dto"
 
 export class UpdateQuotation {
   constructor( private readonly dao: QuotationDAO ) {
@@ -65,7 +59,7 @@ export class UpdateQuotation {
   }
 
   async execute(
-    quotation: QuotationDTO ): Promise<Either<BaseException[], boolean>> {
+    quotation: QuotationUpdateDTO ): Promise<Either<BaseException[], Quotation>> {
 
     const exist = await ensureQuotationExist( this.dao, quotation.id )
 
@@ -75,14 +69,24 @@ export class UpdateQuotation {
 
     const oldQuotation = exist.right
 
-    const details = await this.combineDetails(
-      oldQuotation.id.toString(),
-      oldQuotation.details,
-      quotation.details
-    )
+    let details: QuotationDetail[] = []
+    let total: number | undefined  = undefined
+    if ( quotation.details ) {
 
-    if ( isLeft( details ) ) {
-      return left( details.left )
+      const detailsResult = await this.combineDetails(
+        oldQuotation.id.toString(),
+        oldQuotation.details,
+        quotation.details
+      )
+
+      if ( isLeft( detailsResult ) ) {
+        return left( detailsResult.left )
+      }
+      details = detailsResult.right
+      total = details.reduce( ( acc, detail ) => acc + detail.value.value, 0 )
+    }
+    else {
+      details = oldQuotation.details
     }
 
     const updatedQuotation = Quotation.fromPrimitives(
@@ -90,12 +94,12 @@ export class UpdateQuotation {
       oldQuotation.userId.toString(),
       oldQuotation.chatId.toString(),
       oldQuotation.workerId.toString(),
-      quotation.title,
-      quotation.total,
-      quotation.status,
-      quotation.value_format,
+      quotation.title ? quotation.title : oldQuotation.title.value,
+      total ? total : oldQuotation.total.value,
+      quotation.status ? quotation.status : oldQuotation.status.value,
+      details[0]!.valueFormat.value,
       oldQuotation.createdAt.toString(),
-      details.right,
+      details,
       quotation.estimated_time
     )
 
@@ -109,6 +113,6 @@ export class UpdateQuotation {
       return left( [result.left] )
     }
 
-    return right( true )
+    return right( updatedQuotation )
   }
 }

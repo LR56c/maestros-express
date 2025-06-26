@@ -1,0 +1,112 @@
+import { NextRequest, NextResponse } from "next/server"
+import {
+  specialitySchema
+}                                    from "@/modules/speciality/application/speciality_dto"
+import prisma                        from "@/lib/prisma"
+import {
+  querySchema
+}                                    from "@/modules/shared/application/query_dto"
+import {
+  parseData
+}                                    from "@/modules/shared/application/parse_handlers"
+import { isLeft }                    from "fp-ts/Either"
+import {
+  SpecialityMapper
+}                                    from "@/modules/speciality/application/speciality_mapper"
+import { z }                         from "zod"
+import {
+  PrismaQuotationData
+}                                    from "@/modules/quotation/infrastructure/prisma_quotation_data"
+import {
+  AddQuotation
+}                                    from "@/modules/quotation/application/add_quotation"
+import {
+  SearchQuotation
+}                                    from "@/modules/quotation/application/search_quotation"
+import {
+  UpdateQuotation
+}                                    from "@/modules/quotation/application/update_quotation"
+import {
+  quotationRequestSchema
+}                                    from "@/modules/quotation/application/quotation_request"
+import {
+  QuotationMapper
+}                                    from "@/modules/quotation/application/quotation_mapper"
+import {
+  quotationUpdateSchema
+}                                    from "@/modules/quotation/application/quotation_update_dto"
+
+const dao    = new PrismaQuotationData( prisma )
+const add    = new AddQuotation( dao )
+const update = new UpdateQuotation( dao )
+const search = new SearchQuotation( dao )
+
+export async function POST( request: NextRequest ) {
+  const body = await request.json()
+  const data = parseData( quotationRequestSchema, body )
+
+  if ( isLeft( data ) ) {
+    return NextResponse.json( { error: data.left.message }, { status: 400 } )
+  }
+
+  const result = await add.execute( data.right )
+
+  if ( isLeft( result ) ) {
+    return NextResponse.json( { status: 500 } )
+  }
+
+  return NextResponse.json( QuotationMapper.toDTO( result.right ),
+    { status: 201 } )
+}
+
+export async function GET( request: NextRequest ) {
+  const { searchParams }                             = new URL( request.url )
+  const paramsObject                                 = Object.fromEntries(
+    searchParams.entries() )
+  const { limit, skip, sort_by, sort_type, ...rest } = paramsObject
+
+  const data = parseData( querySchema, {
+    limit    : limit ? parseInt( limit as string ) : 10,
+    skip     : skip ?? undefined,
+    sort_by  : sort_by ?? undefined,
+    sort_type: sort_type ?? undefined,
+    ...rest
+  } )
+
+  if ( isLeft( data ) ) {
+    return NextResponse.json( { error: data.left.message }, { status: 400 } )
+  }
+
+  const result = await search.execute(
+    data.right.query,
+    data.right.limit,
+    data.right.skip,
+    data.right.sort_by,
+    data.right.sort_type
+  )
+
+  if ( isLeft( result ) ) {
+    return NextResponse.json( { status: 500 } )
+  }
+
+  return NextResponse.json( result.right.map( QuotationMapper.toDTO ),
+    { status: 200 } )
+}
+
+export async function PUT( request: NextRequest ) {
+  const body = await request.json()
+  const data = parseData( quotationUpdateSchema, body )
+
+  if ( isLeft( data ) ) {
+    return NextResponse.json( { error: data.left.message }, { status: 400 } )
+  }
+
+  const result = await update.execute( data.right)
+
+  if ( isLeft( result ) ) {
+    return NextResponse.json( { status: 500 } )
+  }
+
+  return NextResponse.json( QuotationMapper.toDTO( result.right ),
+    { status: 200 } )
+}
