@@ -13,4 +13,5 @@ export abstract class PaymentDAO {
     skip ?: ValidString, sortBy ?: ValidString,
     sortType ?: ValidString ): Promise<Either<BaseException[], Payment[]>>
   abstract add( payment : Payment ): Promise<Either<BaseException, boolean>>
+  abstract update( payment : Payment ): Promise<Either<BaseException, boolean>>
 }

@@ -19,12 +19,19 @@ import {
 import {
   ChatRequest
 }                                      from "@/modules/chat/application/chat_request"
+import {
+  InfrastructureException
+}                                      from "@/modules/shared/domain/exceptions/infrastructure_exception"
 
 export class AddChat {
   constructor( private readonly dao: ChatDAO ) {
   }
 
   async execute(dto: ChatRequest ): Promise<Either<BaseException[], Chat>> {
+
+    if(dto.worker_id === dto.client_id) {
+      return left( [new InfrastructureException("Worker and client cannot be the same")] )
+    }
 
     const existResult = await ensureChatExist( this.dao, dto.id )
     if ( isLeft( existResult ) ) {

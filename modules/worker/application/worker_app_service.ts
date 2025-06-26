@@ -6,6 +6,4 @@ export abstract class WorkerAppService {
   abstract add( worker: WorkerResponse ): Promise<void>
 
   abstract update( worker: WorkerResponse ): Promise<void>
-
-  abstract draft( worker: WorkerResponse ): Promise<void>
 }

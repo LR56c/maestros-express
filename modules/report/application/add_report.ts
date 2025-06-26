@@ -23,26 +23,7 @@ export class AddReport {
 
   async execute( dto: ReportDTO ): Promise<Either<BaseException[], Report>>{
 
-    const vfromUserId = await this.searchUser.execute({
-      id: dto.from_user_id,
-    }, 1)
-
-    if ( isLeft( vfromUserId ) ) {
-      return left( vfromUserId.left )
-    }
-
-    const vtoUserId = await this.searchUser.execute({
-      id: dto.to_user_id,
-    }, 1)
-
-    if ( isLeft( vtoUserId ) ) {
-      return left( vtoUserId.left )
-    }
-
-    const from = vfromUserId.right[0]
-    const to = vtoUserId.right[0]
-
-    if ( from.userId.toString() === to.userId.toString() ) {
+    if ( dto.from_user_id === dto.to_user_id ) {
       return left( [new InfrastructureException("Cannot report yourself")] )
     }
 

@@ -21,6 +21,25 @@ export class PrismaPaymentData implements PaymentDAO {
   constructor( private readonly db: PrismaClient ) {
   }
 
+  async update( payment: Payment ): Promise<Either<BaseException, boolean>> {
+    try {
+      await this.db.payment.update( {
+        where: {
+          id: payment.id.toString()
+        },
+        data : {
+          status     : payment.status.value,
+        }
+      } )
+      return right( true )
+    }
+    catch ( e ) {
+      return left( new InfrastructureException() )
+    }
+  }
+
+
+
   async add( payment: Payment ): Promise<Either<BaseException, boolean>> {
     try {
       await this.db.payment.create( {

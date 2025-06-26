@@ -1,6 +1,6 @@
-import { Payment }       from "@/modules/payment/domain/payment"
-import { PaymentDTO }    from "@/modules/payment/application/payment_dto"
-import { ZoneDTO }       from "@/modules/zone/application/zone_dto"
+import { Payment }         from "@/modules/payment/domain/payment"
+import { PaymentResponse } from "@/modules/payment/application/payment_response"
+import { ZoneDTO }         from "@/modules/zone/application/zone_dto"
 import { Errors }        from "@/modules/shared/domain/exceptions/errors"
 import { Zone }          from "@/modules/zone/domain/zone"
 import { wrapType }      from "@/modules/shared/utils/wrap_type"
@@ -19,7 +19,7 @@ import {
 }                        from "@/modules/shared/domain/value_objects/valid_string"
 
 export class PaymentMapper {
-  static toDTO( payment: Payment ): PaymentDTO {
+  static toDTO( payment: Payment ): PaymentResponse {
     return {
       id          : payment.id.toString(),
       service_type: payment.serviceType.value,
@@ -30,7 +30,7 @@ export class PaymentMapper {
     }
   }
 
-  static toJSON( payment: PaymentDTO ): Record<string, any> {
+  static toJSON( payment: PaymentResponse ): Record<string, any> {
     return {
       id          : payment.id,
       service_type: payment.service_type,
@@ -41,7 +41,7 @@ export class PaymentMapper {
     }
   }
 
-  static fromJSON( payment: Record<string, any> ): PaymentDTO | Errors {
+  static fromJSON( payment: Record<string, any> ): PaymentResponse | Errors {
     const errors = []
 
     const id = wrapType(
