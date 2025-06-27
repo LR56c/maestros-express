@@ -27,7 +27,7 @@ export class AddWorkerSchedule {
 
   async execute(
     workerId: string,
-    dto: WorkerScheduleDTO ): Promise<Either<BaseException[], boolean>> {
+    dto: WorkerScheduleDTO ): Promise<Either<BaseException[], WorkerSchedule>> {
     const exist = await ensureWorkerScheduleExist( this.dao, dto.id )
 
     if ( isLeft( exist ) ) {
@@ -57,6 +57,6 @@ export class AddWorkerSchedule {
       return left( [result.left] )
     }
 
-    return right( true )
+    return right( newSchedule )
   }
 }

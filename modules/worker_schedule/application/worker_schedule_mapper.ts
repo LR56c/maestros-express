@@ -32,7 +32,6 @@ export class WorkerScheduleMapper {
       status              : workerSchedule.status.value,
       start_date          : workerSchedule.startDate.value,
       end_date            : workerSchedule.endDate.value,
-      created_at          : workerSchedule.createdAt.value,
       recurrent_start_date: workerSchedule.recurrentStartDate?.value,
       recurrent_end_date  : workerSchedule.recurrentEndDate?.value
     }
@@ -45,7 +44,6 @@ export class WorkerScheduleMapper {
       status              : workerSchedule.status,
       start_date          : workerSchedule.start_date,
       end_date            : workerSchedule.end_date,
-      created_at          : workerSchedule.created_at,
       recurrent_start_date: workerSchedule.recurrent_start_date,
       recurrent_end_date  : workerSchedule.recurrent_end_date
     }
@@ -89,13 +87,6 @@ export class WorkerScheduleMapper {
       errors.push( endDate )
     }
 
-    const createdAt = wrapType(
-      () => ValidDate.from( json.created_at ) )
-
-    if ( createdAt instanceof BaseException ) {
-      errors.push( createdAt )
-    }
-
     const recurrentStartDate = wrapTypeDefault( undefined,
       ( value ) => ValidDate.from( value ), json.recurrent_start_date )
 
@@ -129,9 +120,6 @@ export class WorkerScheduleMapper {
       ).value,
       end_date            : (
         endDate as ValidDate
-      ).value,
-      created_at          : (
-        createdAt as ValidDate
       ).value,
       recurrent_start_date: (
         recurrentStartDate as ValidDate | undefined

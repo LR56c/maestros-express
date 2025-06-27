@@ -20,7 +20,7 @@ export class UpdateWorkerSchedule {
   constructor( private readonly dao: WorkerScheduleDAO ) {
   }
 
-  async execute( schedule: WorkerScheduleDTO ): Promise<Either<BaseException[], boolean>>{
+  async execute( schedule: WorkerScheduleDTO ): Promise<Either<BaseException[], WorkerSchedule>>{
     const existResult = await ensureWorkerScheduleExist(this.dao, schedule.id )
 
     if ( isLeft(existResult) ) {
@@ -29,7 +29,7 @@ export class UpdateWorkerSchedule {
 
     const oldSchedule = existResult.right
 
-    const newSchedule = WorkerSchedule.fromPrimitives(
+    const updatedSchedule = WorkerSchedule.fromPrimitives(
       oldSchedule.id.toString(),
       oldSchedule.workerId.toString(),
       schedule.week_day,
@@ -41,17 +41,17 @@ export class UpdateWorkerSchedule {
       schedule.recurrent_end_date
     )
 
-    if ( newSchedule instanceof Errors ) {
-      return left(newSchedule.values)
+    if ( updatedSchedule instanceof Errors ) {
+      return left(updatedSchedule.values)
     }
 
-    const result = await this.dao.update(newSchedule)
+    const result = await this.dao.update(updatedSchedule)
 
     if ( isLeft(result) ) {
       return left([result.left])
     }
 
-    return right(true)
+    return right(updatedSchedule)
   }
 
 }
