@@ -37,14 +37,6 @@ export class PrismaWorkerBookingData implements WorkerBookingDAO{
           id: id.toString()
         }
       })
-      // await this.db.workerBooking.update( {
-      //   where: {
-      //     id: id.toString()
-      //   },
-      //   data : {
-      //     status: WorkingBookingStatusEnum.AVAILABLE
-      //   }
-      // } )
       return right( true )
     }
     catch ( e ) {

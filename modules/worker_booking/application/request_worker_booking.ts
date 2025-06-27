@@ -25,7 +25,7 @@ export class RequestWorkerBooking {
   async execute(
     clientId: string,
     workerId: string,
-    book: WorkerBookingDTO ): Promise<Either<BaseException[], boolean>> {
+    book: WorkerBookingDTO ): Promise<Either<BaseException[], WorkerBooking>> {
     const exist = await ensureWorkerBookingExist(this.dao, book.id)
 
     if ( isLeft( exist ) ) {
@@ -52,7 +52,7 @@ export class RequestWorkerBooking {
       return left( [result.left] )
     }
 
-    return right( true )
+    return right( newBooking )
   }
 
 }

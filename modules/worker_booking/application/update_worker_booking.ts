@@ -18,7 +18,7 @@ export class UpdateWorkerBooking {
   constructor( private readonly dao: WorkerBookingDAO ) {
   }
 
-  async execute( book: WorkerBookingDTO ): Promise<Either<BaseException[], boolean>> {
+  async execute( book: WorkerBookingDTO ): Promise<Either<BaseException[], WorkerBooking>> {
     const exist = await ensureWorkerBookingExist( this.dao, book.id )
 
     if ( isLeft( exist ) ) {
@@ -27,7 +27,7 @@ export class UpdateWorkerBooking {
 
     const oldBooking = exist.right
 
-    const newBooking = WorkerBooking.fromPrimitives(
+    const updatedBooking = WorkerBooking.fromPrimitives(
       oldBooking.id.toString(),
       oldBooking.workerId.toString(),
       oldBooking.clientId.toString(),
@@ -36,17 +36,17 @@ export class UpdateWorkerBooking {
       oldBooking.createdAt.toString()
     )
 
-    if ( newBooking instanceof Errors ) {
-      return left( newBooking.values )
+    if ( updatedBooking instanceof Errors ) {
+      return left( updatedBooking.values )
     }
 
-    const result = await this.dao.update( newBooking )
+    const result = await this.dao.update( updatedBooking )
 
     if ( isLeft( result ) ) {
       return left( [result.left] )
     }
 
-    return right(true)
+    return right(updatedBooking)
   }
 
 }
