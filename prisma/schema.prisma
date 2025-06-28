@@ -303,7 +303,7 @@ model WorkerEmbedding {
   id        String                @id @default(uuid()) @db.Uuid
   type      WorkerEmbeddingType   @map("type")
   content   String
-  embedding Unsupported("vector")
+  embedding Unsupported("vector(1536)")
   createdAt DateTime              @default(now()) @map("created_at") @db.Timestamptz(6)
   workerId  String                @map("worker_id") @db.Uuid
   worker    Worker                @relation(fields: [workerId], references: [id], onDelete: Cascade)

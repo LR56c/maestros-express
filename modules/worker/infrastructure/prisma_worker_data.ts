@@ -30,6 +30,9 @@ import {
   WorkerTax
 }                                      from "@/modules/worker_tax/domain/worker_tax"
 import { Role }                        from "@/modules/role/domain/role"
+import {
+  UUID
+}                                      from "@/modules/shared/domain/value_objects/uuid"
 
 type WorkerRelations = {
   user: User,
@@ -44,100 +47,100 @@ type WorkerRelations = {
   // packages: Package[],
   // reviews: Review[],
 }
+export const mapWorkerRelations = async ( w: any ): Promise<Either<BaseException[], WorkerRelations>> => {
+  const taxes: WorkerTax[] = []
+  for ( const tax of w.WorkerTax ) {
+    const taxMapped = WorkerTax.fromPrimitives(
+      tax.id.toString(),
+      tax.workerId.toString(),
+      tax.name,
+      tax.value,
+      tax.valueFormat,
+      tax.createdAt
+    )
+    if ( taxMapped instanceof Errors ) {
+      return left( taxMapped.values )
+    }
+    taxes.push( taxMapped )
+  }
+  const specialities: Speciality[] = []
+  for ( const ws of w.WorkerSpeciality ) {
+    const spec = Speciality.fromPrimitives(
+      ws.speciality.id.toString(),
+      ws.speciality.name,
+      ws.speciality.createdAt
+    )
+    if ( spec instanceof Errors ) {
+      return left( spec.values )
+    }
+    specialities.push( spec )
+  }
+
+  const roles: Role[] = []
+  for ( const ur of w.user.usersRoles ) {
+    const role = Role.fromPrimitives(
+      ur.role.id.toString(),
+      ur.role.name,
+      ur.role.createdAt,
+      ur.role.updatedAt
+    )
+    if ( role instanceof Errors ) {
+      return left( role.values )
+    }
+    roles.push( role )
+  }
+  const userMapped = User.fromPrimitive(
+    w.user.id.toString(),
+    w.user.email,
+    w.user.name,
+    w.user.surname,
+    roles,
+    w.user.createdAt,
+    w.user.avatar
+  )
+  if ( userMapped instanceof Errors ) {
+    return left( userMapped.values )
+  }
+  const nationalIdentityDatabase = w.nationalIdentity
+  const countryDatabase          = nationalIdentityDatabase.country
+  const country                  = Country.fromPrimitives(
+    countryDatabase.id.toString(),
+    countryDatabase.name,
+    countryDatabase.code,
+    countryDatabase.createdAt
+  )
+  if ( country instanceof Errors ) {
+    return left( country.values )
+  }
+  const nationalIdentity = NationalIdentity.fromPrimitives(
+    nationalIdentityDatabase.id.toString(),
+    nationalIdentityDatabase.identifier,
+    nationalIdentityDatabase.type,
+    country as Country,
+    nationalIdentityDatabase.createdAt
+  )
+  if ( nationalIdentity instanceof Errors ) {
+    return left( nationalIdentity.values )
+  }
+  return right( {
+    user            : userMapped,
+    nationalIdentity: nationalIdentity,
+    specialities    : specialities,
+    taxes           : taxes
+    // certificates    : certificates,
+    // workZones       : [],
+    // bookings        : [],
+    // packages        : [],
+    // reviews         : [],
+    // schedule        : [],
+    // stories         : [],
+  } )
+}
 
 export class PrismaWorkerData implements WorkerDAO {
   constructor( private readonly db: PrismaClient ) {
   }
 
-  private async mapWorkerRelations( w: any ): Promise<Either<BaseException[], WorkerRelations>> {
-    const taxes: WorkerTax[] = []
-    for ( const tax of w.WorkerTax ) {
-      const taxMapped = WorkerTax.fromPrimitives(
-        tax.id.toString(),
-        tax.workerId.toString(),
-        tax.name,
-        tax.value,
-        tax.valueFormat,
-        tax.createdAt
-      )
-      if ( taxMapped instanceof Errors ) {
-        return left( taxMapped.values )
-      }
-      taxes.push( taxMapped )
-    }
-    const specialities: Speciality[] = []
-    for ( const ws of w.WorkerSpeciality ) {
-      const spec = Speciality.fromPrimitives(
-        ws.speciality.id.toString(),
-        ws.speciality.name,
-        ws.speciality.createdAt
-      )
-      if ( spec instanceof Errors ) {
-        return left( spec.values )
-      }
-      specialities.push( spec )
-    }
-
-    const roles : Role[] = []
-    for ( const ur of  w.user.usersRoles) {
-      const role = Role.fromPrimitives(
-        ur.role.id.toString(),
-        ur.role.name,
-        ur.role.createdAt,
-        ur.role.updatedAt
-      )
-      if ( role instanceof Errors ) {
-        return left( role.values )
-      }
-      roles.push( role )
-    }
-    const userMapped = User.fromPrimitive(
-      w.user.id.toString(),
-      w.user.email,
-      w.user.name,
-      w.user.surname,
-      roles,
-      w.user.createdAt,
-      w.user.avatar
-    )
-    if ( userMapped instanceof Errors ) {
-      return left( userMapped.values )
-    }
-    const nationalIdentityDatabase = w.nationalIdentity
-    const countryDatabase          = nationalIdentityDatabase.country
-    const country                  = Country.fromPrimitives(
-      countryDatabase.id.toString(),
-      countryDatabase.name,
-      countryDatabase.code,
-      countryDatabase.createdAt
-    )
-    if ( country instanceof Errors ) {
-      return left( country.values )
-    }
-    const nationalIdentity = NationalIdentity.fromPrimitives(
-      nationalIdentityDatabase.id.toString(),
-      nationalIdentityDatabase.identifier,
-      nationalIdentityDatabase.type,
-      country as Country,
-      nationalIdentityDatabase.createdAt
-    )
-    if ( nationalIdentity instanceof Errors ) {
-      return left( nationalIdentity.values )
-    }
-    return right( {
-      user            : userMapped,
-      nationalIdentity: nationalIdentity,
-      specialities    : specialities,
-      taxes           : taxes
-      // certificates    : certificates,
-      // workZones       : [],
-      // bookings        : [],
-      // packages        : [],
-      // reviews         : [],
-      // schedule        : [],
-      // stories         : [],
-    } )
-  }
 
   async add( worker: Worker ): Promise<Either<BaseException, boolean>> {
     try {
@@ -175,11 +178,21 @@ export class PrismaWorkerData implements WorkerDAO {
     sortBy?: ValidString,
     sortType?: ValidString ): Promise<Either<BaseException[], Worker[]>> {
     try {
-      const where = {}
+      let idsCount: number | undefined = undefined
+      const where                      = {}
       if ( query.id ) {
         // @ts-ignore
         where["id"] = {
           equals: query.id
+        }
+      }
+      if ( query.ids ) {
+        const arr: string[] = query.ids.split( "," )
+        const ids           = arr.map( i => UUID.from( i ).toString() )
+        idsCount            = ids.length
+        // @ts-ignore
+        where["id"]         = {
+          in: ids
         }
       }
       const orderBy = {}
@@ -188,8 +201,8 @@ export class PrismaWorkerData implements WorkerDAO {
         // @ts-ignore
         orderBy[key] = sortType ? sortType.value : "desc"
       }
-      const offset            = skip ? parseInt( skip.value ) : 0
-      const response          = await this.db.worker.findMany( {
+      const offset   = skip ? parseInt( skip.value ) : 0
+      const response = await this.db.worker.findMany( {
         where  : where,
         orderBy: orderBy,
         skip   : offset,
@@ -214,13 +227,18 @@ export class PrismaWorkerData implements WorkerDAO {
               speciality: true
             }
           },
-          WorkerTax: true
+          WorkerTax       : true
         }
       } )
+
+      if ( idsCount && response.length !== idsCount ) {
+        return left( [new InfrastructureException( "Not all workers found" )] )
+      }
+
       const workers: Worker[] = []
-      console.log("Worker Response from DB: ", response)
+      // console.log( "Worker Response from DB: ", response )
       for ( const w of response ) {
-        const relationMapped = await this.mapWorkerRelations( w )
+        const relationMapped = await mapWorkerRelations( w )
         if ( isLeft( relationMapped ) ) {
           return left( relationMapped.left )
         }

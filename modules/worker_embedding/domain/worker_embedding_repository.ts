@@ -12,13 +12,16 @@ import {
 import {
   WorkerEmbedding
 }                 from "@/modules/worker_embedding/domain/worker_embedding"
+import { Worker } from "@/modules/worker/domain/worker"
 
 export abstract class WorkerEmbeddingRepository {
-  abstract add( embed : WorkerEmbedding ): Promise<Either<BaseException, boolean>>
+  abstract upsert( embed : WorkerEmbedding ): Promise<Either<BaseException, boolean>>
 
   abstract remove( id: UUID ): Promise<Either<BaseException, boolean>>
 
+  abstract getById( embedId : UUID): Promise<Either<BaseException[], WorkerEmbedding>>
+
   abstract search( query: Record<string, any>, limit?: ValidInteger,
     skip ?: ValidString, sortBy ?: ValidString,
-    sortType ?: ValidString ): Promise<Either<BaseException[], WorkerEmbedding[]>>
+    sortType ?: ValidString ): Promise<Either<BaseException[], Worker[]>>
 }

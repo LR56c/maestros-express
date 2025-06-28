@@ -34,8 +34,8 @@ import { searchSpeciality }          from "@/app/api/speciality/route"
 
 const dao    = new PrismaWorkerData( prisma )
 const add    = new AddWorker( dao, searchUser, searchCountry )
-const update = new UpdateWorker( dao ,searchSpeciality)
-const search = new SearchWorker( dao )
+const update              = new UpdateWorker( dao ,searchSpeciality)
+export const searchWorker = new SearchWorker( dao )
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
@@ -73,7 +73,7 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await search.execute(     data.right.query,
+  const result = await searchWorker.execute(     data.right.query,
     data.right.limit,
     data.right.skip,
     data.right.sort_by,

@@ -18,9 +18,9 @@ import { ValidString } from "@/modules/shared/domain/value_objects/valid_string"
 export class WorkerEmbedding {
   private constructor(
     readonly id: UUID,
+    readonly workerId: UUID,
     readonly content: ValidString,
     readonly type: WorkerEmbeddingType,
-    readonly data: Worker | Story,
     readonly createdAt: ValidDate
   )
   {
@@ -28,20 +28,20 @@ export class WorkerEmbedding {
 
   static create(
     id: string,
+    workerId: string,
     content: string,
     type: string,
-    data: Worker | Story
   ): WorkerEmbedding | Errors {
     return WorkerEmbedding.fromPrimitives(
-      id, content,type, data, ValidDate.nowUTC()
+      id,workerId, content,type, ValidDate.nowUTC()
     )
   }
 
   static fromPrimitives(
     id: string,
+    workerId: string,
     content: string,
     type: string,
-    data: Worker | Story,
     createdAt: Date | string
   ): WorkerEmbedding | Errors {
     const errors = []
@@ -51,6 +51,13 @@ export class WorkerEmbedding {
 
     if ( idVO instanceof BaseException ) {
       errors.push( idVO )
+    }
+
+    const workerIdVO = wrapType<UUID, InvalidUUIDException>(
+      () => UUID.from( workerId ) )
+
+    if ( workerIdVO instanceof BaseException ) {
+      errors.push( workerIdVO )
     }
 
     const contentVO = wrapType<ValidString, InvalidUUIDException>(
@@ -79,25 +86,25 @@ export class WorkerEmbedding {
 
     return new WorkerEmbedding(
       idVO as UUID,
+      workerIdVO as UUID,
       contentVO as ValidString,
       typeVO as WorkerEmbeddingType,
-      data,
       createdAtVO as ValidDate
     )
   }
 
   static fromPrimitivesThrow(
     id: string,
+    workerId: string,
     content: string,
     type: string,
-    data: Worker | Story,
     createdAt: Date
   ): WorkerEmbedding {
     return new WorkerEmbedding(
       UUID.from( id ),
+      UUID.from( workerId ),
       ValidString.from( content ),
       WorkerEmbeddingType.from( type ),
-      data,
       ValidDate.from( createdAt )
     )
   }

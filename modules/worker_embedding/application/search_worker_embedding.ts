@@ -9,9 +9,7 @@ import {
 import {
   WorkerEmbeddingRepository
 } from "@/modules/worker_embedding/domain/worker_embedding_repository"
-import {
-  WorkerEmbedding
-}                               from "@/modules/worker_embedding/domain/worker_embedding"
+import { Worker }               from "@/modules/worker/domain/worker"
 
 export class SearchWorkerEmbedding {
 
@@ -19,7 +17,7 @@ export class SearchWorkerEmbedding {
   }
   async execute( query: Record<string, any>, limit?: number, skip ?: string,
     sortBy ?: string,
-    sortType ?: string ): Promise<Either<BaseException[], WorkerEmbedding[]>> {
+    sortType ?: string ): Promise<Either<BaseException[], Worker[]>> {
     const searchParamsResult = genericEnsureSearch( limit, skip, sortBy,
       sortType )
 

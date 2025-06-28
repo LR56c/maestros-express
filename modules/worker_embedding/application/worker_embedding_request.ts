@@ -10,16 +10,17 @@ import {
 const workEmbedSchema = workerResponseSchema.extend( {
   type: z.literal( WorkerEmbeddingTypeEnum.WORKER )
 } )
+export type WorkerEmbedRequest = z.infer<typeof workEmbedSchema>
 
 const storyEmbedSchema = storySchema.extend( {
   type: z.literal( WorkerEmbeddingTypeEnum.STORY )
 } )
+export type StoryEmbedRequest = z.infer<typeof storyEmbedSchema>
 
-export const workerEmbeddingSchema = z.object( {
+export const workerEmbeddingRequestSchema = z.object( {
   id  : z.string(),
-  data: z.discriminatedUnion( "type",
-    [workEmbedSchema, storyEmbedSchema] )
+  data: z.discriminatedUnion( "type", [workEmbedSchema, storyEmbedSchema] )
 } )
 
-export type WorkerEmbeddingDTO = z.infer<typeof workerEmbeddingSchema>
+export type WorkerEmbeddingRequest = z.infer<typeof workerEmbeddingRequestSchema>
 

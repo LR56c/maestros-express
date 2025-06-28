@@ -16,21 +16,27 @@ import {
 import {
   WorkerEmbedding
 } from "@/modules/worker_embedding/domain/worker_embedding"
+import { wrapType } from "@/modules/shared/utils/wrap_type"
+import { UUID } from "@/modules/shared/domain/value_objects/uuid"
 
 export const ensureWorkerEmbeddingExist = async ( repo: WorkerEmbeddingRepository,
   embedId: string ): Promise<Either<BaseException[], WorkerEmbedding>> => {
 
-  const embed = await repo.search({
-    id: embedId
-  }, ValidInteger.from(1))
+  const vEmbedId = wrapType(()=>UUID.from(embedId))
+
+  if ( vEmbedId instanceof  BaseException) {
+    return left([vEmbedId])
+  }
+
+  const embed = await repo.getById(vEmbedId)
 
   if ( isLeft(embed) ) {
     return left(embed.left)
   }
 
-  if ( embed.right.length > 0 && embed.right[0]!.id.value !== embedId ) {
+  if ( embed.right.id.value !== embedId ) {
     return left( [new DataNotFoundException()] )
   }
 
-  return right(embed.right[0])
+  return right(embed.right)
 }

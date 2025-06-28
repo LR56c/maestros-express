@@ -1,59 +1,41 @@
 import {
   WorkerEmbedding
-}                       from "@/modules/worker_embedding/domain/worker_embedding"
+}                   from "@/modules/worker_embedding/domain/worker_embedding"
 import {
-  WorkerEmbeddingDTO
-}                       from "@/modules/worker_embedding/application/worker_embedding_dto"
-import { WorkerMapper } from "@/modules/worker/application/worker_mapper"
-import { StoryMapper }  from "@/modules/story/application/story_mapper"
-import { Errors }       from "@/modules/shared/domain/exceptions/errors"
-import { wrapType }     from "@/modules/shared/utils/wrap_type"
+  Errors
+}                   from "@/modules/shared/domain/exceptions/errors"
+import { wrapType } from "@/modules/shared/utils/wrap_type"
 import {
   BaseException
-}                       from "@/modules/shared/domain/exceptions/base_exception"
-import { UUID }         from "@/modules/shared/domain/value_objects/uuid"
+}                   from "@/modules/shared/domain/exceptions/base_exception"
+import {
+  UUID
+}                   from "@/modules/shared/domain/value_objects/uuid"
 import {
   WorkerEmbeddingType
-} from "@/modules/worker_embedding/domain/worker_embedding_type"
-import { Worker }       from "@/modules/worker/domain/worker"
-import { Story }        from "@/modules/story/domain/story"
+}                   from "@/modules/worker_embedding/domain/worker_embedding_type"
+import {
+  WorkerEmbeddingResponse
+}                   from "@/modules/worker_embedding/application/worker_embedding_response"
 
 export class WorkerEmbeddingMapper {
-  static toDTO( embed: WorkerEmbedding ): WorkerEmbeddingDTO {
-    let data: any
-    if ( embed.type.value === "WORKER" ) {
-      data = {
-        ...embed.data,
-        type: "WORKER"
-      }
-    }
-    else {
-      data = {
-        ...embed.data,
-        type: "STORY"
-      }
-    }
+  static toDTO( embed: WorkerEmbedding ): WorkerEmbeddingResponse {
     return {
       id  : embed.id.value,
-      data: data
+      type  : embed.type.value,
+      worker_id  : embed.workerId.value,
     }
   }
 
-  static toJSON( dto: WorkerEmbeddingDTO ): Record<string, any> {
-    let data: any
-    if ( dto.data.type === "WORKER" ) {
-      data = WorkerMapper.toJSON( dto.data )
-    }
-    else {
-      data = StoryMapper.toJSON( dto.data )
-    }
+  static toJSON( dto: WorkerEmbeddingResponse ): Record<string, any> {
     return {
       id: dto.id,
-      data
+      type: dto.type,
+      worker_id: dto.worker_id,
     }
   }
 
-  static fromJSON( json: Record<string, any> ): WorkerEmbeddingDTO | Errors {
+  static fromJSON( json: Record<string, any> ): WorkerEmbeddingResponse | Errors {
     const errors = []
     const vId    = wrapType( () => UUID.from( json.id ) )
 
@@ -61,26 +43,16 @@ export class WorkerEmbeddingMapper {
       errors.push( vId )
     }
 
-    const data = json.data
-    let embedData: any
-    if ( data.type === "WORKER" ) {
-      const mapped = WorkerMapper.fromJSON( data )
+    const type = wrapType( () => WorkerEmbeddingType.from( json.type ) )
 
-      if ( mapped instanceof Errors ) {
-        errors.push( ...mapped.values )
-      }
-      else {
-        embedData = mapped
-      }
+    if ( type instanceof BaseException ) {
+      errors.push( type )
     }
-    else {
-      const mapped = StoryMapper.fromJSON( data )
-      if ( mapped instanceof Errors ) {
-        errors.push( ...mapped.values )
-      }
-      else {
-        embedData = mapped
-      }
+
+    const vWorkerId = wrapType( () => UUID.from( json.worker_id ) )
+
+    if ( vWorkerId instanceof BaseException ) {
+      errors.push( vWorkerId )
     }
 
     if ( errors.length ) {
@@ -88,44 +60,25 @@ export class WorkerEmbeddingMapper {
     }
 
     return {
-      id  : json.id,
-      data: {
-        type: data.type,
-        ...embedData
-      }
+      id: (vId as UUID).value,
+      type: (type as WorkerEmbeddingType).value,
+      worker_id: (vWorkerId as UUID).value,
     }
   }
 
   static toDomain( json: Record<string, any> ): WorkerEmbedding | Errors {
 
-    const type = wrapType(()=>WorkerEmbeddingType.from( json.data.type ))
+    const type = wrapType( () => WorkerEmbeddingType.from( json.data.type ) )
 
     if ( type instanceof BaseException ) {
       return new Errors( [type] )
     }
 
-    let data : Worker | Story
-
-    if( type.value === "WORKER" ) {
-      const worker = WorkerMapper.toDomain( json.data )
-      if ( worker instanceof Errors ) {
-        return worker
-      }
-      data = worker
-    }
-    else{
-      const story = StoryMapper.toDomain( json.data )
-      if ( story instanceof Errors ) {
-        return story
-      }
-      data = story
-    }
-
     return WorkerEmbedding.fromPrimitives(
       json.id,
+      json.worker_id,
       json.content,
-      type as WorkerEmbeddingType,
-      data,
+      type.value,
       json.created_at
     )
   }

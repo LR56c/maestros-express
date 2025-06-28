@@ -26,13 +26,16 @@ import {
 import {
   StoryMapper
 }                                    from "@/modules/story/application/story_mapper"
+import {
+  GetStoryById
+}                                    from "@/modules/story/application/get_story_by_id"
 
 const dao    = new PrismaStoryData( prisma )
 const add    = new AddStory( dao )
 const remove = new RemoveStory( dao )
 const update = new UpdateStory( dao )
-const search = new GetStoryByWorker( dao )
-
+const getStories = new GetStoryByWorker( dao )
+export const getStory = new GetStoryById(dao)
 export async function POST( request: NextRequest ) {
   const body = await request.json()
   const data = parseData( storySchema.extend( {
@@ -59,7 +62,7 @@ export async function GET( request: NextRequest ) {
   const { searchParams } = new URL( request.url )
   const id               = searchParams.get( "id" )
 
-  const result = await search.execute( id ?? "" )
+  const result = await getStories.execute( id ?? "" )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )

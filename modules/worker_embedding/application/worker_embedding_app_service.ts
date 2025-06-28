@@ -1,6 +1,6 @@
 import {
   WorkerEmbeddingDTO
-} from "@/modules/worker_embedding/application/worker_embedding_dto"
+} from "@/modules/worker_embedding/application/worker_embedding_response"
 
 
 export abstract class WorkerEmbeddingAppService {
