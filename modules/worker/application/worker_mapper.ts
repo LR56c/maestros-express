@@ -12,79 +12,23 @@ import {
   SpecialityMapper
 }                                    from "@/modules/speciality/application/speciality_mapper"
 import {
-  CertificateMapper
-}                                    from "@/modules/certificate/application/certificate_mapper"
-import {
-  ZoneMapper
-}                                    from "@/modules/zone/application/zone_mapper"
-import {
   WorkerTax
 }                                    from "@/modules/worker_tax/domain/worker_tax"
 import {
   WorkerTaxMapper
 }                                    from "@/modules/worker_tax/application/worker_tax_mapper"
 import {
-  StoryMapper
-}                                    from "@/modules/story/application/story_mapper"
-import {
-  WorkerBookingMapper
-}                                    from "@/modules/worker_booking/application/worker_booking_mapper"
-import {
-  WorkerScheduleMapper
-}                                    from "@/modules/worker_schedule/application/worker_schedule_mapper"
-import {
-  PackageMapper
-}                                    from "@/modules/package/application/package_mapper"
-import {
-  ReviewMapper
-}                                    from "@/modules/review/application/review_mapper"
-import { ZoneDTO }                   from "@/modules/zone/application/zone_dto"
-import {
   Errors
 }                                    from "@/modules/shared/domain/exceptions/errors"
-import { Zone }                      from "@/modules/zone/domain/zone"
 import {
   Speciality
 }                                    from "@/modules/speciality/domain/speciality"
 import {
-  Certificate
-}                                    from "@/modules/certificate/domain/certificate"
-import { Review }                    from "@/modules/review/domain/review"
-import { Package }                   from "@/modules/package/domain/package"
-import {
-  WorkerSchedule
-}                                    from "@/modules/worker_schedule/domain/worker_schedule"
-import {
-  WorkerBooking
-}                                    from "@/modules/worker_booking/domain/worker_booking"
-import { Story }                     from "@/modules/story/domain/story"
-import {
   SpecialityDTO
 }                                    from "@/modules/speciality/application/speciality_dto"
 import {
-  CertificateDTO
-}                                    from "@/modules/certificate/application/certificate_dto"
-import {
   WorkerTaxDTO
 }                                    from "@/modules/worker_tax/application/worker_tax_dto"
-import {
-  StoryDTO
-}                                    from "@/modules/story/application/story_dto"
-import {
-  WorkerBookingDTO
-}                                    from "@/modules/worker_booking/application/worker_booking_dto"
-import {
-  WorkerScheduleDTO
-} from "@/modules/worker_schedule/application/worker_schedule_dto"
-import {
-  PackageResponse
-} from "@/modules/package/application/package_response"
-import {
-  ReviewDTO
-} from "@/modules/review/application/review_dto"
-import {
-  ValidDate
-}                                    from "@/modules/shared/domain/value_objects/valid_date"
 import {
   BaseException
 }                                    from "@/modules/shared/domain/exceptions/base_exception"
@@ -104,8 +48,30 @@ import { wrapType, wrapTypeDefault } from "@/modules/shared/utils/wrap_type"
 import {
   WorkerStatus
 }                                    from "@/modules/worker/domain/worker_status"
+import {
+  WorkerProfileDTO
+}                                    from "@/modules/worker/application/worker_profile_dto"
+import {
+  Position
+}                                    from "@/modules/shared/domain/value_objects/position"
 
 export class WorkerMapper {
+  static toProfile( w: Worker, age: number,
+    location: string ): WorkerProfileDTO {
+    return {
+      user_id       : w.user.userId.toString(),
+      full_name     : `${ w.user.name.value } ${ w.user.surname.value }`,
+      avatar        : w.user.avatar?.value,
+      age,
+      description   : w.description?.value ?? "",
+      review_count  : w.reviewCount.value,
+      review_average: w.reviewAverage.value,
+      location,
+      specialities  : w.specialities.map( SpecialityMapper.toDTO ),
+      taxes         : w.taxes.map( WorkerTaxMapper.toDTO )
+    }
+  }
+
   static toDTO( worker: Worker ): WorkerResponse {
     return {
       user             : UserMapper.toDTO( worker.user ),
@@ -116,9 +82,9 @@ export class WorkerMapper {
       review_count     : worker.reviewCount.value,
       review_average   : worker.reviewAverage.value,
       status           : worker.status.value,
-      location         : worker.location.value,
+      location         : worker.location.toPoint(),
       specialities     : worker.specialities.map( SpecialityMapper.toDTO ),
-      taxes            : worker.taxes.map( WorkerTaxMapper.toDTO ),
+      taxes            : worker.taxes.map( WorkerTaxMapper.toDTO )
       // work_zones       : worker.workZones.map( ZoneMapper.toDTO ),
       // certificates     : worker.certificates.map( CertificateMapper.toDTO ),
       // stories          : worker.stories.map( StoryMapper.toDTO ),
@@ -141,7 +107,7 @@ export class WorkerMapper {
       status           : dto.status,
       location         : dto.location,
       specialities     : dto.specialities.map( SpecialityMapper.toJSON ),
-      taxes            : dto.taxes.map( WorkerTaxMapper.toJSON ),
+      taxes            : dto.taxes.map( WorkerTaxMapper.toJSON )
       // certificates     : dto.certificates.map( CertificateMapper.toJSON ),
       // work_zones       : dto.work_zones.map( ZoneMapper.toJSON ),
       // stories          : dto.stories.map( StoryMapper.toJSON ),
@@ -304,7 +270,7 @@ export class WorkerMapper {
     }
 
     const location = wrapType(
-      () => ValidString.from( json.location ) )
+      () => Position.fromJSON( json.location ) )
 
     if ( location instanceof BaseException ) {
       errors.push( location )
@@ -332,10 +298,10 @@ export class WorkerMapper {
         status as WorkerStatus
       ).value,
       location         : (
-        location as ValidString
-      ).value,
+        location as Position
+      ).toPoint(),
       specialities     : specialities,
-      taxes            : taxes,
+      taxes            : taxes
       // certificates     : certificates,
       // work_zones       : workZones,
       // stories          : stories,

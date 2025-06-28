@@ -25,6 +25,9 @@ import {
 import {
   WorkerStatus
 }                                    from "@/modules/worker/domain/worker_status"
+import {
+  Position
+}                                    from "@/modules/shared/domain/value_objects/position"
 
 export class Worker {
   private constructor(
@@ -33,7 +36,7 @@ export class Worker {
     readonly birthDate: ValidDate,
     readonly reviewCount: ValidDecimal,
     readonly reviewAverage: ValidDecimal,
-    readonly location: ValidString,
+    readonly location: Position,
     readonly status: WorkerStatus,
     readonly specialities: Speciality[],
     readonly taxes: WorkerTax[],
@@ -99,7 +102,7 @@ export class Worker {
       errors.push( descriptionVO )
     }
 
-    const locationVO = wrapType( () => ValidString.from( location ) )
+    const locationVO = wrapType( () => Position.fromJSON( location ) )
     if ( locationVO instanceof BaseException ) {
       errors.push( locationVO )
     }
@@ -141,7 +144,7 @@ export class Worker {
       birthDateVO as ValidDate,
       reviewCountVO as ValidDecimal,
       reviewAverageVO as ValidDecimal,
-      locationVO as ValidString,
+      locationVO as Position,
       workerStatusVO as WorkerStatus,
       specialities,
       taxes,
@@ -174,7 +177,7 @@ export class Worker {
   ): Worker {
     return new Worker(
       user, nationalIdentity, ValidDate.from( birthDate ), ValidDecimal.from( reviewCount ),
-      ValidDecimal.from( reviewAverage ), ValidString.from( location ),
+      ValidDecimal.from( reviewAverage ), Position.fromJSON( location ),
       WorkerStatus.from( status ), specialities,
       taxes,
       ValidDate.from( createdAt ),

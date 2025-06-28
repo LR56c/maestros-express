@@ -12,7 +12,7 @@ import {
 import {
   WorkerEmbedding
 }                 from "@/modules/worker_embedding/domain/worker_embedding"
-import { Worker } from "@/modules/worker/domain/worker"
+import { Position } from "@/modules/shared/domain/value_objects/position"
 
 export abstract class WorkerEmbeddingRepository {
   abstract upsert( embed : WorkerEmbedding ): Promise<Either<BaseException, boolean>>
@@ -21,7 +21,5 @@ export abstract class WorkerEmbeddingRepository {
 
   abstract getById( embedId : UUID): Promise<Either<BaseException[], WorkerEmbedding>>
 
-  abstract search( query: Record<string, any>, limit?: ValidInteger,
-    skip ?: ValidString, sortBy ?: ValidString,
-    sortType ?: ValidString ): Promise<Either<BaseException[], Worker[]>>
+  abstract search( rawContent : ValidString, targetLocation : Position, radius : ValidInteger, limit?: ValidInteger ): Promise<Either<BaseException[], WorkerEmbedding[]>>
 }

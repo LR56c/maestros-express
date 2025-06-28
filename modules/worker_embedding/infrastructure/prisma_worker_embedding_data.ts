@@ -3,8 +3,6 @@ import {
   WorkerEmbeddingRepository
 }                       from "@/modules/worker_embedding/domain/worker_embedding_repository"
 
-import * as changeCase from "change-case"
-
 import {
   WorkerEmbedding
 }                                      from "@/modules/worker_embedding/domain/worker_embedding"
@@ -27,22 +25,21 @@ import {
 import {
   WorkerEmbeddingAI
 }                                      from "@/modules/worker_embedding/domain/worker_embedding_ai"
-import { Worker }                      from "@/modules/worker/domain/worker"
 import {
   Errors
 }                                      from "@/modules/shared/domain/exceptions/errors"
 import {
-  mapWorkerRelations
-}                                      from "@/modules/worker/infrastructure/prisma_worker_data"
-import {
   DataNotFoundException
 }                                      from "@/modules/shared/domain/exceptions/data_not_found_exception"
-import { wrapType }                    from "@/modules/shared/utils/wrap_type"
+import {
+  Position
+}                                      from "@/modules/shared/domain/value_objects/position"
 
-export class PrismaWorkerEmbeddingData implements WorkerEmbeddingRepository {
+export class PrismaWorkerEmbeddingData
+  implements WorkerEmbeddingRepository {
   constructor(
     private readonly db: PrismaClient,
-    private readonly ai: WorkerEmbeddingAI
+    private readonly ai: WorkerEmbeddingAI,
   )
   {
   }
@@ -54,30 +51,7 @@ export class PrismaWorkerEmbeddingData implements WorkerEmbeddingRepository {
           id: embedId.toString()
         },
         include: {
-          worker: {
-            include: {
-              user            : {
-                include: {
-                  usersRoles: {
-                    include: {
-                      role: true
-                    }
-                  }
-                }
-              },
-              nationalIdentity: {
-                include: {
-                  country: true
-                }
-              },
-              WorkerSpeciality: {
-                include: {
-                  speciality: true
-                }
-              },
-              WorkerTax       : true
-            }
-          }
+          worker: true
         }
       } )
       if ( !embed ) {
@@ -88,6 +62,7 @@ export class PrismaWorkerEmbeddingData implements WorkerEmbeddingRepository {
         embed.id,
         embed.workerId,
         embed.content,
+        embed.worker.location,
         embed.type,
         embed.createdAt
       )
@@ -109,7 +84,10 @@ export class PrismaWorkerEmbeddingData implements WorkerEmbeddingRepository {
         return left( embedding.left )
       }
 
-      await this.db.$executeRaw`INSERT INTO worker_embedding (id, type, content, embedding, created_at, worker_id)
+      const longitude = embed.location.value.longitude
+      const latitude  = embed.location.value.latitude
+
+      await this.db.$executeRaw`INSERT INTO worker_embedding (id, type, content, embedding, created_at, worker_id, location)
                                 VALUES (${ embed.id.toString() }::uuid,
                                         ${ embed.type.value.toLowerCase() }
                                         ::"WorkerEmbeddingType",
@@ -117,7 +95,8 @@ export class PrismaWorkerEmbeddingData implements WorkerEmbeddingRepository {
                                         ${ embedding.right }::vector,
                                         ${ embed.createdAt.toString() }
                                         ::timestamp,
-                                        ${ embed.workerId.toString() }::uuid)`
+                                        ${ embed.workerId.toString() }::uuid,
+                                        ST_SetSRID(ST_MakePoint(${ longitude }, ${ latitude }), 4326)::geography)`
       return right( true )
     }
     catch ( e ) {
@@ -139,96 +118,10 @@ export class PrismaWorkerEmbeddingData implements WorkerEmbeddingRepository {
     }
   }
 
-  async search( query: Record<string, any>, limit?: ValidInteger,
-    skip?: ValidString,
-    sortBy?: ValidString,
-    sortType?: ValidString ): Promise<Either<BaseException[], Worker[]>> {
-    try {
-      const vInput = wrapType( () => ValidString.from( query.input ) )
+  async search( rawContent: ValidString, targetLocation: Position,
+    radius: ValidInteger,
+    limit?: ValidInteger ): Promise<Either<BaseException[], WorkerEmbedding[]>> {
+    return left( [new InfrastructureException()] )
 
-      if ( vInput instanceof BaseException ) {
-        return left( [vInput] )
-      }
-
-      const vectorSearch = await this.ai.search( vInput, limit )
-      if ( isLeft( vectorSearch ) ) {
-        return left( vectorSearch.left )
-      }
-
-      const workersIds = vectorSearch.right.map( e => e.workerId.toString() )
-
-      const where    = {}
-      const idsCount = workersIds.length
-      // @ts-ignore
-      where["id"]    = {
-        in: workersIds
-      }
-      const orderBy  = {}
-      if ( sortBy ) {
-        const key    = changeCase.camelCase( sortBy.value )
-        // @ts-ignore
-        orderBy[key] = sortType ? sortType.value : "desc"
-      }
-      const response = await this.db.worker.findMany( {
-        where  : where,
-        orderBy: orderBy,
-        include: {
-          user            : {
-            include: {
-              usersRoles: {
-                include: {
-                  role: true
-                }
-              }
-            }
-          },
-          nationalIdentity: {
-            include: {
-              country: true
-            }
-          },
-          WorkerSpeciality: {
-            include: {
-              speciality: true
-            }
-          },
-          WorkerTax       : true
-        }
-      } )
-      if ( idsCount && response.length !== idsCount ) {
-        return left( [new InfrastructureException( "Not all workers found" )] )
-      }
-
-      const workers: Worker[] = []
-      for ( const w of response ) {
-        const relationMapped = await mapWorkerRelations( w )
-        if ( isLeft( relationMapped ) ) {
-          return left( relationMapped.left )
-        }
-
-        const mapped = Worker.fromPrimitives(
-          relationMapped.right.user,
-          relationMapped.right.nationalIdentity,
-          w.birthDate,
-          w.reviewCount,
-          w.reviewAverage,
-          w.location,
-          w.status,
-          relationMapped.right.specialities,
-          relationMapped.right.taxes,
-          w.createdAt,
-          w.verifiedAt ? w.verifiedAt : undefined,
-          w.description ? w.description : undefined
-        )
-        if ( mapped instanceof Errors ) {
-          return left( mapped.values )
-        }
-        workers.push( mapped )
-      }
-      return right( workers )
-    }
-    catch ( e ) {
-      return left( [new InfrastructureException()] )
-    }
   }
 }

@@ -161,7 +161,7 @@ export class PrismaWorkerData implements WorkerDAO {
             reviewCount       : worker.reviewCount.value,
             reviewAverage     : worker.reviewAverage.value,
             status            : worker.status.value,
-            location          : worker.location.value,
+            location          : worker.location.toPoint(),
             nationalIdentityId: worker.nationalIdentity.id.toString()
           }
         } )
@@ -236,7 +236,7 @@ export class PrismaWorkerData implements WorkerDAO {
       }
 
       const workers: Worker[] = []
-      // console.log( "Worker Response from DB: ", response )
+
       for ( const w of response ) {
         const relationMapped = await mapWorkerRelations( w )
         if ( isLeft( relationMapped ) ) {
@@ -294,7 +294,7 @@ export class PrismaWorkerData implements WorkerDAO {
             reviewCount  : worker.reviewCount.value,
             reviewAverage: worker.reviewAverage.value,
             status       : worker.status.value,
-            location     : worker.location.value
+            location     : worker.location.toPoint()
           }
         } )
       ] )

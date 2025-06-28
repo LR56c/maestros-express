@@ -83,7 +83,7 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { status: 500 } )
   }
 
-  return NextResponse.json( result.right.map( WorkerMapper.toDTO ),
+  return NextResponse.json( result.right,
     { status: 200 } )
 }
 

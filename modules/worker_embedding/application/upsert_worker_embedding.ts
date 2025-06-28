@@ -1,7 +1,12 @@
 import {
   WorkerEmbeddingRepository
-}                                      from "@/modules/worker_embedding/domain/worker_embedding_repository"
-import { Either, isLeft, left, right } from "fp-ts/Either"
+} from "@/modules/worker_embedding/domain/worker_embedding_repository"
+import {
+  Either,
+  isLeft,
+  left,
+  right
+} from "fp-ts/Either"
 import {
   BaseException
 } from "@/modules/shared/domain/exceptions/base_exception"
@@ -10,36 +15,34 @@ import {
 } from "@/modules/shared/utils/contain_error"
 import {
   DataNotFoundException
-}                                      from "@/modules/shared/domain/exceptions/data_not_found_exception"
+} from "@/modules/shared/domain/exceptions/data_not_found_exception"
 import {
   ensureWorkerEmbeddingExist
-}                                      from "@/modules/worker_embedding/utils/ensure_worker_embedding_exist"
+} from "@/modules/worker_embedding/utils/ensure_worker_embedding_exist"
 import {
   WorkerEmbedding
-}                                      from "@/modules/worker_embedding/domain/worker_embedding"
+} from "@/modules/worker_embedding/domain/worker_embedding"
 import {
   SearchWorker
-}                                      from "@/modules/worker/application/search_worker"
+} from "@/modules/worker/application/search_worker"
 import {
   GetStoryById
-}                                      from "@/modules/story/application/get_story_by_id"
+} from "@/modules/story/application/get_story_by_id"
 import {
   Errors
-}                                      from "@/modules/shared/domain/exceptions/errors"
+} from "@/modules/shared/domain/exceptions/errors"
 import {
   InfrastructureException
-}                                      from "@/modules/shared/domain/exceptions/infrastructure_exception"
-import {
-  UUID
-}                                      from "@/modules/shared/domain/value_objects/uuid"
+} from "@/modules/shared/domain/exceptions/infrastructure_exception"
 import {
   StoryEmbedRequest,
-  WorkerEmbeddingRequest, WorkerEmbedRequest
+  WorkerEmbeddingRequest,
+  WorkerEmbedRequest
 } from "@/modules/worker_embedding/application/worker_embedding_request"
 
 type DataType = {
   content: string
-  workerId: UUID
+  workerId: string
 }
 
 export class UpsertWorkerEmbedding {
@@ -62,7 +65,7 @@ export class UpsertWorkerEmbedding {
   }
 
   private async recoverData( dto: WorkerEmbeddingRequest ): Promise<Either<BaseException[], DataType>> {
-    let workerId: UUID
+    let workerId: string
     let content: string
     if ( dto.data.type === "WORKER" ) {
       const workerResult = await this.searchWorker.execute( {
@@ -72,7 +75,7 @@ export class UpsertWorkerEmbedding {
       if ( isLeft( workerResult ) ) {
         return left( workerResult.left )
       }
-      workerId = workerResult.right[0].user.userId
+      workerId = workerResult.right[0].user_id
       content  = this.workerPrompt( dto.data )
     }
     else if ( dto.data.type === "STORY" ) {
@@ -81,7 +84,7 @@ export class UpsertWorkerEmbedding {
       if ( isLeft( storyResult ) ) {
         return left( storyResult.left )
       }
-      workerId = storyResult.right.workerId
+      workerId = storyResult.right.workerId.toString()
       content  = this.storyPrompt( dto.data )
     }
     else {
@@ -102,9 +105,10 @@ export class UpsertWorkerEmbedding {
 
     const newEmbed = WorkerEmbedding.create(
       dto.id,
+      dataResult.right.workerId,
       dataResult.right.content,
+      dto.location,
       dto.data.type,
-      dataResult.right.workerId.value
     )
 
     if ( newEmbed instanceof Errors ) {
@@ -124,9 +128,10 @@ export class UpsertWorkerEmbedding {
 
     const updatedEmbed = WorkerEmbedding.fromPrimitives(
       existEmbed.id.toString(),
+      dataResult.right.workerId,
       dataResult.right.content,
+      dto.location,
       dto.data.type,
-      dataResult.right.workerId.value,
       existEmbed.createdAt.toString()
     )
 
@@ -146,7 +151,6 @@ export class UpsertWorkerEmbedding {
         return left( existResult.left )
       }
       const createResult = await this.create( dto )
-
       if ( isLeft( createResult ) ) {
         return left( createResult.left )
       }
@@ -163,7 +167,6 @@ export class UpsertWorkerEmbedding {
       embed = updateResult.right
     }
     const result = await this.repo.upsert( embed )
-
     if ( isLeft( result ) ) {
       return left( [result.left] )
     }

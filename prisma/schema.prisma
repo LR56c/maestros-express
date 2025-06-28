@@ -266,7 +266,7 @@ model Worker {
   description        String?            @map("description")
   reviewCount        Int                @default(0) @map("review_count")
   reviewAverage      Float              @default(0) @map("review_average")
-  location           String            @map("location")
+  location           String             @map("location")
   status             WorkerStatus       @map("status")
   nationalIdentityId String             @map("national_identity") @db.Uuid
   user               User               @relation(fields: [id], references: [id], onDelete: Cascade)
@@ -300,13 +300,14 @@ model Report {
 }
 
 model WorkerEmbedding {
-  id        String                @id @default(uuid()) @db.Uuid
-  type      WorkerEmbeddingType   @map("type")
+  id        String                      @id @default(uuid()) @db.Uuid
+  type      WorkerEmbeddingType         @map("type")
   content   String
+  location  Unsupported("geography(POINT)")
   embedding Unsupported("vector(1536)")
-  createdAt DateTime              @default(now()) @map("created_at") @db.Timestamptz(6)
-  workerId  String                @map("worker_id") @db.Uuid
-  worker    Worker                @relation(fields: [workerId], references: [id], onDelete: Cascade)
+  createdAt DateTime                    @default(now()) @map("created_at") @db.Timestamptz(6)
+  workerId  String                      @map("worker_id") @db.Uuid
+  worker    Worker                      @relation(fields: [workerId], references: [id], onDelete: Cascade)
 
   @@index([workerId])
   @@map("worker_embedding")
@@ -362,7 +363,7 @@ model Message {
   id        String        @id @default(uuid()) @db.Uuid
   status    MessageStatus @map("status")
   type      MessageType   @map("type")
-  content   String       @map("content")
+  content   String        @map("content")
   createdAt DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
   userId    String        @map("user_id") @db.Uuid
   chatId    String        @map("chat_id") @db.Uuid

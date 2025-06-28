@@ -14,12 +14,14 @@ import {
   BaseException
 }                    from "@/modules/shared/domain/exceptions/base_exception"
 import { ValidString } from "@/modules/shared/domain/value_objects/valid_string"
+import { Position } from "@/modules/shared/domain/value_objects/position"
 
 export class WorkerEmbedding {
   private constructor(
     readonly id: UUID,
     readonly workerId: UUID,
     readonly content: ValidString,
+    readonly location: Position,
     readonly type: WorkerEmbeddingType,
     readonly createdAt: ValidDate
   )
@@ -30,10 +32,11 @@ export class WorkerEmbedding {
     id: string,
     workerId: string,
     content: string,
+    position: string,
     type: string,
   ): WorkerEmbedding | Errors {
     return WorkerEmbedding.fromPrimitives(
-      id,workerId, content,type, ValidDate.nowUTC()
+      id,workerId, content,position,type, ValidDate.nowUTC()
     )
   }
 
@@ -41,30 +44,38 @@ export class WorkerEmbedding {
     id: string,
     workerId: string,
     content: string,
+    position: string,
     type: string,
     createdAt: Date | string
   ): WorkerEmbedding | Errors {
     const errors = []
 
-    const idVO = wrapType<UUID, InvalidUUIDException>(
+    const idVO = wrapType(
       () => UUID.from( id ) )
 
     if ( idVO instanceof BaseException ) {
       errors.push( idVO )
     }
 
-    const workerIdVO = wrapType<UUID, InvalidUUIDException>(
+    const workerIdVO = wrapType(
       () => UUID.from( workerId ) )
 
     if ( workerIdVO instanceof BaseException ) {
       errors.push( workerIdVO )
     }
 
-    const contentVO = wrapType<ValidString, InvalidUUIDException>(
+    const contentVO = wrapType(
       () => ValidString.from( content ) )
 
     if ( contentVO instanceof BaseException ) {
       errors.push( contentVO )
+    }
+
+    const positionVO = wrapType(
+      () => Position.fromJSON( position ) )
+
+    if ( positionVO instanceof BaseException ) {
+      errors.push( positionVO )
     }
 
     const typeVO = wrapType(
@@ -88,6 +99,7 @@ export class WorkerEmbedding {
       idVO as UUID,
       workerIdVO as UUID,
       contentVO as ValidString,
+      positionVO as Position,
       typeVO as WorkerEmbeddingType,
       createdAtVO as ValidDate
     )
@@ -97,6 +109,7 @@ export class WorkerEmbedding {
     id: string,
     workerId: string,
     content: string,
+    position: string,
     type: string,
     createdAt: Date
   ): WorkerEmbedding {
@@ -104,6 +117,7 @@ export class WorkerEmbedding {
       UUID.from( id ),
       UUID.from( workerId ),
       ValidString.from( content ),
+      Position.fromJSON(position),
       WorkerEmbeddingType.from( type ),
       ValidDate.from( createdAt )
     )

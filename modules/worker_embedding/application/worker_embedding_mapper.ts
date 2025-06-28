@@ -78,6 +78,7 @@ export class WorkerEmbeddingMapper {
       json.id,
       json.worker_id,
       json.content,
+      json.position,
       type.value,
       json.created_at
     )

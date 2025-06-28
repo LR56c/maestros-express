@@ -9,38 +9,45 @@ import {
 import { isLeft }                    from "fp-ts/Either"
 import {
   PrismaWorkerEmbeddingData
-} from "@/modules/worker_embedding/infrastructure/prisma_worker_embedding_data"
+}                                    from "@/modules/worker_embedding/infrastructure/prisma_worker_embedding_data"
 import {
   UpsertWorkerEmbedding
-} from "@/modules/worker_embedding/application/upsert_worker_embedding"
+}                                    from "@/modules/worker_embedding/application/upsert_worker_embedding"
 import {
   RemoveWorkerEmbedding
-} from "@/modules/worker_embedding/application/remove_worker_embedding"
+}                                    from "@/modules/worker_embedding/application/remove_worker_embedding"
 import {
   SearchWorkerEmbedding
 }                                    from "@/modules/worker_embedding/application/search_worker_embedding"
 import {
   WorkerEmbeddingMapper
-} from "@/modules/worker_embedding/application/worker_embedding_mapper"
+}                                    from "@/modules/worker_embedding/application/worker_embedding_mapper"
 import {
-  OpenaiSupabaseWorkerEmbeddingData
-} from "@/modules/worker_embedding/infrastructure/openai_supabase_worker_embedding_data"
-import { getStory } from "@/app/api/story/route"
+  OpenaiWorkerEmbeddingData
+}                                    from "@/modules/worker_embedding/infrastructure/openai_worker_embedding_data"
+import { getStory }                  from "@/app/api/story/route"
 import { searchWorker }              from "@/app/api/worker/route"
 import OpenAI                        from "openai"
-import { createClient } from '@supabase/supabase-js'
+import { createClient }              from "@supabase/supabase-js"
 import {
   workerEmbeddingRequestSchema
-} from "@/modules/worker_embedding/application/worker_embedding_request"
-import { WorkerMapper } from "@/modules/worker/application/worker_mapper"
+}                                    from "@/modules/worker_embedding/application/worker_embedding_request"
+import {
+  SupabaseWorkerEmbeddingData
+}                                    from "@/modules/worker_embedding/infrastructure/supabase_worker_embedding_data"
 
-const ai     = new OpenaiSupabaseWorkerEmbeddingData(createClient( process.env.SUPABASE_URL ?? "", process.env.SUPABASE_ANON_KEY ?? "" ),new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-}))
-const dao    = new PrismaWorkerEmbeddingData( prisma, ai )
-const add    = new UpsertWorkerEmbedding( dao, searchWorker, getStory )
-const remove = new RemoveWorkerEmbedding( dao )
-const search = new SearchWorkerEmbedding( dao )
+const ai = new OpenaiWorkerEmbeddingData( new OpenAI( {
+  apiKey: process.env.OPENAI_API_KEY
+} ) )
+
+const prismaDao   = new PrismaWorkerEmbeddingData( prisma, ai )
+const supabaseDao = new SupabaseWorkerEmbeddingData( ai,
+  createClient( process.env.SUPABASE_URL ?? "",
+    process.env.SUPABASE_ANON_KEY ?? "" ) )
+const add         = new UpsertWorkerEmbedding( prismaDao, searchWorker,
+  getStory )
+const remove      = new RemoveWorkerEmbedding( prismaDao )
+const search      = new SearchWorkerEmbedding( supabaseDao, searchWorker )
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
@@ -50,7 +57,6 @@ export async function POST( request: NextRequest ) {
   }
 
   const result = await add.execute( data.right )
-
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
   }
@@ -89,7 +95,7 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { status: 500 } )
   }
 
-  return NextResponse.json( result.right.map( WorkerMapper.toDTO ),
+  return NextResponse.json( result.right,
     { status: 200 } )
 }
 
