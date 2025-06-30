@@ -79,7 +79,7 @@ export class PrismaWorkerEmbeddingData
 
   async upsert( embed: WorkerEmbedding ): Promise<Either<BaseException, boolean>> {
     try {
-      const embedding = await this.ai.generate( embed.content )
+      const embedding = await this.ai.generateText( embed.content )
       if ( isLeft( embedding ) ) {
         return left( embedding.left )
       }

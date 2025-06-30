@@ -56,7 +56,7 @@ export class SupabaseWorkerEmbeddingData
   async search( rawContent: ValidString, targetLocation: Position,
     radius: ValidInteger,
     limit?: ValidInteger ): Promise<Either<BaseException[], WorkerEmbedding[]>> {
-    const vector = await this.ai.generate( rawContent )
+    const vector = await this.ai.generateText( rawContent )
 
     if ( isLeft( vector ) ) {
       return left( [vector.left] )
