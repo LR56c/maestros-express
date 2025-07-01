@@ -19,13 +19,11 @@ const fileSchema = z.instanceof( File ).refine(
 
 
 export class ValidImage {
-  readonly value: string
-  readonly format: string
-
-  private constructor( value: string, format: string ) {
-    this.value  = value
-    this.format = format
-  }
+  private constructor(
+    readonly value: string,
+    readonly format: string,
+    readonly fileFormat: string
+  ) {}
 
   /**
    * Crea una instancia de ValidImage
@@ -40,14 +38,15 @@ export class ValidImage {
       return ValidImage.fromFileAsync( value )
     }
     const base64Schema = z.string()
-                          .regex( base64Regex, "Invalid base64 image string" )
-    const result       = base64Schema.safeParse( value )
+      .regex( base64Regex, "Invalid base64 image string" )
+    const result = base64Schema.safeParse( value )
     if ( !result.success ) {
       throw new InvalidImageException( result.error.message )
     }
-    const match  = value.match( /^data:image\/(png|jpeg|jpg|webp);base64,/ )
+    const match = value.match( /^data:image\/(png|jpeg|jpg|webp);base64,/ )
     const format = match ? match[1] : "unknown"
-    return new ValidImage( value, format )
+    const fileFormat = `image/${format}`
+    return new ValidImage( value, format, fileFormat )
   }
 
   private static async fromFileAsync( file: File ): Promise<ValidImage> {
@@ -57,19 +56,21 @@ export class ValidImage {
     }
     const base64 = await ValidImage.fileToBase64( file )
     const format = file.type.split( "/" )[1] || "unknown"
-    return new ValidImage( base64, format )
+    const fileFormat = `image/${format}`
+    return new ValidImage( base64, format, fileFormat )
   }
 
   toFile( fileName: string = "image" ): File {
-    const mimeType = this.format.startsWith( "image/" )
-      ? this.format
-      : `image/${ this.format }`
-    const byteString = atob( this.value )
+    let b64 = this.value
+    if ( b64.startsWith( "data:" ) ) {
+      b64 = b64.substring( b64.indexOf( "," ) + 1 )
+    }
+    const byteString = atob( b64 )
     const ab         = new Uint8Array( byteString.length )
     for ( let i = 0; i < byteString.length; i++ ) {
       ab[i] = byteString.charCodeAt( i )
     }
-    return new File( [ab], fileName, { type: mimeType } )
+    return new File( [ab], fileName, { type: this.fileFormat } )
   }
 
   static async fromOrNull( value: File | string ): Promise<ValidImage | undefined> {

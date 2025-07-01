@@ -36,7 +36,7 @@ import {
   SupabaseWorkerEmbeddingData
 }                                    from "@/modules/worker_embedding/infrastructure/supabase_worker_embedding_data"
 
-const ai = new OpenaiWorkerEmbeddingData( new OpenAI( {
+export const ai = new OpenaiWorkerEmbeddingData( new OpenAI( {
   apiKey: process.env.OPENAI_API_KEY
 } ) )
 
