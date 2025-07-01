@@ -1,3 +1,5 @@
+"use server"
+
 import { NextRequest, NextResponse } from "next/server"
 import {
   specialitySchema
@@ -47,7 +49,7 @@ import {
 import { searchUser }                from "@/app/api/user/route"
 
 const dao    = new PrismaReportData( prisma )
-const add    = new AddReport( dao,searchUser )
+const add    = new AddReport( dao,await searchUser() )
 const search = new SearchReport( dao )
 
 export async function POST( request: NextRequest ) {

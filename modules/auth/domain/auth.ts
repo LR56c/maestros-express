@@ -7,9 +7,6 @@ import {
   ValidDate
 }                                    from "../../shared/domain/value_objects/valid_date"
 import {
-  ValidBool
-}                                    from "../../shared/domain/value_objects/valid_bool"
-import {
   Errors
 }                                    from "../../shared/domain/exceptions/errors"
 import { wrapType, wrapTypeDefault } from "../../shared/utils/wrap_type"
@@ -17,35 +14,17 @@ import {
   BaseException
 }                                    from "../../shared/domain/exceptions/base_exception"
 import {
-  EmailException
-}                                    from "../../shared/domain/exceptions/email_exception"
-import {
-  InvalidStringException
-}                                    from "../../shared/domain/exceptions/invalid_string_exception"
-import {
-  InvalidDateException
-}                                    from "../../shared/domain/exceptions/invalid_date_exception"
-import {
-  InvalidBooleanException
-}                                    from "../../shared/domain/exceptions/invalid_boolean_exception"
-import {
-  InvalidAuthMethodException
-}                                    from "./exceptions/invalid_auth_method_exception"
-import {
   UUID
 }                                    from "@/modules/shared/domain/value_objects/uuid"
-import {
-  InvalidUUIDException
-}                                    from "@/modules/shared/domain/exceptions/invalid_uuid_exception"
 
 export class Auth {
   private constructor(
     readonly userId: UUID,
     readonly email: Email,
-    readonly name: ValidString,
+    readonly metadata: Record<string, any>,
     readonly authMethod: AuthMethod,
     readonly createdAt: ValidDate,
-    readonly isActive: ValidBool,
+    readonly name ?: ValidString,
     readonly updatedAt ?: ValidDate,
     readonly lastLogin ?: ValidDate
   )
@@ -55,46 +34,31 @@ export class Auth {
   static create(
     userId: string,
     email: string,
-    name: string,
-    authMethod: string
+    metadata: Record<string, any>,
+    authMethod: string,
+    name?: string
   ): Auth | Errors {
-    return Auth.fromPrimitives( userId, email, name, authMethod,
-      ValidDate.nowUTC(),
-      true, undefined, undefined )
-  }
-
-  static from(
-    userId: UUID,
-    email: Email,
-    name: ValidString,
-    authMethod: AuthMethod,
-    createdAt: ValidDate,
-    isActive: ValidBool,
-    updatedAt ?: ValidDate,
-    lastLogin ?: ValidDate
-  ): Auth
-  {
-    return new Auth( userId, email, name, authMethod, createdAt, isActive,
-      updatedAt, lastLogin )
+    return Auth.fromPrimitives( userId, email, metadata, authMethod,
+      ValidDate.nowUTC(), name, undefined, undefined )
   }
 
   static fromPrimitivesThrow(
     userId: string,
     email: string,
-    name: string,
+    metadata: Record<string, any>,
     authMethod: string,
-    createdAt: Date,
-    isActive: boolean,
-    updatedAt ?: Date,
-    lastLogin ?: Date
+    createdAt: Date | string,
+    name?: string,
+    updatedAt ?: Date | string,
+    lastLogin ?: Date | string
   ): Auth {
     return new Auth(
       UUID.from( userId ),
       Email.from( email ),
-      ValidString.from( name ),
+      metadata,
       AuthMethod.from( authMethod ),
       ValidDate.from( createdAt ),
-      ValidBool.from( isActive ),
+      name ? ValidString.from( name ) : undefined,
       updatedAt ? ValidDate.from( updatedAt ) : undefined,
       lastLogin ? ValidDate.from( lastLogin ) : undefined
     )
@@ -103,34 +67,41 @@ export class Auth {
   static fromPrimitives(
     userId: string,
     email: string,
-    name: string,
+    metadata: Record<string, any>,
     authMethod: string,
     createdAt: Date | string,
-    isActive: boolean,
+    name?: string,
     updatedAt ?: Date | string,
     lastLogin ?: Date | string
   ): Auth | Errors {
     const errors  = []
-    const vuserId = wrapType<UUID, InvalidUUIDException>(
+    const vuserId = wrapType(
       () => UUID.from( userId ) )
     if ( vuserId instanceof BaseException ) {
       errors.push( vuserId )
     }
 
-    const vemail = wrapType<Email, EmailException>( () => Email.from( email ) )
+    const vemail = wrapType( () => Email.from( email ) )
 
     if ( vemail instanceof BaseException ) {
       errors.push( vemail )
     }
 
-    const vname = wrapType<ValidString, InvalidStringException>(
-      () => ValidString.from( name ) )
+    const vname = wrapTypeDefault( undefined, ( value ) =>
+      ValidString.from( value ), name )
 
     if ( vname instanceof BaseException ) {
       errors.push( vname )
     }
 
-    const vcreatedAt = wrapType<ValidDate, InvalidDateException>(
+    const vmethod = wrapType(
+      () => AuthMethod.from( authMethod ) )
+
+    if ( vmethod instanceof BaseException ) {
+      errors.push( vmethod )
+    }
+
+    const vcreatedAt = wrapType(
       () => ValidDate.from( createdAt ) )
 
     if ( vcreatedAt instanceof BaseException ) {
@@ -156,20 +127,6 @@ export class Auth {
       errors.push( vlastLogin )
     }
 
-    const visActive = wrapType<ValidBool, InvalidBooleanException>(
-      () => ValidBool.from( isActive ) )
-
-    if ( visActive instanceof BaseException ) {
-      errors.push( visActive )
-    }
-
-    const vauthMethod = wrapType<AuthMethod, InvalidAuthMethodException>(
-      () => AuthMethod.from( authMethod ) )
-
-    if ( vauthMethod instanceof BaseException ) {
-      errors.push( vauthMethod )
-    }
-
     if ( errors.length > 0 ) {
       return new Errors( errors )
     }
@@ -177,10 +134,10 @@ export class Auth {
     return new Auth(
       vuserId as UUID,
       vemail as Email,
-      vname as ValidString,
-      vauthMethod as AuthMethod,
+      metadata,
+      vmethod as AuthMethod,
       vcreatedAt as ValidDate,
-      visActive as ValidBool,
+      vname as ValidString | undefined,
       vupdatedAt as ValidDate | undefined,
       vlastLogin as ValidDate | undefined
     )

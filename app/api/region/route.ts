@@ -1,3 +1,5 @@
+"use server"
+
 import { NextRequest, NextResponse } from "next/server"
 import prisma                        from "@/lib/prisma"
 import {
@@ -34,7 +36,7 @@ const dao                 = new PrismaRegionData( prisma )
 const add                 = new AddRegion( dao, searchCountry )
 const remove              = new RemoveRegion( dao )
 const update              = new UpdateRegion( dao )
-export const searchRegion = new SearchRegion( dao )
+export const searchRegion = async ()=> new SearchRegion( dao )
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
@@ -72,7 +74,7 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await searchRegion.execute( data.right )
+  const result = await (await searchRegion()).execute( data.right )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )

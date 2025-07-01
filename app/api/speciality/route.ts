@@ -1,3 +1,5 @@
+"use server"
+
 import { NextRequest, NextResponse } from "next/server"
 import {
   specialitySchema
@@ -34,7 +36,7 @@ const dao    = new PrismaSpecialityData( prisma )
 const add    = new AddSpeciality( dao )
 const remove = new RemoveSpeciality( dao )
 const update                  = new UpdateSpeciality( dao )
-export const searchSpeciality = new SearchSpeciality( dao )
+export const searchSpeciality =async ()=>new SearchSpeciality( dao )
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
@@ -72,7 +74,7 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await searchSpeciality.execute(
+  const result = await (await searchSpeciality()).execute(
     data.right.query,
     data.right.limit,
     data.right.skip,

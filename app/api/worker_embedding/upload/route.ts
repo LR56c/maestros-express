@@ -1,3 +1,5 @@
+"use server"
+
 import { NextRequest, NextResponse } from "next/server"
 import {
   parseData
@@ -5,14 +7,15 @@ import {
 import { isLeft }                    from "fp-ts/Either"
 import {
   UploadRequestWorkerEmbedding
-}                                    from "@/modules/worker_embedding/application/upload_request_worker_embedding"
-import { ai }                        from "@/app/api/worker_embedding/route"
-import { z }                         from "zod"
+}                 from "@/modules/worker_embedding/application/upload_request_worker_embedding"
+import { aiRepo } from "@/app/api/worker_embedding/route"
+import { z }      from "zod"
 import {
   UploadRequestMapper
+
 }                                    from "@/modules/worker_embedding/application/upload_request_mapper"
 
-const upload = new UploadRequestWorkerEmbedding( ai )
+const upload = new UploadRequestWorkerEmbedding( await aiRepo() )
 
 export async function POST( request: NextRequest ) {
   // const body = await request.json()

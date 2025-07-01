@@ -1,3 +1,4 @@
+"use server"
 import { NextRequest, NextResponse } from "next/server"
 import prisma                        from "@/lib/prisma"
 import {
@@ -27,27 +28,25 @@ import {
 }                                    from "@/modules/worker_embedding/infrastructure/openai_worker_embedding_data"
 import { getStory }                  from "@/app/api/story/route"
 import { searchWorker }              from "@/app/api/worker/route"
-import OpenAI                        from "openai"
-import { createClient }              from "@supabase/supabase-js"
+// import { createClient }              from "@supabase/supabase-js"
 import {
   workerEmbeddingRequestSchema
 }                                    from "@/modules/worker_embedding/application/worker_embedding_request"
 import {
   SupabaseWorkerEmbeddingData
 }                                    from "@/modules/worker_embedding/infrastructure/supabase_worker_embedding_data"
+import { ai, supabase } from "@/app/api/dependencies"
 
-export const ai = new OpenaiWorkerEmbeddingData( new OpenAI( {
-  apiKey: process.env.OPENAI_API_KEY
-} ) )
 
-const prismaDao   = new PrismaWorkerEmbeddingData( prisma, ai )
-const supabaseDao = new SupabaseWorkerEmbeddingData( ai,
-  createClient( process.env.SUPABASE_URL ?? "",
-    process.env.SUPABASE_ANON_KEY ?? "" ) )
-const add         = new UpsertWorkerEmbedding( prismaDao, searchWorker,
+export const aiRepo = async () => new OpenaiWorkerEmbeddingData( await ai() )
+
+
+const prismaDao       = new PrismaWorkerEmbeddingData( prisma, await aiRepo() )
+const supabaseDao     = new SupabaseWorkerEmbeddingData( await aiRepo(), await supabase() )
+const add             = new UpsertWorkerEmbedding( prismaDao, await searchWorker(),
   getStory )
-const remove      = new RemoveWorkerEmbedding( prismaDao )
-const search      = new SearchWorkerEmbedding( supabaseDao, searchWorker )
+const remove          = new RemoveWorkerEmbedding( prismaDao )
+const search          = new SearchWorkerEmbedding( supabaseDao, await searchWorker() )
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()

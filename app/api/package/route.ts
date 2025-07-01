@@ -1,7 +1,6 @@
+"use server"
+
 import { NextRequest, NextResponse } from "next/server"
-import {
-  specialitySchema
-}                                    from "@/modules/speciality/application/speciality_dto"
 import prisma                        from "@/lib/prisma"
 import {
   querySchema
@@ -10,10 +9,6 @@ import {
   parseData
 }                                    from "@/modules/shared/application/parse_handlers"
 import { isLeft }                    from "fp-ts/Either"
-import {
-  SpecialityMapper
-}                                    from "@/modules/speciality/application/speciality_mapper"
-import { z }                         from "zod"
 import {
   PrismaPackageData
 }                                    from "@/modules/package/infrastructure/prisma_package_data"

@@ -1,3 +1,5 @@
+"use server"
+
 import { NextRequest, NextResponse } from "next/server"
 import prisma                        from "@/lib/prisma"
 import {
@@ -35,7 +37,7 @@ const add    = new AddStory( dao )
 const remove = new RemoveStory( dao )
 const update = new UpdateStory( dao )
 const getStories = new GetStoryByWorker( dao )
-export const getStory = new GetStoryById(dao)
+export const getStory = async ()=>new GetStoryById(dao)
 export async function POST( request: NextRequest ) {
   const body = await request.json()
   const data = parseData( storySchema.extend( {

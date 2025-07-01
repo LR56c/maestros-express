@@ -1,3 +1,5 @@
+"use server"
+
 import { NextRequest, NextResponse } from "next/server"
 import prisma                        from "@/lib/prisma"
 import {
@@ -30,7 +32,7 @@ const dao               = new PrismaRoleData( prisma )
 const add               = new AddRole( dao )
 const remove            = new RemoveRole( dao )
 const update            = new UpdateRole( dao )
-export const searchRole = new SearchRole( dao )
+export const searchRole = async () => new SearchRole( dao )
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
@@ -67,7 +69,9 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await searchRole.execute( data.right )
+  const result = await (
+    await searchRole()
+  ).execute( data.right )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )

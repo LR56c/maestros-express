@@ -1,19 +1,11 @@
+"use server"
+
 import { NextRequest, NextResponse } from "next/server"
-import {
-  specialitySchema
-}                                    from "@/modules/speciality/application/speciality_dto"
 import prisma                        from "@/lib/prisma"
-import {
-  querySchema
-}                                    from "@/modules/shared/application/query_dto"
 import {
   parseData
 }                                    from "@/modules/shared/application/parse_handlers"
 import { isLeft }                    from "fp-ts/Either"
-import {
-  SpecialityMapper
-}                                    from "@/modules/speciality/application/speciality_mapper"
-import { z }                         from "zod"
 import {
   PrismaChatData
 }                                    from "@/modules/chat/infrastructure/prisma_chat_data"
@@ -23,11 +15,10 @@ import {
 }                                    from "@/modules/chat/application/update_chat"
 import {
   GetChatByUser
-}                             from "@/modules/chat/application/get_chat_by_user"
-import { chatResponseSchema } from "@/modules/chat/application/chat_response"
+}                                    from "@/modules/chat/application/get_chat_by_user"
 import {
   ChatMapper
-}                             from "@/modules/chat/application/chat_mapper"
+}                                    from "@/modules/chat/application/chat_mapper"
 import {
   chatRequestSchema
 }                                    from "@/modules/chat/application/chat_request"

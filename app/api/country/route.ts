@@ -1,3 +1,5 @@
+"use server"
+
 import { NextRequest, NextResponse } from "next/server"
 import prisma                        from "@/lib/prisma"
 import {
@@ -33,7 +35,7 @@ const dao                  = new PrismaCountryData( prisma )
 const add                  = new AddCountry( dao )
 const remove               = new RemoveCountry( dao )
 const update               = new UpdateCountry( dao )
-export const searchCountry = new SearchCountry( dao )
+export const searchCountry = async () => new SearchCountry( dao )
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
@@ -71,7 +73,7 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await searchCountry.execute( data.right )
+  const result = await (await searchCountry()).execute( data.right )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )

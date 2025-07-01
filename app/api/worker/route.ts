@@ -1,3 +1,5 @@
+"use server"
+
 import { NextRequest, NextResponse } from "next/server"
 import prisma                        from "@/lib/prisma"
 import {
@@ -32,10 +34,10 @@ import {
 }                                    from "@/modules/worker/application/worker_update_dto"
 import { searchSpeciality }          from "@/app/api/speciality/route"
 
-const dao    = new PrismaWorkerData( prisma )
-const add    = new AddWorker( dao, searchUser, searchCountry )
-const update              = new UpdateWorker( dao ,searchSpeciality)
-export const searchWorker = new SearchWorker( dao )
+const dao                 = new PrismaWorkerData( prisma )
+const add                 = new AddWorker( dao, await searchUser(), searchCountry )
+const update              = new UpdateWorker( dao, searchSpeciality )
+export const searchWorker = async () => new SearchWorker( dao )
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
@@ -73,11 +75,13 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await searchWorker.execute(     data.right.query,
+  const result = await (
+    await searchWorker()
+  ).execute( data.right.query,
     data.right.limit,
     data.right.skip,
     data.right.sort_by,
-    data.right.sort_type, )
+    data.right.sort_type )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
