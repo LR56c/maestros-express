@@ -42,7 +42,6 @@ export async function POST( request: NextRequest ) {
     data.right.base64Image,
     data.right.input
   )
-  console.log("Upload result:", result)
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
   }

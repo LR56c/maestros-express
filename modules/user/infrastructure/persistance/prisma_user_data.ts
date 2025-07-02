@@ -32,7 +32,7 @@ export class PrismaUserData implements UserDAO {
 
   async remove( id: UUID ): Promise<Either<BaseException, boolean>> {
     try {
-      await this.db.user.delete( {
+      await this.db.myUser.delete( {
         where: {
           id: id.value
         }
@@ -47,7 +47,7 @@ export class PrismaUserData implements UserDAO {
   async update( user: User ): Promise<Either<BaseException, boolean>> {
     try {
       await this.db.$transaction( [
-        this.db.user.update( {
+        this.db.myUser.update( {
           where: {
             id: user.userId.value
           },
@@ -79,7 +79,7 @@ export class PrismaUserData implements UserDAO {
   async add( user: User ): Promise<Either<BaseException, boolean>> {
     try {
       await this.db.$transaction( [
-        this.db.user.create( {
+        this.db.myUser.create( {
           data: {
             id       : user.userId.value,
             email    : user.email.value,
@@ -165,7 +165,7 @@ export class PrismaUserData implements UserDAO {
   async count( query: Record<string, any> ): Promise<Either<BaseException[], ValidInteger>> {
     try {
       let where = this.queryWhere( query )
-      const num = await this.db.user.count( {
+      const num = await this.db.myUser.count( {
         where: where
       } )
       return right( ValidInteger.from( num ) )
@@ -190,7 +190,7 @@ export class PrismaUserData implements UserDAO {
       }
 
       const offset   = skip ? parseInt( skip.value ) : 0
-      const response = await this.db.user.findMany( {
+      const response = await this.db.myUser.findMany( {
         where  : where,
         orderBy: orderBy,
         skip   : offset,
@@ -244,7 +244,7 @@ export class PrismaUserData implements UserDAO {
   async getById( id: UUID ):
     Promise<Either<BaseException[], User>> {
     try {
-      const response = await this.db.user.findUnique( {
+      const response = await this.db.myUser.findUnique( {
         where  : {
           id: id.toString()
         },

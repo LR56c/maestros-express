@@ -1,21 +1,26 @@
 "use client"
-import { registerAuth } from "@/app/actions/auth/register"
 import { useState }     from "react"
+import { logoutAuth }   from "@/app/actions/auth/logout"
+import { loginAuth }    from "@/app/actions/auth/login"
+import { registerAuth } from "@/app/actions/auth/register"
 
 
 export default function Register() {
   const [email, setEmail] = useState( "" )
   const [pass, setPass]   = useState( "" )
-
-  const onRegister = async () => {
-    const r = await registerAuth( {
+  const [name, setName] = useState("")
+  const onLogout = async ()=>{
+    await logoutAuth()
+  }
+  const onRegister        = async () => {
+    await registerAuth( {
       email   : email,
-      password: pass
+      password: pass,
+      name: name
     } )
-    console.log( "Client Register response:", r )
   }
   return (
-    <form>
+    <form className="flex flex-col">
       <label htmlFor="email">Email:</label>
       <input id="email" name="email"
              value={ email }
@@ -28,7 +33,15 @@ export default function Register() {
              onChange={ ( e ) => setPass( e.target.value ) }
              type="password"
              required/>
+      <label htmlFor="name">Name:</label>
+      <input id="name"
+             name="name"
+             value={ name }
+             onChange={ ( e ) => setName( e.target.value ) }
+             type="text"
+             required/>
       <button type="button" onClick={ onRegister }>Sign up</button>
+      <button type="button" onClick={ onLogout }>logout</button>
     </form>
   )
 }

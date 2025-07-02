@@ -1,9 +1,9 @@
 import { AuthRepository } from "@/modules/auth/domain/auth_repository"
 import { ResetPassword } from "@/modules/auth/domain/reset_password_method"
-import type { Either } from "fp-ts/Either"
-import type {
+import { Either, left }  from "fp-ts/Either"
+import  {
   BaseException
-} from "@/modules/shared/domain/exceptions/base_exception"
+}                        from "@/modules/shared/domain/exceptions/base_exception"
 import { AuthResetDTO }   from "@/modules/auth/application/auth_reset_dto"
 import { wrapType }       from "@/modules/shared/utils/wrap_type"
 

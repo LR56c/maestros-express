@@ -18,11 +18,11 @@ import {
 }                                        from "@/modules/auth/domain/auth_repository"
 import {
   UUID
-}                                        from "@/modules/shared/domain/value_objects/uuid"
-import { Either, left, right }           from "fp-ts/Either"
+}                                      from "@/modules/shared/domain/value_objects/uuid"
+import { Either, isLeft, left, right } from "fp-ts/Either"
 import {
   Email
-}                                        from "@/modules/shared/domain/value_objects/email"
+}                                      from "@/modules/shared/domain/value_objects/email"
 import {
   Password
 }                                        from "@/modules/auth/domain/password"
@@ -38,8 +38,6 @@ import {
 import {
   AuthMethod
 }                          from "@/modules/auth/domain/auth_method"
-import { boolean, string } from "fp-ts"
-import { password }        from "@clack/prompts"
 
 function checkSupabaseProvider( value: string ): value is Provider {
   return value === "google"
@@ -63,7 +61,7 @@ export class SupabaseAuthData implements AuthRepository {
     const { data, error } = await this.client.auth.signInWithPassword(
       { email: email.value, password: password.value } )
     if ( error ) {
-      throw new InfrastructureException( error.message )
+      return left([new InfrastructureException( error.message )])
     }
     const auth = Auth.fromPrimitives(
       data.user.id,
@@ -72,7 +70,6 @@ export class SupabaseAuthData implements AuthRepository {
       data.user.app_metadata.provider!.toUpperCase(),
       data.user.created_at,
       data.user.updated_at,
-      data.user.last_sign_in_at
     )
 
     if ( auth instanceof Errors ) {
@@ -99,21 +96,30 @@ export class SupabaseAuthData implements AuthRepository {
     if ( error ) {
       return left( [new InfrastructureException( error.message )] )
     }
+
+    const supabaseMetadata = {
+      ...data.user!.app_metadata,
+      ...auth.metadata
+    }
     const authData = Auth.fromPrimitives(
       data.user!.id,
       data.user!.email!,
-      data.user!.app_metadata,
+      supabaseMetadata,
       data.user!.app_metadata.provider!.toUpperCase(),
       data.user!.created_at,
       data.user!.updated_at,
-      data.user!.last_sign_in_at
     )
 
     if ( authData instanceof Errors ) {
       return left( authData.values )
     }
 
-    return right( authData )
+    const updateResult = await this.update(authData)
+    if ( isLeft(updateResult) ){
+      return left(updateResult.left)
+    }
+
+    return right( updateResult.right )
   }
 
   async requestResetPassword( method: ResetPassword,
@@ -165,7 +171,6 @@ export class SupabaseAuthData implements AuthRepository {
       data.user!.app_metadata.provider!.toUpperCase(),
       data.user!.created_at,
       data.user!.updated_at,
-      data.user!.last_sign_in_at
     )
 
     if ( auth instanceof Errors ) {
@@ -195,7 +200,6 @@ export class SupabaseAuthData implements AuthRepository {
       data.user!.app_metadata.provider!.toUpperCase(),
       data.user!.created_at,
       data.user!.updated_at,
-      data.user!.last_sign_in_at
     )
 
     if ( auth instanceof Errors ) {
@@ -242,7 +246,6 @@ export class SupabaseAuthData implements AuthRepository {
       data.user.app_metadata.provider!.toUpperCase(),
       data.user.created_at,
       data.user.updated_at,
-      data.user.last_sign_in_at
     )
 
     if ( updatedAuth instanceof Errors ) {
@@ -267,7 +270,6 @@ export class SupabaseAuthData implements AuthRepository {
       data.user.app_metadata.provider!.toUpperCase(),
       data.user.created_at,
       data.user.updated_at,
-      data.user.last_sign_in_at
     )
 
     if ( auth instanceof Errors ) {

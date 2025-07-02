@@ -1,15 +1,14 @@
-import { type NextRequest } from "next/server"
-import { updateSession }    from "@/utils/supabase/middleware"
+import { type NextRequest, NextResponse } from "next/server"
+import { getSessionCookie } from "better-auth/cookies";
 
-// const urlObject = request.nextUrl
-// console.log( "Middleware triggered for request:", request )
-// // request.method
-// if ( urlObject.pathname.startsWith( "/api" ) ) {
-//   console.log('Skipping middleware for API route:', urlObject.pathname)
-//   return NextResponse.next()
-// }
-export async function middleware( request: NextRequest ) {
-  return await updateSession( request )
+export async function middleware(request: NextRequest) {
+  const sessionCookie = getSessionCookie(request);
+
+  if (!sessionCookie) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  return NextResponse.next();
 }
 
 export const config = {

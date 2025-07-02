@@ -1,6 +1,6 @@
 import { AuthRepository } from "@/modules/auth/domain/auth_repository"
-import type { Either }    from "fp-ts/Either"
-import type {
+import { Either, left }   from "fp-ts/Either"
+import {
   BaseException
 }                         from "@/modules/shared/domain/exceptions/base_exception"
 import { Auth }           from "@/modules/auth/domain/auth"
@@ -9,13 +9,14 @@ import { wrapType }       from "@/modules/shared/utils/wrap_type"
 import {
   ValidString
 }                         from "@/modules/shared/domain/value_objects/valid_string"
+import { AuthMethod }     from "@/modules/auth/domain/auth_method"
 
 export class SigninOauth {
   constructor( private readonly repo: AuthRepository ) {
   }
 
   async execute(dto : OauthRequest): Promise<Either<BaseException[], Auth>>{
-    const errors = []
+    const errors : BaseException[] = []
 
     const token =wrapType(()=>ValidString.from(dto.token))
 
@@ -23,16 +24,17 @@ export class SigninOauth {
       errors.push( token )
     }
 
-    const method =wrapType(()=>ValidString.from(dto.auth_method))
+    const method =wrapType(()=>AuthMethod.from(dto.method))
 
     if ( method instanceof BaseException ) {
-      errors.push( token )
+      errors.push( method )
     }
 
     if ( errors.length > 0 ) {
       return left( errors )
     }
 
-    return this.repo.singinOauth( token, method )
+    return this.repo.singinOauth( token as ValidString
+      , method as AuthMethod )
   }
 }

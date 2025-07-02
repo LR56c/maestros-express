@@ -2,7 +2,7 @@ import { AuthRepository } from "@/modules/auth/domain/auth_repository"
 import { UUID }           from "@/modules/shared/domain/value_objects/uuid"
 import { ResetPassword }  from "@/modules/auth/domain/reset_password_method"
 import type { Either }    from "fp-ts/Either"
-import type {
+import {
   BaseException
 }                         from "@/modules/shared/domain/exceptions/base_exception"
 import { AuthResetDTO }   from "@/modules/auth/application/auth_reset_dto"
@@ -21,12 +21,13 @@ export class ConfirmResetPasswordAuth {
       errors.push( userUUID )
     }
     const resetMethod = wrapType(
-      () => ResetPassword.from( reset.method, reset.data ) )
+      () => ResetPassword.from( reset.method ) )
 
     if ( resetMethod instanceof BaseException ) {
       errors.push( resetMethod )
     }
 
-    return this.repo.confirmResetPassword( userUUID, resetMethod, reset.data )
+    return this.repo.confirmResetPassword( userUUID as UUID,
+      resetMethod as ResetPassword, reset.data )
   }
 }

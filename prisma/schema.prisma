@@ -16,7 +16,7 @@ model Notification {
   viewedAt  DateTime? @map("viewed_at")
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   userId    String    @map("user_id") @db.Uuid
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      MyUser    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@map("notification")
@@ -29,33 +29,11 @@ model NotificationConfig {
   notificationType NotificationType @map("notification_type")
   createdAt        DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
   userId           String           @map("user_id") @db.Uuid
-  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user             MyUser           @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([deviceToken])
   @@map("notification_config")
-}
-
-model User {
-  id                 String               @id @db.Uuid
-  email              String               @unique
-  name               String
-  surname            String
-  avatar             String?
-  createdAt          DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
-  Worker             Worker?
-  ClientChats        Chat[]               @relation("ClientChats")
-  WorkerChats        Chat[]               @relation("WorkerChats")
-  Message            Message[]
-  Notification       Notification[]
-  NotificationConfig NotificationConfig[]
-  Payment            Payment[]
-  Quotation          Quotation[]
-  FromUserReport     Report[]             @relation("FromUserReports")
-  ToUserReport       Report[]             @relation("ToUserReports")
-  Review             Review[]
-  usersRoles         UsersRoles[]
-  WorkerBooking      WorkerBooking[]
 }
 
 model Role {
@@ -157,7 +135,7 @@ model Quotation {
   clientId        String            @map("client_id") @db.Uuid
   chatId          String            @map("chat_id") @db.Uuid
   chat            Chat              @relation(fields: [chatId], references: [id], onDelete: Cascade)
-  client          User              @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  client          MyUser            @relation(fields: [clientId], references: [id], onDelete: Cascade)
   worker          Worker            @relation(fields: [workerId], references: [id], onDelete: Cascade)
   QuotationDetail QuotationDetail[]
 
@@ -185,7 +163,7 @@ model Review {
   value       Int        @map("value")
   createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
   userId      String     @map("user_id") @db.Uuid
-  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        MyUser     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([serviceId])
@@ -224,7 +202,7 @@ model WorkerBooking {
   createdAt DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
   workerId  String              @map("worker_id") @db.Uuid
   clientId  String              @map("client_id") @db.Uuid
-  client    User                @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  client    MyUser              @relation(fields: [clientId], references: [id], onDelete: Cascade)
   worker    Worker              @relation(fields: [workerId], references: [id], onDelete: Cascade)
 
   @@index([workerId])
@@ -269,7 +247,7 @@ model Worker {
   location           String             @map("location")
   status             WorkerStatus       @map("status")
   nationalIdentityId String             @map("national_identity") @db.Uuid
-  user               User               @relation(fields: [id], references: [id], onDelete: Cascade)
+  user               MyUser             @relation(fields: [id], references: [id], onDelete: Cascade)
   nationalIdentity   NationalIdentity   @relation(fields: [nationalIdentityId], references: [id], onDelete: Cascade)
   Certificate        Certificate[]
   Package            Package[]
@@ -291,8 +269,8 @@ model Report {
   createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   fromUserId String   @map("from_user_id") @db.Uuid
   toUserId   String   @map("to_user_id") @db.Uuid
-  fromUser   User     @relation("FromUserReports", fields: [fromUserId], references: [id], onDelete: Cascade)
-  toUser     User     @relation("ToUserReports", fields: [toUserId], references: [id], onDelete: Cascade)
+  fromUser   MyUser   @relation("FromUserReports", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUser     MyUser   @relation("ToUserReports", fields: [toUserId], references: [id], onDelete: Cascade)
 
   @@index([fromUserId])
   @@index([toUserId])
@@ -300,14 +278,14 @@ model Report {
 }
 
 model WorkerEmbedding {
-  id        String                      @id @default(uuid()) @db.Uuid
-  type      WorkerEmbeddingType         @map("type")
+  id        String                          @id @default(uuid()) @db.Uuid
+  type      WorkerEmbeddingType             @map("type")
   content   String
   location  Unsupported("geography(POINT)")
   embedding Unsupported("vector(1536)")
-  createdAt DateTime                    @default(now()) @map("created_at") @db.Timestamptz(6)
-  workerId  String                      @map("worker_id") @db.Uuid
-  worker    Worker                      @relation(fields: [workerId], references: [id], onDelete: Cascade)
+  createdAt DateTime                        @default(now()) @map("created_at") @db.Timestamptz(6)
+  workerId  String                          @map("worker_id") @db.Uuid
+  worker    Worker                          @relation(fields: [workerId], references: [id], onDelete: Cascade)
 
   @@index([workerId])
   @@map("worker_embedding")
@@ -368,7 +346,7 @@ model Message {
   userId    String        @map("user_id") @db.Uuid
   chatId    String        @map("chat_id") @db.Uuid
   Chat      Chat          @relation(fields: [chatId], references: [id])
-  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      MyUser        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@map("message")
@@ -383,8 +361,8 @@ model Chat {
   createdAt         DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
   workerId          String      @map("worker_id") @db.Uuid
   clientId          String      @map("client_id") @db.Uuid
-  client            User        @relation("ClientChats", fields: [clientId], references: [id], onDelete: Cascade)
-  worker            User        @relation("WorkerChats", fields: [workerId], references: [id], onDelete: Cascade)
+  client            MyUser      @relation("ClientChats", fields: [clientId], references: [id], onDelete: Cascade)
+  worker            MyUser      @relation("WorkerChats", fields: [workerId], references: [id], onDelete: Cascade)
   messages          Message[]
   Quotation         Quotation[]
 
@@ -403,18 +381,19 @@ model Payment {
   valueFormat String        @map("value_format")
   createdAt   DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
   userId      String        @map("user_id") @db.Uuid
-  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        MyUser        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@map("payment")
 }
 
 /// Tabla de relación explícita entre User y Role
+
 model UsersRoles {
   userId String @map("user_id") @db.Uuid
   roleId String @map("role_id") @db.Uuid
   role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   MyUser @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, roleId])
   @@map("users_roles")
@@ -511,4 +490,88 @@ enum WorkerEmbeddingType {
 enum CertificateType {
   PDF   @map("pdf")
   IMAGE @map("image")
+}
+
+model MyUser {
+  id                 String               @id @db.Uuid
+  email              String               @unique
+  name               String
+  surname            String
+  avatar             String?
+  createdAt          DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
+  Worker             Worker?
+  ClientChats        Chat[]               @relation("ClientChats")
+  WorkerChats        Chat[]               @relation("WorkerChats")
+  Message            Message[]
+  Notification       Notification[]
+  NotificationConfig NotificationConfig[]
+  Payment            Payment[]
+  Quotation          Quotation[]
+  FromUserReport     Report[]             @relation("FromUserReports")
+  ToUserReport       Report[]             @relation("ToUserReports")
+  Review             Review[]
+  usersRoles         UsersRoles[]
+  WorkerBooking      WorkerBooking[]
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  authUser              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verification")
+}
+
+model User {
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean
+  image         String?
+  createdAt     DateTime
+  updatedAt     DateTime
+  sessions      Session[]
+  accounts      Account[]
+
+  @@unique([email])
+  @@map("auth_user")
 }

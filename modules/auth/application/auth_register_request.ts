@@ -3,7 +3,7 @@ import { passwordSchema } from "../domain/password"
 
 export const authRegisterRequestSchema = z.object( {
   email            : z.string(),
-  name            : z.string().optional(),
+  name            : z.string(),
   password: passwordSchema
 } )
 

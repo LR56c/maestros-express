@@ -23,7 +23,6 @@ export class AuthMapper {
     return {
       user_id : auth.userId.toString(),
       email   : auth.email.value,
-      name    : auth.name?.value,
       method  : auth.authMethod.value,
       metadata: auth.metadata
     }
@@ -33,7 +32,6 @@ export class AuthMapper {
     return {
       user_id : auth.user_id,
       email   : auth.email,
-      name    : auth.name,
       method  : auth.method,
       metadata: auth.metadata
     }
@@ -61,13 +59,6 @@ export class AuthMapper {
       errors.push( method )
     }
 
-    const name = wrapTypeDefault( undefined,
-      ( value ) => ValidString.from( value ), json.name )
-
-    if ( name instanceof BaseException ) {
-      errors.push( name )
-    }
-
     if ( errors.length > 0 ) {
       return new Errors( errors )
     }
@@ -79,7 +70,6 @@ export class AuthMapper {
       email   : (
         email as Email
       ).value,
-      name    : name instanceof ValidString ? name.value : undefined,
       method  : (
         method as AuthMethod
       ).value,
@@ -94,9 +84,7 @@ export class AuthMapper {
       json.metadata,
       json.method,
       json.created_at,
-      json.name,
       json.updated_at,
-      json.last_login
     )
   }
 }

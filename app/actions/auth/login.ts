@@ -1,30 +1,25 @@
 "use server"
 
 import { actionClient } from "@/lib/safe-action"
-import {
-  authRegisterRequestSchema
-}                       from "@/modules/auth/application/auth_register_request"
-import {
-  RegisterAuth
-}                       from "@/modules/auth/application/register_auth"
 import { isLeft }       from "fp-ts/Either"
+import { AuthMapper }   from "@/modules/auth/application/auth_mapper"
 import {
-  AuthMapper
-}                       from "@/modules/auth/application/auth_mapper"
+  authLoginRequestSchema
+}                       from "@/modules/auth/application/auth_login_request"
 import {
-  BetterAuthData
-}                       from "@/modules/auth/infrastructure/better_auth_data"
+  SupabaseAuthData
+}                       from "@/modules/auth/infrastructure/supabase_auth_data"
+import { supabase }     from "@/app/api/dependencies"
+import { LoginAuth }    from "@/modules/auth/application/login_auth"
 
-const betterAuthData = new BetterAuthData()
-
-const register = new RegisterAuth( betterAuthData )
-
-export const registerAuth = actionClient.inputSchema(
-  authRegisterRequestSchema )
+const supabaseDao = new SupabaseAuthData( await supabase() )
+const login = new LoginAuth(supabaseDao)
+export const loginAuth = actionClient.inputSchema(
+  authLoginRequestSchema )
                                         .action(
                                           async ( { parsedInput: dto } ) => {
 
-                                            const result = await register.execute( dto )
+                                            const result = await login.execute( dto )
 
                                             if ( isLeft( result ) ) {
                                               return {
