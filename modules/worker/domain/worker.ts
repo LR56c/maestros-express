@@ -1,8 +1,8 @@
-import { ValidDate }                 from "@/modules/shared/domain/value_objects/valid_date"
-import { User }                      from "@/modules/user/domain/user"
+import { ValidDate } from "@/modules/shared/domain/value_objects/valid_date"
+import { UserAuth }  from "@/modules/user/domain/user"
 import {
   NationalIdentity
-}                                    from "@/modules/national_identity/domain/national_identity"
+}                    from "@/modules/national_identity/domain/national_identity"
 import {
   ValidString
 }                                    from "@/modules/shared/domain/value_objects/valid_string"
@@ -31,7 +31,7 @@ import {
 
 export class Worker {
   private constructor(
-    readonly user: User,
+    readonly user: UserAuth,
     readonly nationalIdentity: NationalIdentity,
     readonly birthDate: ValidDate,
     readonly reviewCount: ValidDecimal,
@@ -55,7 +55,7 @@ export class Worker {
   }
 
   static create(
-    user: User,
+    user: UserAuth,
     nationalIdentity: NationalIdentity,
     birthDate: Date | string,
     location: string,
@@ -70,7 +70,7 @@ export class Worker {
   }
 
   static fromPrimitives(
-    user: User,
+    user: UserAuth,
     nationalIdentity: NationalIdentity,
     birthDate: Date | string,
     reviewCount: number,
@@ -155,7 +155,7 @@ export class Worker {
   }
 
   static fromPrimitivesThrow(
-    user: User,
+    user: UserAuth,
     nationalIdentity: NationalIdentity,
     birthDate: Date | string,
     reviewCount: number,

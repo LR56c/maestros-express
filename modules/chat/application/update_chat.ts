@@ -4,9 +4,6 @@ import {
   BaseException
 } from "@/modules/shared/domain/exceptions/base_exception"
 import {
-  ChatResponse
-} from "@/modules/chat/application/chat_response"
-import {
   ensureChatExist
 } from "@/modules/chat/utils/ensure_chat_exist"
 import { Chat } from "@/modules/chat/domain/chat"
@@ -32,8 +29,11 @@ export class UpdateChat {
       oldChat.id.value,
       oldChat.workerId.value,
       oldChat.clientId.value,
+      oldChat.workerName.value,
+      oldChat.clientName.value,
       oldChat.createdAt.value,
       oldChat.subject.value,
+      oldChat.messages,
       chat.accepted_date ?? oldChat.acceptedDate?.value,
       chat.quotation_accepted ?? oldChat.quotationAccepted?.value,
       chat.worker_archived ?? oldChat.workerArchived?.value

@@ -3,7 +3,6 @@ import {
   BaseException
 }                                    from "../../shared/domain/exceptions/base_exception"
 import { wrapType, wrapTypeDefault } from "../../shared/utils/wrap_type"
-import type { Role }                 from "@/modules/role/domain/role"
 import {
   ValidString
 }                                    from "@/modules/shared/domain/value_objects/valid_string"
@@ -16,15 +15,96 @@ import {
 import {
   Email
 }                                    from "@/modules/shared/domain/value_objects/email"
+import { RoleType }                  from "@/modules/user/domain/role_type"
 
-export class User {
+export abstract class User {
+  abstract readonly userId: ValidString
+  abstract readonly email: Email
+  abstract readonly fullName: ValidString
+  abstract readonly createdAt: ValidDate
+  abstract readonly role: RoleType
+  abstract readonly avatar?: ValidString
+}
+
+export class UserAnon implements User {
   private constructor(
-    readonly userId: UUID,
+    readonly userId: ValidString,
     readonly email: Email,
-    readonly name: ValidString,
-    readonly surname: ValidString,
-    readonly roles: Role[],
+    readonly fullName: ValidString,
     readonly createdAt: ValidDate,
+    readonly role: RoleType,
+    readonly avatar ?: ValidString
+  )
+  {
+  }
+
+  static fromPrimitives(
+    userId: string,
+    email: string,
+    fullName: string,
+    createdAt: Date | string
+  ): UserAuth | Errors {
+    const errors = []
+
+    const userIdValue = wrapType(
+      () => ValidString.from( userId ) )
+
+    if ( userIdValue instanceof BaseException ) {
+      errors.push( userIdValue )
+    }
+
+    console.log("email", email)
+    const vemail = wrapType(
+      () => Email.from( email ) )
+
+    if ( vemail instanceof BaseException ) {
+      errors.push( vemail )
+    }
+
+    const vname = wrapType(
+      () => ValidString.from( fullName ) )
+
+    if ( vname instanceof BaseException ) {
+      errors.push( vname )
+    }
+
+    const vcreatedAt = wrapType(
+      () => ValidDate.from( createdAt ) )
+
+    if ( vcreatedAt instanceof BaseException ) {
+      errors.push( vcreatedAt )
+    }
+
+    const vrole = wrapType(
+      () => RoleType.from( "PUBLIC" ) )
+
+    if ( vrole instanceof BaseException ) {
+      errors.push( vrole )
+    }
+
+    if ( errors.length > 0 ) {
+      return new Errors( errors )
+    }
+
+    return new UserAnon(
+      userIdValue as UUID,
+      vemail as Email,
+      vname as ValidString,
+      vcreatedAt as ValidDate,
+      vrole as RoleType,
+      undefined
+    )
+  }
+}
+
+
+export class UserAuth implements User {
+  private constructor(
+    readonly userId: ValidString,
+    readonly email: Email,
+    readonly fullName: ValidString,
+    readonly createdAt: ValidDate,
+    readonly role: RoleType,
     readonly avatar?: ValidString
   )
   {
@@ -33,60 +113,55 @@ export class User {
   static create(
     userId: string,
     email: string,
-    name: string,
-    surname: string,
-    roles: Role[],
+    fullName: string,
+    role: string,
     avatar: string | null
-  ): User | Errors {
-    return User.fromPrimitive( userId, email, name, surname, roles,
-      new Date(), avatar )
+  ): UserAuth | Errors {
+    return UserAuth.fromPrimitives( userId, email, fullName, new Date(), role,
+      avatar )
   }
 
   static from(
     userId: UUID,
     email: Email,
-    name: ValidString,
-    surname: ValidString,
-    roles: Role[],
+    fullName: ValidString,
     createdAt: ValidDate,
+    role: RoleType,
     avatar   ?: ValidString
-  ): User {
-    return new User( userId, email,name,surname, roles, createdAt, avatar )
+  ): UserAuth {
+    return new UserAuth( userId, email, fullName, createdAt, role, avatar )
   }
 
   static fromPrimitiveThrow(
     userId: string,
     email: string,
-    name: string,
-    surname: string,
-    roles: Role[],
+    fullName: string,
     createdAt: Date | string,
+    role: string,
     avatar?: string
-  ): User {
-    return new User(
-      UUID.from( userId ),
+  ): UserAuth {
+    return new UserAuth(
+      ValidString.from( userId ),
       Email.from( email ),
-      ValidString.from( name ),
-      ValidString.from( surname ),
-      roles,
+      ValidString.from( fullName ),
       ValidDate.from( createdAt ),
+      RoleType.from( role ),
       avatar ? ValidString.from( avatar ) : undefined
     )
   }
 
-  static fromPrimitive(
+  static fromPrimitives(
     userId: string,
     email: string,
-    name: string,
-    surname: string,
-    roles: Role[],
+    fullName: string,
     createdAt: Date | string,
+    role: string,
     avatar: string | null
-  ): User | Errors {
+  ): UserAuth | Errors {
     const errors = []
 
     const userIdValue = wrapType(
-      () => UUID.from( userId ) )
+      () => ValidString.from( userId ) )
 
     if ( userIdValue instanceof BaseException ) {
       errors.push( userIdValue )
@@ -100,17 +175,10 @@ export class User {
     }
 
     const vname = wrapType(
-      () => ValidString.from( name ) )
+      () => ValidString.from( fullName ) )
 
     if ( vname instanceof BaseException ) {
       errors.push( vname )
-    }
-
-    const vsurname = wrapType(
-      () => ValidString.from( surname ) )
-
-    if ( vsurname instanceof BaseException ) {
-      errors.push( vsurname )
     }
 
     const vavatar = wrapTypeDefault( undefined,
@@ -127,17 +195,23 @@ export class User {
       errors.push( vcreatedAt )
     }
 
+    const vrole = wrapType(
+      () => RoleType.from( role ) )
+
+    if ( vrole instanceof BaseException ) {
+      errors.push( vrole )
+    }
+
     if ( errors.length > 0 ) {
       return new Errors( errors )
     }
 
-    return new User(
+    return new UserAuth(
       userIdValue as UUID,
       vemail as Email,
       vname as ValidString,
-      vsurname as ValidString,
-      roles,
       vcreatedAt as ValidDate,
+      vrole as RoleType,
       vavatar as ValidString | undefined
     )
   }

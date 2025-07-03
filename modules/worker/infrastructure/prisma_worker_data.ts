@@ -17,9 +17,9 @@ import {
 import { Worker }                      from "@/modules/worker/domain/worker"
 import {
   Errors
-}                                      from "@/modules/shared/domain/exceptions/errors"
-import { User }                        from "@/modules/user/domain/user"
-import { Country }                     from "@/modules/country/domain/country"
+}                   from "@/modules/shared/domain/exceptions/errors"
+import { UserAuth } from "@/modules/user/domain/user"
+import { Country }  from "@/modules/country/domain/country"
 import {
   NationalIdentity
 }                                      from "@/modules/national_identity/domain/national_identity"
@@ -35,7 +35,7 @@ import {
 }                                      from "@/modules/shared/domain/value_objects/uuid"
 
 type WorkerRelations = {
-  user: User,
+  user: UserAuth,
   nationalIdentity: NationalIdentity,
   specialities: Speciality[],
   taxes: WorkerTax[],
@@ -47,6 +47,7 @@ type WorkerRelations = {
   // packages: Package[],
   // reviews: Review[],
 }
+
 export const mapWorkerRelations = async ( w: any ): Promise<Either<BaseException[], WorkerRelations>> => {
   const taxes: WorkerTax[] = []
   for ( const tax of w.WorkerTax ) {
@@ -76,27 +77,26 @@ export const mapWorkerRelations = async ( w: any ): Promise<Either<BaseException
     specialities.push( spec )
   }
 
-  const roles: Role[] = []
-  for ( const ur of w.user.usersRoles ) {
-    const role = Role.fromPrimitives(
-      ur.role.id.toString(),
-      ur.role.name,
-      ur.role.createdAt,
-      ur.role.updatedAt
-    )
-    if ( role instanceof Errors ) {
-      return left( role.values )
-    }
-    roles.push( role )
-  }
-  const userMapped = User.fromPrimitive(
+  // const roles: Role[] = []
+  // for ( const ur of w.user.usersRoles ) {
+  //   const role = Role.fromPrimitives(
+  //     ur.role.id.toString(),
+  //     ur.role.name,
+  //     ur.role.createdAt,
+  //     ur.role.updatedAt
+  //   )
+  //   if ( role instanceof Errors ) {
+  //     return left( role.values )
+  //   }
+  //   roles.push( role )
+  // }
+  const userMapped = UserAuth.fromPrimitives(
     w.user.id.toString(),
     w.user.email,
     w.user.name,
-    w.user.surname,
-    roles,
     w.user.createdAt,
-    w.user.avatar
+    w.user.role,
+    w.user.image
   )
   if ( userMapped instanceof Errors ) {
     return left( userMapped.values )
@@ -210,11 +210,7 @@ export class PrismaWorkerData implements WorkerDAO {
         include: {
           user            : {
             include: {
-              usersRoles: {
-                include: {
-                  role: true
-                }
-              }
+              accounts: true
             }
           },
           nationalIdentity: {

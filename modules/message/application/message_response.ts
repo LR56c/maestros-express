@@ -2,6 +2,7 @@ import { z } from "zod"
 
 export const messageResponseSchema = z.object( {
   id        : z.string(),
+  user_id           : z.string(),
   content   : z.string(),
   type      : z.string(),
   status    : z.string(),

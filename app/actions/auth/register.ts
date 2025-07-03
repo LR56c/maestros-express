@@ -1,26 +1,23 @@
 "use server"
 
-import { actionClient } from "@/lib/safe-action"
+import { BetterAuthWithPrismaNextjsUserData } from "@/modules/user/infrastructure/better_auth_with_prisma_nextjs_user_data"
 import {
-  authRegisterRequestSchema
-}                       from "@/modules/auth/application/auth_register_request"
+  RegisterUser
+}                                             from "@/modules/user/application/use_cases/register_user"
+import { actionClient }   from "@/lib/safe-action"
 import {
-  RegisterAuth
-}                       from "@/modules/auth/application/register_auth"
-import { isLeft }       from "fp-ts/Either"
-import {
-  AuthMapper
-}                       from "@/modules/auth/application/auth_mapper"
-import {
-  BetterAuthData
-}                       from "@/modules/auth/infrastructure/better_auth_data"
+  userRegisterRequestSchema
+} from "@/modules/user/application/models/user_register_request"
+import { isLeft }         from "fp-ts/Either"
+import { UserMapper }     from "@/modules/user/application/user_mapper"
+import prisma                           from "@/lib/prisma"
 
-const betterAuthData = new BetterAuthData()
+const betterAuthData = new BetterAuthWithPrismaNextjsUserData(prisma)
 
-const register = new RegisterAuth( betterAuthData )
+const register = new RegisterUser( betterAuthData )
 
-export const registerAuth = actionClient.inputSchema(
-  authRegisterRequestSchema )
+export const registerUser = actionClient.inputSchema(
+  userRegisterRequestSchema )
                                         .action(
                                           async ( { parsedInput: dto } ) => {
 
@@ -32,8 +29,6 @@ export const registerAuth = actionClient.inputSchema(
                                               }
                                             }
                                             return {
-                                              data : AuthMapper.toDTO(
-                                                result.right ),
                                               error: false
                                             }
                                           }

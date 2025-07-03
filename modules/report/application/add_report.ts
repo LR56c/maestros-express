@@ -6,13 +6,13 @@ import {
 import { ReportDTO } from "@/modules/report/application/report_dto"
 import { ensureReportExist } from "@/modules/report/utils/ensure_report_exist"
 import { Report }               from "@/modules/report/domain/report"
-import { Errors }               from "@/modules/shared/domain/exceptions/errors"
+import { Errors } from "@/modules/shared/domain/exceptions/errors"
 import {
   SearchUser
-}                                      from "@/modules/user/application/search_user"
+}                 from "@/modules/user/backup_application/search_user"
 import {
   InfrastructureException
-}                                      from "@/modules/shared/domain/exceptions/infrastructure_exception"
+}                 from "@/modules/shared/domain/exceptions/infrastructure_exception"
 
 export class AddReport {
   constructor(

@@ -19,22 +19,22 @@ export class MessageMapper {
   static toDTO( message: Message ): MessageResponse {
     return {
       id       : message.id.toString(),
-      chatId   : message.chatId.toString(),
-      userId   : message.userId.toString(),
+      user_id   : message.userId.toString(),
       content  : message.content.value,
       type     : message.type.value,
       status   : message.status.value,
-      createdAt: message.createdAt.value
+      created_at: message.createdAt.value
     }
   }
 
   static toJSON( message: MessageResponse ): Record<string, any> {
     return {
       id       : message.id,
+      user_id   : message.user_id.toString(),
       content  : message.content,
       type     : message.type,
       status   : message.status,
-      createdAt: message.createdAt
+      createdAt: message.created_at
     }
   }
 
@@ -46,6 +46,13 @@ export class MessageMapper {
 
     if ( id instanceof BaseException ) {
       errors.push( id )
+    }
+
+    const userId = wrapType(
+      () => ValidString.from( json.user_id ) )
+
+    if ( userId instanceof BaseException ) {
+      errors.push( userId )
     }
 
     const content = wrapType(
@@ -84,6 +91,9 @@ export class MessageMapper {
       id        : (
         id as UUID
       ).toString(),
+      user_id: (
+        userId as ValidString
+      ).value,
       content   : (
         content as ValidString
       ).value,

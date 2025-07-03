@@ -1,18 +1,26 @@
-import { UUID }          from "@/modules/shared/domain/value_objects/uuid"
-import { ValidDate }     from "@/modules/shared/domain/value_objects/valid_date"
+import { UUID } from "@/modules/shared/domain/value_objects/uuid"
+import {
+  ValidDate
+}               from "@/modules/shared/domain/value_objects/valid_date"
 import {
   ValidString
-}                        from "@/modules/shared/domain/value_objects/valid_string"
-import { Errors }        from "@/modules/shared/domain/exceptions/errors"
+}               from "@/modules/shared/domain/value_objects/valid_string"
+import {
+  Errors
+}               from "@/modules/shared/domain/exceptions/errors"
 import {
   BaseException
-}                        from "@/modules/shared/domain/exceptions/base_exception"
-import { MessageType }   from "@/modules/message/domain/message_type"
+}               from "@/modules/shared/domain/exceptions/base_exception"
+import {
+  MessageType
+}               from "@/modules/message/domain/message_type"
 import {
   MessageStatus,
   MessageStatusEnum
-} from "@/modules/message/domain/message_status"
-import { wrapType }      from "@/modules/shared/utils/wrap_type"
+}               from "@/modules/message/domain/message_status"
+import {
+  wrapType
+}               from "@/modules/shared/utils/wrap_type"
 
 export class Message {
   private constructor(
@@ -32,7 +40,7 @@ export class Message {
     chatId: string,
     userId: string,
     content: string,
-    type: string,
+    type: string
   ): Message | Errors {
     return Message.fromPrimitives(
       id,

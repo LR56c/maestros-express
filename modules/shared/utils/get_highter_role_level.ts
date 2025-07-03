@@ -1,10 +1,5 @@
-import { matchRole, RoleLevel } from "~~/modules/role/domain/role_level"
+import { matchRole, RoleLevel } from "@/modules/role/domain/role_level"
 
-export const roleMap        = new Map<string, string>( [
-  ["admin", "Administrador"],
-  ["mod", "Moderador"],
-  ["user", "Usuario"]
-] )
 export const getHighterRoleLevel = ( roles: string[] ) => {
   let userRole: RoleLevel | undefined = undefined
   for ( const role of roles ) {

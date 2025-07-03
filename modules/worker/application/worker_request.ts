@@ -1,7 +1,7 @@
 import { z } from "zod"
 import {
   userResponseSchema
-}            from "@/modules/user/application/user_response"
+}            from "@/modules/user/backup_application/user_response"
 import {
   nationalIdentifierSchema
 }            from "@/modules/national_identity/application/national_identity_dto"

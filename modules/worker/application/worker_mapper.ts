@@ -1,13 +1,13 @@
 import { Worker }                    from "@/modules/worker/domain/worker"
 import {
   WorkerResponse
-}                                    from "@/modules/worker/application/worker_response"
+} from "@/modules/worker/application/worker_response"
 import {
   UserMapper
-}                                    from "@/modules/user/application/user_mapper"
+} from "@/modules/user/backup_application/user_mapper"
 import {
   NationalIdentityMapper
-}                                    from "@/modules/national_identity/application/national_identity_mapper"
+} from "@/modules/national_identity/application/national_identity_mapper"
 import {
   SpecialityMapper
 }                                    from "@/modules/speciality/application/speciality_mapper"
@@ -37,13 +37,13 @@ import {
 }                                    from "@/modules/shared/domain/value_objects/valid_string"
 import {
   ValidDecimal
-}                                    from "@/modules/shared/domain/value_objects/valid_decimal"
+} from "@/modules/shared/domain/value_objects/valid_decimal"
 import {
   UserResponse
-}                                    from "@/modules/user/application/user_response"
+} from "@/modules/user/backup_application/user_response"
 import {
   NationalIdentifierDTO
-}                                    from "@/modules/national_identity/application/national_identity_dto"
+} from "@/modules/national_identity/application/national_identity_dto"
 import { wrapType, wrapTypeDefault } from "@/modules/shared/utils/wrap_type"
 import {
   WorkerStatus
@@ -60,7 +60,7 @@ export class WorkerMapper {
     location: string ): WorkerProfileDTO {
     return {
       user_id       : w.user.userId.toString(),
-      full_name     : `${ w.user.name.value } ${ w.user.surname.value }`,
+      full_name     : `${ w.user.fullName.value } ${ w.user.surname.value }`,
       avatar        : w.user.avatar?.value,
       age,
       description   : w.description?.value ?? "",

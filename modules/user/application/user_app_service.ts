@@ -1,13 +1,20 @@
-import type { UserRequest }   from "@/modules/user/application/user_request"
-import type { UserResponse }  from "@/modules/user/application/user_response"
-import type { UserUpdateDTO } from "@/modules/user/application/user_update_dto"
+import {
+  UserLoginRequest
+} from "@/modules/user/application/models/user_login_request"
+import {
+  UserResponse
+} from "@/modules/user/application/models/user_response"
+import {
+  UserRegisterRequest
+} from "@/modules/user/application/models/user_register_request"
+import {
+  UserUpdateDTO
+} from "@/modules/user/application/models/user_update_dto"
 
 export abstract class UserAppService {
-  abstract add( user: UserRequest ): Promise<UserResponse>
-
-  abstract search( query: string ): Promise<UserResponse[]>
-
   abstract remove( id: string ): Promise<void>
-
-  abstract update( id: string, user: UserUpdateDTO ): Promise<UserResponse>
+  abstract login(request: UserLoginRequest): Promise<UserResponse>
+  abstract logout( token: string ): Promise<void>
+  abstract register(request: UserRegisterRequest): Promise<UserResponse>
+  abstract update( auth: UserUpdateDTO ): Promise<UserResponse>
 }

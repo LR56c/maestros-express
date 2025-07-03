@@ -44,7 +44,10 @@ export class AddChat {
       dto.id,
       dto.worker_id,
       dto.client_id,
+      dto.worker_name,
+      dto.client_name,
       dto.subject,
+      []
     )
 
     if ( newChat instanceof Errors ) {

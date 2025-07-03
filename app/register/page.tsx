@@ -1,23 +1,32 @@
 "use client"
-import { useState }     from "react"
-import { logoutAuth }   from "@/app/actions/auth/logout"
-import { loginAuth }    from "@/app/actions/auth/login"
-import { registerAuth } from "@/app/actions/auth/register"
+import { useState }                                   from "react"
+import { authClient, hasAdmin, hasClient, hasWorker } from "@/lib/auth_client"
+import { logoutUser }                                 from "@/app/actions/auth/logout"
+import { updateUser } from "@/app/actions/auth/update"
 
 
 export default function Register() {
-  const [email, setEmail] = useState( "" )
-  const [pass, setPass]   = useState( "" )
-  const [name, setName] = useState("")
-  const onLogout = async ()=>{
-    await logoutAuth()
+  const [email, setEmail]                            = useState( "" )
+  const [pass, setPass]                              = useState( "" )
+  const [name, setName]                              = useState( "" )
+  const { data: session, error, isPending, refetch } = authClient.useSession()
+  const onLogout                                     = async () => {
+    await logoutUser()
+    // console.log("session", session, error, isPending)
+    // const isClient = hasClient
+    // const isWorker = hasWorker
+    // const isAdmin = hasAdmin
+    // console.log("isClient", isClient, "isWorker", isWorker, "isAdmin", isAdmin.data.success)
   }
-  const onRegister        = async () => {
-    await registerAuth( {
-      email   : email,
-      password: pass,
-      name: name
-    } )
+  const onRegister                                   = async () => {
+    // await updateUser( {
+    //   email: "abc@gmail.com",
+    //   role: "worker"
+    // } )
+    // await loginUser( {
+    //   email   : email,
+    //   password: pass
+    // } )
   }
   return (
     <form className="flex flex-col">

@@ -1,139 +1,95 @@
-import { User }                      from "@/modules/user/domain/user"
+import { Errors }                    from "../../shared/domain/exceptions/errors"
+import { wrapType, wrapTypeDefault } from "../../shared/utils/wrap_type"
 import {
-  Errors
-}                                    from "@/modules/shared/domain/exceptions/errors"
-import { wrapType, wrapTypeDefault } from "@/modules/shared/utils/wrap_type"
+  Email
+}                                    from "../../shared/domain/value_objects/email"
 import {
   BaseException
-}                                    from "@/modules/shared/domain/exceptions/base_exception"
-import type {
-  UserResponse
-}                                    from "@/modules/user/application/user_response"
-import type { RoleDTO }              from "@/modules/role/application/role_dto"
+}                   from "../../shared/domain/exceptions/base_exception"
+import { UserAuth } from "@/modules/user/domain/user"
 import {
-  RoleMapper
-}                                    from "@/modules/role/application/role_mapper"
+  UserResponse
+}                   from "@/modules/user/application/models/user_response"
 import {
   ValidString
 }                                    from "@/modules/shared/domain/value_objects/valid_string"
-import type { Role }                 from "@/modules/role/domain/role"
-import {
-  Email
-}                                    from "@/modules/shared/domain/value_objects/email"
-import {
-  UUID
-}                                    from "@/modules/shared/domain/value_objects/uuid"
+import { AuthMethod }                from "@/modules/user/domain/auth_method"
 
 export class UserMapper {
-  static toDTO( user: User ): UserResponse {
+  static toDTO( user: UserAuth ): UserResponse {
     return {
-      user_id   : user.userId.toString(),
-      email     : user.email.value,
-      name      : user.name.value,
-      surname   : user.surname.value,
-      avatar    : user.avatar?.value,
-      roles     : user.roles.map( ( role ) => RoleMapper.toDTO( role ) )
+      user_id  : user.userId.toString(),
+      email    : user.email.value,
+      avatar   : user.avatar?.value,
+      full_name: user.fullName.value
     }
   }
 
-  static toJSON( user: UserResponse ): Record<string, any> {
+  static toJSON( auth: UserResponse ): Record<string, any> {
     return {
-      user_id   : user.user_id,
-      email     : user.email,
-      name      : user.name,
-      surname   : user.surname,
-      avatar    : user.avatar,
-      roles     : user.roles.map( ( role ) => role.name )
+      user_id  : auth.user_id,
+      email    : auth.email,
+      avatar   : auth.avatar,
+      full_name: auth.full_name
     }
   }
 
-  static toDomain( json: Record<string, any> ): User | Errors {
-    const roles: Role[] = []
-
-    if ( json.roles && Array.isArray( json.roles ) ) {
-      for ( const role of json.roles ) {
-        const r = RoleMapper.toDomain( role )
-        if ( r instanceof Errors ) {
-          return r
-        }
-        roles.push( r )
-      }
-    }
-
-    return User.fromPrimitive(
-      json.user_id,
-      json.email,
-      json.name,
-      json.surname,
-      roles,
-      json.created_at,
-      json.avatar
-    )
-  }
-
-  static fromJSON( user: Record<string, any> ): UserResponse | Errors {
+  static fromJSON( json: Record<string, any> ): UserResponse | Errors {
     const errors = []
+    const id     = wrapType(
+      () => ValidString.from( json.user_id ) )
 
-    const userId = wrapType( () => UUID.from( user.user_id ) )
-
-    if ( userId instanceof BaseException ) {
-      errors.push( userId )
+    if ( id instanceof BaseException ) {
+      errors.push( id )
     }
 
-    const roles: RoleDTO[] = []
-    for ( const role of user.roles ) {
-      const r = RoleMapper.fromJSON( role )
-      if ( r instanceof Errors ) {
-        errors.push( ...r.values )
-        break
-      }
-      roles.push( r )
-    }
-
-    const avatar = wrapTypeDefault( undefined,
-      ( value ) => ValidString.from( value ), user.avatar )
-
-    if ( avatar instanceof BaseException ) {
-      errors.push( avatar )
-    }
-
-    const email = wrapType( () => Email.from( user.email ) )
+    const email = wrapType(
+      () => Email.from( json.email ) )
 
     if ( email instanceof BaseException ) {
       errors.push( email )
     }
 
-    const name = wrapType( () => ValidString.from( user.name ) )
+    const vname = wrapType(
+      () => ValidString.from( json.full_name ) )
 
-    if ( name instanceof BaseException ) {
-      errors.push( name )
+    if ( vname instanceof BaseException ) {
+      errors.push( vname )
     }
 
-    const surname = wrapType( () => ValidString.from( user.surname ) )
+    const avatar = wrapTypeDefault( undefined,
+      ( value ) => ValidString.from( value ), json.avatar )
 
-    if ( surname instanceof BaseException ) {
-      errors.push( surname )
+    if ( avatar instanceof BaseException ) {
+      errors.push( avatar )
     }
 
-    if ( errors.length ) {
+    if ( errors.length > 0 ) {
       return new Errors( errors )
     }
 
     return {
-      user_id: (
-        userId as UUID
-      ).toString(),
-      email  : (
+      user_id  : (
+        id as ValidString
+      ).value,
+      email    : (
         email as Email
       ).value,
-      name   : (
-        name as ValidString
+      full_name: (
+        vname as ValidString
       ).value,
-      surname: (
-        surname as ValidString
-      ).value,
-      avatar   : avatar instanceof ValidString ? avatar.value : undefined,
-      roles  : roles
+      avatar   : avatar instanceof ValidString ? avatar.value : undefined
     }
+  }
+
+  static toDomain( json: Record<string, any> ): UserAuth | Errors {
+    return UserAuth.fromPrimitives(
+      json.user_id,
+      json.email,
+      json.full_name,
+      json.created_at,
+      json.role,
+      json.avatar,
+    )
   }
 }

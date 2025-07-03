@@ -4,11 +4,11 @@ import {
   BaseException
 }                                      from "@/modules/shared/domain/exceptions/base_exception"
 import { ensureWorkerExist } from "@/modules/worker/utils/ensure_worker_exist"
-import { Worker }               from "@/modules/worker/domain/worker"
-import { SearchUser }           from "@/modules/user/application/search_user"
+import { Worker }     from "@/modules/worker/domain/worker"
+import { SearchUser } from "@/modules/user/backup_application/search_user"
 import {
   NationalIdentity
-}                               from "@/modules/national_identity/domain/national_identity"
+}                     from "@/modules/national_identity/domain/national_identity"
 import {
   SearchCountry
 }                               from "@/modules/country/application/search_country"
