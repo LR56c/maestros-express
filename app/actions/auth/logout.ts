@@ -2,11 +2,11 @@
 
 import { BetterAuthWithPrismaNextjsUserData } from "@/modules/user/infrastructure/better_auth_with_prisma_nextjs_user_data"
 import { actionClient }                       from "@/lib/safe-action"
-import { isLeft }         from "fp-ts/Either"
+import { isLeft } from "fp-ts/Either"
 import {
   LogoutUser
-}                         from "@/modules/user/application/use_cases/logout_user"
-import prisma                           from "@/lib/prisma"
+}                 from "@/modules/user/application/auth_use_cases/logout_user"
+import prisma     from "@/lib/prisma"
 
 const betterAuthData = new BetterAuthWithPrismaNextjsUserData(prisma)
 

@@ -27,10 +27,8 @@ export class UpdateChat {
 
     const updatedChat = Chat.fromPrimitives(
       oldChat.id.value,
-      oldChat.workerId.value,
-      oldChat.clientId.value,
-      oldChat.workerName.value,
-      oldChat.clientName.value,
+      oldChat.worker,
+      oldChat.client,
       oldChat.createdAt.value,
       oldChat.subject.value,
       oldChat.messages,

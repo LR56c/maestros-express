@@ -25,31 +25,33 @@ import { Message }                   from "@/modules/message/domain/message"
 import {
   MessageResponse
 }                                    from "@/modules/message/application/message_response"
+import {
+  UserMapper
+}                                    from "@/modules/user/application/user_mapper"
+import {
+  UserResponse
+}                                    from "@/modules/user/application/models/user_response"
 
 export class ChatMapper {
   static toDTO( chat: Chat ): ChatResponse {
     return {
       id                : chat.id.toString(),
-      client_id         : chat.clientId.toString(),
-      worker_id         : chat.workerId.toString(),
-      client_name       : chat.clientName.value,
-      worker_name       : chat.workerName.value,
+      client            : UserMapper.toDTO( chat.client ),
+      worker            : UserMapper.toDTO( chat.worker ),
       messages          : chat.messages.map( MessageMapper.toDTO ),
       subject           : chat.subject?.value,
       accepted_date     : chat.acceptedDate?.value,
       quotation_accepted: chat.quotationAccepted?.value,
       worker_archived   : chat.workerArchived?.value,
-      created_at        : chat.createdAt.value,
+      created_at        : chat.createdAt.value
     }
   }
 
   static toJSON( chat: ChatResponse ): Record<string, any> {
     return {
       id                : chat.id,
-      client_id         : chat.client_id,
-      worker_id         : chat.worker_id,
-      client_name       : chat.client_name,
-      worker_name       : chat.worker_name,
+      client_id         : chat.client,
+      worker_id         : chat.worker,
       subject           : chat.subject,
       accepted_date     : chat.accepted_date,
       quotation_accepted: chat.quotation_accepted,
@@ -69,32 +71,16 @@ export class ChatMapper {
       errors.push( id )
     }
 
-    const clientId = wrapType(
-      () => ValidString.from( chat.client_id ) )
+    const client = UserMapper.fromJSON( chat.client )
 
-    if ( clientId instanceof BaseException ) {
-      errors.push( clientId )
+    if ( client instanceof Errors ) {
+      errors.push( ...client.values )
     }
 
-    const workerId = wrapType(
-      () => ValidString.from( chat.worker_id ) )
+    const worker = UserMapper.fromJSON( chat.worker )
 
-    if ( workerId instanceof BaseException ) {
-      errors.push( workerId )
-    }
-
-    const clientName = wrapType(
-      () => ValidString.from( chat.client_name ) )
-
-    if ( clientName instanceof BaseException ) {
-      errors.push( clientName )
-    }
-
-    const workerName = wrapType(
-      () => ValidString.from( chat.worker_name ) )
-
-    if ( workerName instanceof BaseException ) {
-      errors.push( workerName )
+    if ( worker instanceof Errors ) {
+      errors.push( ...worker.values )
     }
 
     const subject = wrapTypeDefault( undefined,
@@ -132,8 +118,8 @@ export class ChatMapper {
       errors.push( createdAt )
     }
 
-    const messages : MessageResponse[] = []
-    for ( const el of chat.messages) {
+    const messages: MessageResponse[] = []
+    for ( const el of chat.messages ) {
       const message = MessageMapper.fromJSON( el )
       if ( message instanceof Errors ) {
         return message
@@ -151,18 +137,8 @@ export class ChatMapper {
         id as UUID
       ).toString(),
       messages,
-      client_id: (
-        clientId as ValidString
-      ).value,
-      worker_id: (
-        workerId as ValidString
-      ).value,
-      client_name       : (
-        clientName as ValidString
-      ).value,
-      worker_name       : (
-        workerName as ValidString
-      ).value,
+      client            : client as UserResponse,
+      worker            : worker as UserResponse,
       subject           : (
         subject as ValidString
       ).value,
@@ -182,8 +158,8 @@ export class ChatMapper {
   }
 
   static toDomain( json: Record<string, any> ): Chat | Errors {
-    const messages : Message[] = []
-    for ( const el of json.messages) {
+    const messages: Message[] = []
+    for ( const el of json.messages ) {
       const message = MessageMapper.toDomain( el )
       if ( message instanceof Errors ) {
         return message
@@ -193,10 +169,8 @@ export class ChatMapper {
 
     return Chat.fromPrimitives(
       json.id,
-      json.worker_id,
-      json.client_id,
-      json.worker_name,
-      json.client_name,
+      json.worker,
+      json.client,
       json.created_at,
       json.subject,
       messages,

@@ -22,15 +22,24 @@ import {
 import {
   InfrastructureException
 }                                      from "@/modules/shared/domain/exceptions/infrastructure_exception"
+import {
+  SearchUser
+}                                      from "@/modules/user/application/user_use_cases/search_user"
 
 export class AddChat {
-  constructor( private readonly dao: ChatDAO ) {
+  constructor(
+    private readonly dao: ChatDAO,
+    private readonly searchUser: SearchUser
+  )
+  {
   }
 
-  async execute(dto: ChatRequest ): Promise<Either<BaseException[], Chat>> {
+  async execute( dto: ChatRequest ): Promise<Either<BaseException[], Chat>> {
 
-    if(dto.worker_id === dto.client_id) {
-      return left( [new InfrastructureException("Worker and client cannot be the same")] )
+    if ( dto.worker_id === dto.client_id ) {
+      return left( [
+        new InfrastructureException( "Worker and client cannot be the same" )
+      ] )
     }
 
     const existResult = await ensureChatExist( this.dao, dto.id )
@@ -40,12 +49,26 @@ export class AddChat {
       }
     }
 
+    const clientExist = await this.searchUser.execute( {
+      id: dto.worker_id
+    }, 1 )
+
+    if ( isLeft( clientExist ) ) {
+      return left( clientExist.left )
+    }
+
+    const workerExist = await this.searchUser.execute( {
+      id: dto.client_id
+    }, 1 )
+
+    if ( isLeft( workerExist ) ) {
+      return left( workerExist.left )
+    }
+
     const newChat = Chat.create(
       dto.id,
-      dto.worker_id,
-      dto.client_id,
-      dto.worker_name,
-      dto.client_name,
+      workerExist.right[0],
+      clientExist.right[0],
       dto.subject,
       []
     )

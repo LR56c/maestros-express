@@ -13,14 +13,13 @@ import {
   Errors
 }                                    from "@/modules/shared/domain/exceptions/errors"
 import { Message }                   from "@/modules/message/domain/message"
+import { User }                      from "@/modules/user/domain/user"
 
 export class Chat {
   private constructor(
     readonly id: UUID,
-    readonly workerId: ValidString,
-    readonly clientId: ValidString,
-    readonly workerName: ValidString,
-    readonly clientName: ValidString,
+    readonly worker: User,
+    readonly client: User,
     readonly createdAt: ValidDate,
     readonly subject: ValidString,
     readonly messages: Message[],
@@ -33,19 +32,15 @@ export class Chat {
 
   static create(
     id: string,
-    workerId: string,
-    clientId: string,
-    workerName: string,
-    clientName: string,
+    worker: User,
+    client: User,
     subject: string,
     messages: Message[]
   ): Chat | Errors {
     return Chat.fromPrimitives(
       id,
-      workerId,
-      clientId,
-      workerName,
-      clientName,
+      worker,
+      client,
       new Date(),
       subject,
       messages,
@@ -57,10 +52,8 @@ export class Chat {
 
   static fromPrimitivesThrow(
     id: string,
-    workerId: string,
-    clientId: string,
-    workerName: string,
-    clientName: string,
+    worker: User,
+    client: User,
     createdAt: Date | string,
     subject: string,
     messages: Message[],
@@ -70,10 +63,8 @@ export class Chat {
   ): Chat {
     return new Chat(
       UUID.from( id ),
-      ValidString.from( workerId ),
-      ValidString.from( clientId ),
-      ValidString.from( workerName ),
-      ValidString.from( clientName ),
+      worker,
+      client,
       ValidDate.from( createdAt ),
       ValidString.from( subject ),
       messages,
@@ -85,10 +76,8 @@ export class Chat {
 
   static fromPrimitives(
     id: string,
-    workerId: string,
-    clientId: string,
-    workerName: string,
-    clientName: string,
+    worker: User,
+    client: User,
     createdAt: Date | string,
     subject: string,
     messages: Message[],
@@ -103,34 +92,6 @@ export class Chat {
 
     if ( idVO instanceof BaseException ) {
       errors.push( idVO )
-    }
-
-    const workerIdVO = wrapType(
-      () => ValidString.from( workerId ) )
-
-    if ( workerIdVO instanceof BaseException ) {
-      errors.push( workerIdVO )
-    }
-
-    const clientIdVO = wrapType(
-      () => ValidString.from( clientId ) )
-
-    if ( clientIdVO instanceof BaseException ) {
-      errors.push( clientIdVO )
-    }
-
-    const workerNameVO = wrapType(
-      () => ValidString.from( workerName ) )
-
-    if ( workerNameVO instanceof BaseException ) {
-      errors.push( workerNameVO )
-    }
-
-    const clientNameVO = wrapType(
-      () => ValidString.from( clientName ) )
-
-    if ( clientNameVO instanceof BaseException ) {
-      errors.push( clientNameVO )
     }
 
     const subjectVO = wrapType( () => ValidString.from( subject ) )
@@ -172,10 +133,7 @@ export class Chat {
 
     return new Chat(
       idVO as UUID,
-      workerIdVO as ValidString,
-      clientIdVO as ValidString,
-      workerNameVO as ValidString,
-      clientNameVO as ValidString,
+      worker, client,
       createdAtVO as ValidDate,
       subjectVO as ValidString,
       messages,

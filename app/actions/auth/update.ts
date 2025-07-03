@@ -3,9 +3,9 @@
 import {
   BetterAuthWithPrismaNextjsUserData
 }                        from "@/modules/user/infrastructure/better_auth_with_prisma_nextjs_user_data"
-import { actionClient }  from "@/lib/safe-action"
-import { UpdateUser }    from "@/modules/user/application/use_cases/update_user"
-import prisma            from "@/lib/prisma"
+import { actionClient } from "@/lib/safe-action"
+import { UpdateUser }   from "@/modules/user/application/auth_use_cases/update_user"
+import prisma           from "@/lib/prisma"
 import { checkRole }     from "@/utils/check_role"
 import { RoleLevelType } from "@/modules/user/domain/role_type"
 import { isLeft }        from "fp-ts/Either"
