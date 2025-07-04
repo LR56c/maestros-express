@@ -1,13 +1,15 @@
 import { cn } from '@/lib/utils'
 import { ChatMessage } from "@/app/hooks/use_realtime_chat"
+import { UserResponse } from "@/modules/user/application/models/user_response"
 
 interface ChatMessageItemProps {
+  user: UserResponse
   message: ChatMessage
   isOwnMessage: boolean
   showHeader: boolean
 }
 
-export const ChatMessageItem = ({ message, isOwnMessage, showHeader }: ChatMessageItemProps) => {
+export const ChatMessageItem = ({ message, isOwnMessage, showHeader,user }: ChatMessageItemProps) => {
   return (
     <div className={`flex mt-2 ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
       <div
@@ -21,9 +23,9 @@ export const ChatMessageItem = ({ message, isOwnMessage, showHeader }: ChatMessa
               'justify-end flex-row-reverse': isOwnMessage,
             })}
           >
-            <span className={'font-medium'}>{message.user.name}</span>
+            <span className={'font-medium'}>{user.full_name}</span>
             <span className="text-foreground/50 text-xs">
-              {new Date(message.createdAt).toLocaleTimeString('en-US', {
+              {new Date(message.created_at).toLocaleTimeString('en-US', {
                 hour: '2-digit',
                 minute: '2-digit',
                 hour12: true,

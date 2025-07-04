@@ -3,7 +3,7 @@ import { countrySchema } from "@/modules/country/application/country_dto"
 
 export const nationalIdentifierSchema = z.object( {
   id        : z.string(),
-  identifier: z.string(),
+  identifier: z.string().min(1, "Required"),
   type      : z.string(),
   country   : countrySchema
 } )

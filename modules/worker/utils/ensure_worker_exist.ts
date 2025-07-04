@@ -1,30 +1,28 @@
-import { CountryDAO } from "@/modules/country/domain/country_dao"
 import { Either, isLeft, left, right } from "fp-ts/Either"
 import {
   BaseException
-} from "@/modules/shared/domain/exceptions/base_exception"
-import { Country } from "@/modules/country/domain/country"
+}                                      from "@/modules/shared/domain/exceptions/base_exception"
 import {
   ValidInteger
-} from "@/modules/shared/domain/value_objects/valid_integer"
+}                                      from "@/modules/shared/domain/value_objects/valid_integer"
 import {
   DataNotFoundException
-} from "@/modules/shared/domain/exceptions/data_not_found_exception"
+}                                      from "@/modules/shared/domain/exceptions/data_not_found_exception"
 import { WorkerDAO }                   from "@/modules/worker/domain/worker_dao"
-import { Worker } from "@/modules/worker/domain/worker"
+import { Worker }                      from "@/modules/worker/domain/worker"
 
 export const ensureWorkerExist = async ( dao: WorkerDAO,
-  workerId: string ): Promise<Either<BaseException[], Worker>> => {
+  email: string ): Promise<Either<BaseException[], Worker>> => {
 
   const worker = await dao.search({
-    id: workerId
+    email: email
   }, ValidInteger.from(1))
 
   if ( isLeft(worker) ) {
     return left(worker.left)
   }
 
-  if ( worker.right.length > 0 && worker.right[0]!.user.userId.value !== workerId ) {
+  if ( worker.right.length > 0 && worker.right[0]!.user.email.value !== email ) {
     return left( [new DataNotFoundException()] )
   }
 

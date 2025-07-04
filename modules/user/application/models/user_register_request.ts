@@ -4,6 +4,7 @@ import { passwordSchema } from "@/modules/user/domain/password"
 export const userRegisterRequestSchema = z.object( {
   email            : z.string(),
   full_name            : z.string(),
+  avatar  : z.string().optional(),
   password: passwordSchema
 } )
 

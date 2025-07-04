@@ -17,9 +17,9 @@ import {
 import { Worker }                      from "@/modules/worker/domain/worker"
 import {
   Errors
-}                   from "@/modules/shared/domain/exceptions/errors"
-import { UserAuth } from "@/modules/user/domain/user"
-import { Country }  from "@/modules/country/domain/country"
+}                                      from "@/modules/shared/domain/exceptions/errors"
+import { UserAuth }                    from "@/modules/user/domain/user"
+import { Country }                     from "@/modules/country/domain/country"
 import {
   NationalIdentity
 }                                      from "@/modules/national_identity/domain/national_identity"
@@ -29,7 +29,6 @@ import {
 import {
   WorkerTax
 }                                      from "@/modules/worker_tax/domain/worker_tax"
-import { Role }                        from "@/modules/role/domain/role"
 import {
   UUID
 }                                      from "@/modules/shared/domain/value_objects/uuid"
@@ -77,19 +76,6 @@ export const mapWorkerRelations = async ( w: any ): Promise<Either<BaseException
     specialities.push( spec )
   }
 
-  // const roles: Role[] = []
-  // for ( const ur of w.user.usersRoles ) {
-  //   const role = Role.fromPrimitives(
-  //     ur.role.id.toString(),
-  //     ur.role.name,
-  //     ur.role.createdAt,
-  //     ur.role.updatedAt
-  //   )
-  //   if ( role instanceof Errors ) {
-  //     return left( role.values )
-  //   }
-  //   roles.push( role )
-  // }
   const userMapped = UserAuth.fromPrimitives(
     w.user.id.toString(),
     w.user.email,
@@ -98,9 +84,11 @@ export const mapWorkerRelations = async ( w: any ): Promise<Either<BaseException
     w.user.role,
     w.user.image
   )
+
   if ( userMapped instanceof Errors ) {
     return left( userMapped.values )
   }
+
   const nationalIdentityDatabase = w.nationalIdentity
   const countryDatabase          = nationalIdentityDatabase.country
   const country                  = Country.fromPrimitives(
@@ -173,13 +161,29 @@ export class PrismaWorkerData implements WorkerDAO {
     }
   }
 
+  async remove( userId: ValidString ): Promise<Either<BaseException, boolean>> {
+    try {
+      await this.db.worker.delete( {
+        where: {
+          id: userId.value
+        }
+      } )
+      return right( true )
+    }
+    catch ( e ) {
+      return left( new InfrastructureException() )
+    }
+  }
+
   async search( query: Record<string, any>, limit?: ValidInteger,
     skip?: ValidString,
     sortBy?: ValidString,
     sortType?: ValidString ): Promise<Either<BaseException[], Worker[]>> {
     try {
       let idsCount: number | undefined = undefined
-      const where                      = {}
+
+      const where = {}
+
       if ( query.id ) {
         // @ts-ignore
         where["id"] = {
@@ -195,6 +199,12 @@ export class PrismaWorkerData implements WorkerDAO {
           in: ids
         }
       }
+      if ( query.email ) {
+        // @ts-ignore
+        where["user"] = {
+          email: query.email
+        }
+      }
       const orderBy = {}
       if ( sortBy ) {
         const key    = changeCase.camelCase( sortBy.value )
@@ -208,11 +218,6 @@ export class PrismaWorkerData implements WorkerDAO {
         skip   : offset,
         take   : limit?.value,
         include: {
-          user            : {
-            include: {
-              accounts: true
-            }
-          },
           nationalIdentity: {
             include: {
               country: true
@@ -238,7 +243,6 @@ export class PrismaWorkerData implements WorkerDAO {
         if ( isLeft( relationMapped ) ) {
           return left( relationMapped.left )
         }
-
         const mapped = Worker.fromPrimitives(
           relationMapped.right.user,
           relationMapped.right.nationalIdentity,

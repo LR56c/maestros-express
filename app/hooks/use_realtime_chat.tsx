@@ -2,24 +2,20 @@
 
 import { supabaseClient } from '@/lib/supabase'
 import { useCallback, useEffect, useState } from 'react'
+import { MessageResponse } from "@/modules/message/application/message_response"
+import { UUID } from "@/modules/shared/domain/value_objects/uuid"
 
-interface UseRealtimeChatProps {
+interface RealtimeChatProps {
   roomName: string
   username: string
+  senderId: string
 }
 
-export interface ChatMessage {
-  id: string
-  content: string
-  user: {
-    name: string
-  }
-  createdAt: string
-}
+export type ChatMessage = MessageResponse
 
 const EVENT_MESSAGE_TYPE = 'message'
 
-export function useRealtimeChat({ roomName, username }: UseRealtimeChatProps) {
+export function useRealtimeChat({ roomName, username,senderId }: RealtimeChatProps) {
   const supabase = supabaseClient()
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [channel, setChannel] = useState<ReturnType<typeof supabase.channel> | null>(null)
@@ -46,19 +42,18 @@ export function useRealtimeChat({ roomName, username }: UseRealtimeChatProps) {
   }, [roomName, username, supabase])
 
   const sendMessage = useCallback(
-    async (content: string) => {
+    async (content: string, type : string) => {
       if (!channel || !isConnected) return
 
       const message: ChatMessage = {
-        id: crypto.randomUUID(),
+        id: UUID.create().value,
         content,
-        user: {
-          name: username,
-        },
-        createdAt: new Date().toISOString(),
+        user_id: senderId,
+        status: "SENT",
+        type,
+        created_at: new Date().toISOString(),
       }
 
-      // Update local state immediately for the sender
       setMessages((current) => [...current, message])
 
       await channel.send({

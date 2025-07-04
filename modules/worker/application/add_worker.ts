@@ -5,7 +5,6 @@ import {
 }                                      from "@/modules/shared/domain/exceptions/base_exception"
 import { ensureWorkerExist } from "@/modules/worker/utils/ensure_worker_exist"
 import { Worker }     from "@/modules/worker/domain/worker"
-import { SearchUser } from "@/modules/user/backup_application/search_user"
 import {
   NationalIdentity
 }                     from "@/modules/national_identity/domain/national_identity"
@@ -18,17 +17,21 @@ import { containError } from "@/modules/shared/utils/contain_error"
 import {
   DataNotFoundException
 } from "@/modules/shared/domain/exceptions/data_not_found_exception"
+import {
+  RegisterUser
+}                               from "@/modules/user/application/auth_use_cases/register_user"
 
 export class AddWorker {
   constructor(
     private readonly dao: WorkerDAO,
-    private readonly searchUser: SearchUser,
     private readonly searchCountry: SearchCountry,
+    private readonly register: RegisterUser,
+
   ) {
   }
 
   async execute( worker: WorkerRequest ): Promise<Either<BaseException[], Worker>>{
-    const exist = await ensureWorkerExist(this.dao, worker.user.user_id)
+    const exist = await ensureWorkerExist(this.dao, worker.user.email)
 
     if ( isLeft( exist ) ) {
       if ( !containError( exist.left, new DataNotFoundException() ) ) {
@@ -36,12 +39,10 @@ export class AddWorker {
       }
     }
 
-    const userSearchResult = await this.searchUser.execute({
-      id: worker.user.user_id
-    },1)
+    const userResult = await this.register.execute(worker.user)
 
-    if ( isLeft(userSearchResult) ) {
-      return left(userSearchResult.left)
+    if ( isLeft(userResult) ) {
+      return left(userResult.left)
     }
 
     const countryResult = await this.searchCountry.execute({
@@ -52,7 +53,6 @@ export class AddWorker {
       return left(countryResult.left)
     }
 
-    const user = userSearchResult.right[0]
 
     const nationalIdentity = NationalIdentity.create(
       worker.national_identity.id,
@@ -66,7 +66,7 @@ export class AddWorker {
     }
 
     const newWorker = Worker.create(
-      user,
+      userResult.right,
       nationalIdentity,
       worker.birth_date,
       worker.location,

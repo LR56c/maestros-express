@@ -23,7 +23,9 @@ import { Password }            from "@/modules/user/domain/password"
 import { auth }                from "@/lib/auth"
 import { headers }             from "next/headers"
 import { PrismaClient }        from "@/lib/generated/prisma"
-import { authClient }          from "@/lib/auth_client"
+import {
+  NationalIdentity
+}                              from "@/modules/national_identity/domain/national_identity"
 
 export class BetterAuthWithPrismaNextjsUserData implements AuthRepository {
   constructor( private readonly db: PrismaClient ) {
@@ -114,15 +116,27 @@ export class BetterAuthWithPrismaNextjsUserData implements AuthRepository {
   }
 
   async register( user: UserAuth,
-    password: Password ): Promise<Either<BaseException[], UserAuth>> {
+    password: Password,
+    nationalIdentity: NationalIdentity ): Promise<Either<BaseException[], UserAuth>> {
     try {
-      await auth.api.signUpEmail( {
+      const result = await auth.api.signUpEmail( {
         body: {
           email   : user.email.value,
           password: password.value,
           name    : user.fullName.value
         }
       } )
+
+      if ( user.avatar ) {
+        await this.db.user.update( {
+          where: {
+            id: result.user.id
+          },
+          data : {
+            image: user.avatar.value
+          }
+        } )
+      }
       return this.getUser()
     }
     catch ( e ) {
@@ -149,11 +163,12 @@ export class BetterAuthWithPrismaNextjsUserData implements AuthRepository {
         where: {
           id: data.userId.value
         },
-        data: {
+        data : {
           image: data.avatar?.value ?? null,
-          role : data.role.toString().toLowerCase() as "admin" | "client" | "worker",
+          role : data.role.toString()
+                     .toLowerCase() as "admin" | "client" | "worker"
         }
-      })
+      } )
       return right( true )
     }
     catch ( e ) {
@@ -171,8 +186,9 @@ export class BetterAuthWithPrismaNextjsUserData implements AuthRepository {
 
       const { id, email, name, createdAt } = result.user
 
-      const emailStart = email.split( "@" )[ 0 ]
-      const user = UserAnon.fromPrimitives( id, `${emailStart}@express.com`, name, createdAt )
+      const emailStart = email.split( "@" )[0]
+      const user       = UserAnon.fromPrimitives( id,
+        `${ emailStart }@express.com`, name, createdAt )
 
       if ( user instanceof Errors ) {
         return left( user.values )

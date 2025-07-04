@@ -30,7 +30,7 @@ export class RegisterUser {
       dto.email,
       dto.full_name,
       "CLIENT",
-      null
+      dto.avatar ? dto.avatar : null,
     )
 
     if ( user instanceof Errors ) {
