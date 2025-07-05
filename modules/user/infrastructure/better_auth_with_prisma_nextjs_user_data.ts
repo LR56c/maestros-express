@@ -23,9 +23,6 @@ import { Password }            from "@/modules/user/domain/password"
 import { auth }                from "@/lib/auth"
 import { headers }             from "next/headers"
 import { PrismaClient }        from "@/lib/generated/prisma"
-import {
-  NationalIdentity
-}                              from "@/modules/national_identity/domain/national_identity"
 
 export class BetterAuthWithPrismaNextjsUserData implements AuthRepository {
   constructor( private readonly db: PrismaClient ) {
@@ -116,8 +113,7 @@ export class BetterAuthWithPrismaNextjsUserData implements AuthRepository {
   }
 
   async register( user: UserAuth,
-    password: Password,
-    nationalIdentity: NationalIdentity ): Promise<Either<BaseException[], UserAuth>> {
+    password: Password ): Promise<Either<BaseException[], UserAuth>> {
     try {
       const result = await auth.api.signUpEmail( {
         body: {

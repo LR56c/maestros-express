@@ -24,6 +24,6 @@ export const auth = betterAuth( {
         worker,
         client
       }
-    } )
+    } ),
   ]
 } )

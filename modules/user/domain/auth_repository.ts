@@ -21,7 +21,7 @@ export abstract class AuthRepository {
 
   abstract logout( token?: ValidString ): Promise<Either<BaseException, boolean>>
 
-  abstract register( auth: UserAuth, password: Password, nationalIdentity: NationalIdentity ): Promise<Either<BaseException[], UserAuth>>
+  abstract register( auth: UserAuth, password: Password ): Promise<Either<BaseException[], UserAuth>>
 
   abstract update( user: UserAuth ): Promise<Either<BaseException[], boolean>>
 

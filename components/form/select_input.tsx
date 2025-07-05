@@ -19,6 +19,7 @@ interface SelectInputProps {
   values: SelectInputValue[]
   label: string
   name: string
+  loading: boolean
   placeholder?: string
   onChange?: ( value: any ) => void
 }
@@ -28,31 +29,34 @@ export default function SelectInput( {
   label,
   name,
   onChange,
-  placeholder
+  placeholder,
+  loading
 }: SelectInputProps )
 {
-  const valueMap = new Map<string,any>(values.map((v) => [String(v.label), v.value]));
+  const valueMap                  = new Map<string, any>(
+    values.map( ( v ) => [String( v.label ), v.value] ) )
   const { formState: { errors } } = useFormContext()
-  const errorMessage              = getNestedErrorObject( errors, name )?.message as string | undefined
+  const errorMessage              = getNestedErrorObject( errors,
+    name )?.message as string | undefined
 
-  const handleChange = (selectedValue: string) => {
-    const selected = valueMap.get(selectedValue);
-    console.log("Selected value:", selected);
-    if (onChange && selected) {
-      onChange(selected);
+  const handleChange = ( selectedValue: string ) => {
+    const selected = valueMap.get( selectedValue )
+    console.log( "Selected value:", selected )
+    if ( onChange && selected ) {
+      onChange( selected )
     }
   }
 
   return (
     <div className="flex flex-col gap-1">
       <Label htmlFor={ name }>{ label }</Label>
-      <Select onValueChange={ handleChange }>
+      <Select disabled={loading} onValueChange={ handleChange }>
         <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder={ placeholder }/>
+          <SelectValue placeholder={ loading ? "Cargando" : placeholder }/>
         </SelectTrigger>
         <SelectContent>
-          { values.map( ( {label} ) => (
-            <SelectItem key={ String(label) } value={ String(label) }>
+          { values.map( ( { label } ) => (
+            <SelectItem key={ String( label ) } value={ String( label ) }>
               { capitalCase( label ) }
             </SelectItem>
           ) ) }

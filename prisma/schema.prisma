@@ -1,3 +1,4 @@
+
 generator client {
   provider = "prisma-client-js"
   output   = "../lib/generated/prisma"
@@ -398,12 +399,12 @@ model Audit {
 }
 
 enum AuthMethod {
-  EMAIL  @map("email")
+  EMAIL @map("email")
   GOOGLE @map("google")
 }
 
 enum QuotationStatus {
-  PENDING  @map("pending")
+  PENDING @map("pending")
   ACCEPTED @map("accepted")
   CANCELED @map("canceled")
 }
@@ -428,55 +429,55 @@ enum PaymentType {
 }
 
 enum PaymentStatus {
-  PENDING   @map("pending")
+  PENDING @map("pending")
   COMPLETED @map("completed")
 }
 
 enum MessageStatus {
-  SENDING  @map("sending")
-  SENT     @map("sent")
-  READ     @map("read")
+  SENDING @map("sending")
+  SENT @map("sent")
+  READ @map("read")
   CANCELED @map("canceled")
   ACCEPTED @map("accepted")
 }
 
 enum MessageType {
-  SUBJECT   @map("subject")
-  IMAGE     @map("image")
-  TEXT      @map("text")
+  SUBJECT @map("subject")
+  IMAGE @map("image")
+  TEXT @map("text")
   QUOTATION @map("quotation")
 }
 
 enum WorkerStatus {
   INCOMPLETE @map("incomplete")
-  PENDING    @map("pending")
-  VERIFIED   @map("verified")
+  PENDING @map("pending")
+  VERIFIED @map("verified")
 }
 
 enum PackageDocumentType {
   IMAGE @map("image")
   VIDEO @map("video")
-  FILE  @map("file")
-  PDF   @map("pdf")
+  FILE @map("file")
+  PDF @map("pdf")
 }
 
 enum WorkerScheduleStatus {
-  ACTIVE   @map("active")
+  ACTIVE @map("active")
   INACTIVE @map("inactive")
 }
 
 enum WorkerBookingStatus {
   AVAILABLE @map("available")
-  BOOKED    @map("booked")
+  BOOKED @map("booked")
 }
 
 enum WorkerEmbeddingType {
-  STORY  @map("story")
+  STORY @map("story")
   WORKER @map("worker")
 }
 
 enum CertificateType {
-  PDF   @map("pdf")
+  PDF @map("pdf")
   IMAGE @map("image")
 }
 

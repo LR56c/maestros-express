@@ -11,8 +11,10 @@ export const workerRequestSchema = z.object( {
   national_identity: nationalIdentifierSchema,
   birth_date       : z.string().date(),
   description      : z.string().optional(),
-  status           : z.string(),
-  location         : z.string()
+  location         : z.object({
+    latitude : z.number(),
+    longitude: z.number()
+  })
 } )
 
 export type WorkerRequest = z.infer<typeof workerRequestSchema>

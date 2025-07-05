@@ -6,6 +6,7 @@ import { wrapType }                from "@/modules/shared/utils/wrap_type"
 import {
   BaseException
 }                                  from "@/modules/shared/domain/exceptions/base_exception"
+import { redirect }                from "next/navigation"
 
 export const checkRole = async ( minRole: RoleLevelType ) => {
   const session = await auth.api.getSession( {
@@ -19,4 +20,12 @@ export const checkRole = async ( minRole: RoleLevelType ) => {
     return false
   }
   return roleType.value >= minRole
+}
+
+export const verifyServerRole = async ( minRole: RoleLevelType ) => {
+  const hasRole = await checkRole( minRole )
+  if ( !hasRole ) {
+    return redirect('/404')
+  }
+  return true
 }

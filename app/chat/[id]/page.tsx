@@ -1,7 +1,9 @@
+import { redirect } from "next/navigation"
 
-export default async function DirectChat({params}) {
+export default async function DirectChat( { params } ) {
   const { id } = await params
+
   return <div>
-    id: {id}
+    id: { id }
   </div>
 }

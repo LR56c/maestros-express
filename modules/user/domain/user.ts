@@ -53,7 +53,6 @@ export class UserAnon implements User {
       errors.push( userIdValue )
     }
 
-    console.log("email", email)
     const vemail = wrapType(
       () => Email.from( email ) )
 
