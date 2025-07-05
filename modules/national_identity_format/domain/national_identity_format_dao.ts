@@ -1,0 +1,24 @@
+import { type Either } from "fp-ts/Either"
+import {
+  ValidInteger
+}                      from "@/modules/shared/domain/value_objects/valid_integer"
+import {
+  ValidString
+}                      from "@/modules/shared/domain/value_objects/valid_string"
+import {
+  BaseException
+}                      from "@/modules/shared/domain/exceptions/base_exception"
+import { UUID } from "@/modules/shared/domain/value_objects/uuid"
+import {
+  NationalIdentityFormat
+}               from "@/modules/national_identity_format/domain/national_identity_format"
+
+export abstract class NationalIdentityFormatDAO{
+
+  abstract search( query: Record<string, any>, limit ?: ValidInteger,
+    skip ?: ValidString, sortBy ?: ValidString,
+    sortType ?: ValidString ): Promise<Either<BaseException[], NationalIdentityFormat[]>>
+  abstract add( format: NationalIdentityFormat ): Promise<Either<BaseException, boolean>>
+  abstract update( format: NationalIdentityFormat ): Promise<Either<BaseException, boolean>>
+  abstract remove( id: UUID ): Promise<Either<BaseException, boolean>>
+}

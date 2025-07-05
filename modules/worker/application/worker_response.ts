@@ -1,20 +1,21 @@
 import { z } from "zod"
 import {
-  userResponseSchema
-}            from "@/modules/user/backup_application/user_response"
-import {
-  nationalIdentifierSchema
-}            from "@/modules/national_identity/application/national_identity_dto"
+  nationalIdentityFormatSchema
+} from "@/modules/national_identity_format/application/national_identity_format_dto"
 import {
   specialitySchema
-}            from "@/modules/speciality/application/speciality_dto"
+} from "@/modules/speciality/application/speciality_dto"
 import {
   workerTaxSchema
 }            from "@/modules/worker_tax/application/worker_tax_dto"
+import {
+  userResponseSchema
+} from "@/modules/user/application/models/user_response"
 
 export const workerResponseSchema = z.object( {
   user             : userResponseSchema,
-  national_identity: nationalIdentifierSchema,
+  national_identity_id: z.string(),
+  national_identity_value: z.string(),
   birth_date       : z.string(),
   description      : z.string().optional(),
   review_count     : z.number(),

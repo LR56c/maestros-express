@@ -4,7 +4,6 @@ import WorkerApplyForm from "@/components/form/worker_apply_form"
 // import { RoleLevelType }    from "@/modules/user/domain/role_type"
 
 export default async function WorkerApply() {
-  // await verifyServerRole( RoleLevelType.CLIENT )
   return <>
     <WorkerApplyForm/>
   </>

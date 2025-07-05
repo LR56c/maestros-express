@@ -3,14 +3,11 @@ import {
   WorkerResponse
 } from "@/modules/worker/application/worker_response"
 import {
-  UserMapper
-} from "@/modules/user/backup_application/user_mapper"
-import {
-  NationalIdentityMapper
-} from "@/modules/national_identity/application/national_identity_mapper"
+  NationalIdentityFormatMapper
+} from "@/modules/national_identity_format/application/national_identity_format_mapper"
 import {
   SpecialityMapper
-}                                    from "@/modules/speciality/application/speciality_mapper"
+} from "@/modules/speciality/application/speciality_mapper"
 import {
   WorkerTax
 }                                    from "@/modules/worker_tax/domain/worker_tax"
@@ -38,12 +35,6 @@ import {
 import {
   ValidDecimal
 } from "@/modules/shared/domain/value_objects/valid_decimal"
-import {
-  UserResponse
-} from "@/modules/user/backup_application/user_response"
-import {
-  NationalIdentifierDTO
-} from "@/modules/national_identity/application/national_identity_dto"
 import { wrapType, wrapTypeDefault } from "@/modules/shared/utils/wrap_type"
 import {
   WorkerStatus
@@ -54,13 +45,17 @@ import {
 import {
   Position
 }                                    from "@/modules/shared/domain/value_objects/position"
+import { UserMapper } from "@/modules/user/application/user_mapper"
+import {
+  UserResponse
+}                                    from "@/modules/user/application/models/user_response"
 
 export class WorkerMapper {
   static toProfile( w: Worker, age: number,
     location: string ): WorkerProfileDTO {
     return {
       user_id       : w.user.userId.toString(),
-      full_name     : `${ w.user.fullName.value } ${ w.user.surname.value }`,
+      full_name     : w.user.fullName.value,
       avatar        : w.user.avatar?.value,
       age,
       description   : w.description?.value ?? "",
@@ -75,8 +70,8 @@ export class WorkerMapper {
   static toDTO( worker: Worker ): WorkerResponse {
     return {
       user             : UserMapper.toDTO( worker.user ),
-      national_identity: NationalIdentityMapper.toDTO(
-        worker.nationalIdentity ),
+      national_identity_id: worker.nationalIdentityId.toString(),
+      national_identity_value: worker.nationalIdentityValue.value,
       birth_date       : worker.birthDate.toString(),
       description      : worker.description?.value,
       review_count     : worker.reviewCount.value,
@@ -98,8 +93,8 @@ export class WorkerMapper {
   static toJSON( dto: WorkerResponse ): Record<string, any> {
     return {
       user             : UserMapper.toJSON( dto.user ),
-      national_identity: NationalIdentityMapper.toJSON(
-        dto.national_identity ),
+      national_identity_id: dto.national_identity_id,
+      national_identity_value: dto.national_identity_value,
       birth_date       : dto.birth_date,
       description      : dto.description,
       review_count     : dto.review_count,
@@ -125,13 +120,6 @@ export class WorkerMapper {
 
     if ( user instanceof Errors ) {
       errors.push( ...user.values )
-    }
-
-    const nationalIdentity = NationalIdentityMapper.fromJSON(
-      json.national_identity )
-
-    if ( nationalIdentity instanceof Errors ) {
-      errors.push( ...nationalIdentity.values )
     }
 
     const specialities: SpecialityDTO[] = []
@@ -276,13 +264,32 @@ export class WorkerMapper {
       errors.push( location )
     }
 
+    const nationalIdentityId = wrapType(
+      () => ValidString.from( json.national_identity_id ) )
+
+    if ( nationalIdentityId instanceof BaseException ) {
+      errors.push( nationalIdentityId )
+    }
+
+    const nationalIdentityValue = wrapType(
+      () => ValidString.from( json.national_identity_value ) )
+
+    if ( nationalIdentityValue instanceof BaseException ) {
+      errors.push( nationalIdentityValue )
+    }
+
     if ( errors.length > 0 ) {
       return new Errors( errors )
     }
 
     return {
       user             : user as UserResponse,
-      national_identity: nationalIdentity as NationalIdentifierDTO,
+      national_identity_id: (
+        nationalIdentityId as ValidString
+      ).value,
+      national_identity_value: (
+        nationalIdentityValue as ValidString
+      ).value,
       birth_date       : (
         birhtDate as ValidString
       ).value,
@@ -317,13 +324,6 @@ export class WorkerMapper {
 
     if ( user instanceof Errors ) {
       return user
-    }
-
-    const nationalIdentity = NationalIdentityMapper.toDomain(
-      json.national_identity )
-
-    if ( nationalIdentity instanceof Errors ) {
-      return nationalIdentity
     }
 
     const specialities: Speciality[] = []
@@ -409,7 +409,8 @@ export class WorkerMapper {
 
     return Worker.fromPrimitives(
       user,
-      nationalIdentity,
+      json.national_identity_id,
+      json.national_identity_value,
       json.birth_date,
       json.review_count,
       json.review_average,

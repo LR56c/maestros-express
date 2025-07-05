@@ -7,10 +7,10 @@ import { type Either } from "fp-ts/Either"
 import type {
   BaseException
 }                      from "@/modules/shared/domain/exceptions/base_exception"
-import { UserAuth }    from "@/modules/user/domain/user"
+import { UserAuth } from "@/modules/user/domain/user"
 import {
-  NationalIdentity
-}                      from "@/modules/national_identity/domain/national_identity"
+  NationalIdentityFormat
+}                   from "@/modules/national_identity_format/domain/national_identity_format"
 
 export abstract class AuthRepository {
   abstract remove( id: ValidString ): Promise<Either<BaseException, boolean>>

@@ -37,16 +37,16 @@ model NotificationConfig {
   @@map("notification_config")
 }
 
-model NationalIdentity {
-  id         String   @id
-  type       String   @map("type")
-  identifier String   @map("identifier")
-  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-  countryId  String   @map("country_id") @db.Uuid
-  country    Country  @relation(fields: [countryId], references: [id], onDelete: Cascade)
-  Worker     Worker[]
+model NationalIdentityFormat {
+  id        String   @id @default(uuid()) @db.Uuid
+  countryId String   @db.Uuid
+  country   Country  @relation(fields: [countryId], references: [id], onDelete: Cascade)
+  name      String
+  regex     String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  Worker    Worker[]
 
-  @@map("national_identity")
+  @@map("national_identity_format")
 }
 
 model Speciality {
@@ -230,28 +230,29 @@ model WorkerTax {
 }
 
 model Worker {
-  id                 String             @id
-  birthDate          DateTime           @map("birth_date") @db.Timestamptz(6)
-  description        String?            @map("description")
-  reviewCount        Int                @default(0) @map("review_count")
-  reviewAverage      Float              @default(0) @map("review_average")
-  location           String             @map("location")
-  status             WorkerStatus       @map("status")
-  nationalIdentityId String             @map("national_identity")
-  user               User               @relation(fields: [id], references: [id], onDelete: Cascade)
-  nationalIdentity   NationalIdentity   @relation(fields: [nationalIdentityId], references: [id], onDelete: Cascade)
-  Certificate        Certificate[]
-  Package            Package[]
-  Quotation          Quotation[]
-  Story              Story[]
-  WorkerBooking      WorkerBooking[]
-  WorkerEmbedding    WorkerEmbedding[]
-  WorkerSchedule     WorkerSchedule[]
-  WorkerSpeciality   WorkerSpeciality[]
-  WorkerTax          WorkerTax[]
-  Zone               Zone[]
-  createdAt          DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
-  verifiedAt         DateTime?          @map("verified_at") @db.Timestamptz(6)
+  id                       String                 @id
+  birthDate                DateTime               @map("birth_date") @db.Timestamptz(6)
+  description              String?                @map("description")
+  reviewCount              Int                    @default(0) @map("review_count")
+  reviewAverage            Float                  @default(0) @map("review_average")
+  location                 String                 @map("location")
+  status                   WorkerStatus           @map("status")
+  nationalIdentityValue    String                 @map("national_identity_value")
+  nationalIdentityFormatId String                 @map("national_identity_format_id") @db.Uuid
+  nationalIdentityFormat   NationalIdentityFormat @relation(fields: [nationalIdentityFormatId], references: [id], onDelete: Cascade)
+  user                     User                   @relation(fields: [id], references: [id], onDelete: Cascade)
+  Certificate              Certificate[]
+  Package                  Package[]
+  Quotation                Quotation[]
+  Story                    Story[]
+  WorkerBooking            WorkerBooking[]
+  WorkerEmbedding          WorkerEmbedding[]
+  WorkerSchedule           WorkerSchedule[]
+  WorkerSpeciality         WorkerSpeciality[]
+  WorkerTax                WorkerTax[]
+  Zone                     Zone[]
+  createdAt                DateTime               @default(now()) @map("created_at") @db.Timestamptz(6)
+  verifiedAt               DateTime?              @map("verified_at") @db.Timestamptz(6)
 }
 
 model Report {
@@ -283,12 +284,13 @@ model WorkerEmbedding {
 }
 
 model Country {
-  id               String             @id @default(uuid()) @db.Uuid
-  name             String             @unique
-  code             String             @unique
-  createdAt        DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
-  NationalIdentity NationalIdentity[]
-  Region           Region[]
+  id                     String                   @id @default(uuid()) @db.Uuid
+  name                   String                   @unique
+  code                   String                   @unique
+  createdAt              DateTime                 @default(now()) @map("created_at") @db.Timestamptz(6)
+  Region                 Region[]
+  NationalIdentityFormat NationalIdentityFormat[]
+  PhoneFormat            PhoneFormat[]
 
   @@map("country")
 }
@@ -557,4 +559,16 @@ model Verification {
   updatedAt  DateTime?
 
   @@map("verification")
+}
+
+model PhoneFormat {
+  id        String   @id @default(uuid()) @db.Uuid
+  countryId String   @db.Uuid
+  country   Country  @relation(fields: [countryId], references: [id], onDelete: Cascade)
+  regex     String
+  prefix     String
+  example   String?
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("phone_format")
 }

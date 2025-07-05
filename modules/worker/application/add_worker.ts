@@ -3,30 +3,50 @@ import { Either, isLeft, left, right } from "fp-ts/Either"
 import {
   BaseException
 }                                      from "@/modules/shared/domain/exceptions/base_exception"
-import { ensureWorkerExist } from "@/modules/worker/utils/ensure_worker_exist"
-import { Worker }     from "@/modules/worker/domain/worker"
 import {
-  NationalIdentity
-}                     from "@/modules/national_identity/domain/national_identity"
+  ensureWorkerExist
+}                                      from "@/modules/worker/utils/ensure_worker_exist"
+import { Worker }                      from "@/modules/worker/domain/worker"
 import {
-  SearchCountry
-}                               from "@/modules/country/application/search_country"
-import { Errors }               from "@/modules/shared/domain/exceptions/errors"
-import { WorkerRequest } from "@/modules/worker/application/worker_request"
-import { containError } from "@/modules/shared/utils/contain_error"
+  Errors
+}                                      from "@/modules/shared/domain/exceptions/errors"
+import {
+  WorkerRequest
+}                                      from "@/modules/worker/application/worker_request"
+import {
+  containError
+}                                      from "@/modules/shared/utils/contain_error"
 import {
   DataNotFoundException
-} from "@/modules/shared/domain/exceptions/data_not_found_exception"
+}                                      from "@/modules/shared/domain/exceptions/data_not_found_exception"
 import {
   RegisterUser
-}                               from "@/modules/user/application/auth_use_cases/register_user"
+}                                      from "@/modules/user/application/auth_use_cases/register_user"
+import {
+  SearchNationalIdentityFormat
+}                                      from "@/modules/national_identity_format/application/search_national_identity_format"
+import {
+  WorkerStatusEnum
+}                                      from "@/modules/worker/domain/worker_status"
+import {
+  UpsertWorkerEmbedding
+}                                      from "@/modules/worker_embedding/application/upsert_worker_embedding"
+import {
+  UUID
+}                                      from "@/modules/shared/domain/value_objects/uuid"
+import {
+  WorkerMapper
+}                                      from "@/modules/worker/application/worker_mapper"
+import {
+  WorkerEmbeddingTypeEnum
+}                                      from "@/modules/worker_embedding/domain/worker_embedding_type"
 
 export class AddWorker {
   constructor(
     private readonly dao: WorkerDAO,
-    private readonly searchCountry: SearchCountry,
+    private readonly searchNationalIdentity: SearchNationalIdentityFormat,
     private readonly register: RegisterUser,
-
+    private readonly embedding: UpsertWorkerEmbedding,
   ) {
   }
 
@@ -39,43 +59,49 @@ export class AddWorker {
       }
     }
 
+    const nationalIdentityResult = await this.searchNationalIdentity.execute({
+      id: worker.national_identity_id
+    }, 1)
+
+    if ( isLeft(nationalIdentityResult) ) {
+      return left(nationalIdentityResult.left)
+    }
+
+    const nationalIdentity = nationalIdentityResult.right[0]
+
     const userResult = await this.register.execute(worker.user)
 
     if ( isLeft(userResult) ) {
       return left(userResult.left)
     }
 
-    const countryResult = await this.searchCountry.execute({
-      id: worker.national_identity.country.id
-    }, 1)
-
-    if ( isLeft(countryResult) ) {
-      return left(countryResult.left)
-    }
-
-
-    const nationalIdentity = NationalIdentity.create(
-      worker.national_identity.id,
-      worker.national_identity.identifier,
-      worker.national_identity.type,
-      countryResult.right[0],
-    )
-
-    if ( nationalIdentity instanceof Errors ) {
-      return left(nationalIdentity.values)
-    }
+    const locationFormat = `(${worker.location.latitude},${worker.location.longitude})`
 
     const newWorker = Worker.create(
       userResult.right,
-      nationalIdentity,
+      nationalIdentity.id.toString(),
+      worker.national_identity_value,
       worker.birth_date,
-      worker.location,
-      worker.status,
+      locationFormat,
+      WorkerStatusEnum.INCOMPLETE,
       worker.description,
     )
 
     if ( newWorker instanceof Errors ) {
       return left(newWorker.values)
+    }
+
+    const embeddingResult = await this.embedding.execute({
+      id: UUID.create().toString(),
+      location: locationFormat,
+      data: {
+        type: WorkerEmbeddingTypeEnum.WORKER,
+        ...WorkerMapper.toDTO(newWorker)
+      }
+    })
+
+    if ( isLeft(embeddingResult) ) {
+      return left(embeddingResult.left)
     }
 
     const result = await this.dao.add(newWorker)

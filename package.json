@@ -19,6 +19,7 @@
     "@supabase/supabase-js": "^2.50.0",
     "@tanstack/react-query": "^5.80.7",
     "@tanstack/react-query-devtools": "^5.81.5",
+    "@tanstack/react-table": "^8.21.3",
     "@vercel/functions": "^2.2.3",
     "better-auth": "^1.2.12",
     "change-case": "^5.4.4",

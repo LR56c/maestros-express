@@ -1,8 +1,5 @@
-import { ValidDate } from "@/modules/shared/domain/value_objects/valid_date"
-import { UserAuth }  from "@/modules/user/domain/user"
-import {
-  NationalIdentity
-}                    from "@/modules/national_identity/domain/national_identity"
+import { ValidDate }                 from "@/modules/shared/domain/value_objects/valid_date"
+import { UserAuth }                  from "@/modules/user/domain/user"
 import {
   ValidString
 }                                    from "@/modules/shared/domain/value_objects/valid_string"
@@ -28,11 +25,15 @@ import {
 import {
   Position
 }                                    from "@/modules/shared/domain/value_objects/position"
+import {
+  UUID
+}                                    from "@/modules/shared/domain/value_objects/uuid"
 
 export class Worker {
   private constructor(
     readonly user: UserAuth,
-    readonly nationalIdentity: NationalIdentity,
+    readonly nationalIdentityId: UUID,
+    readonly nationalIdentityValue: ValidString,
     readonly birthDate: ValidDate,
     readonly reviewCount: ValidDecimal,
     readonly reviewAverage: ValidDecimal,
@@ -49,21 +50,24 @@ export class Worker {
     // readonly reviews: Review[],
     readonly createdAt: ValidDate,
     readonly verifiedAt?: ValidDate,
-    readonly description?: ValidString,
+    readonly description?: ValidString
   )
   {
   }
 
   static create(
     user: UserAuth,
-    nationalIdentity: NationalIdentity,
+    nationalIdentityId: string,
+    nationalIdentityValue: string,
     birthDate: Date | string,
     location: string,
     status: string,
-    description?: string,
+    description?: string
   ): Worker | Errors {
     return Worker.fromPrimitives(
-      user, nationalIdentity, birthDate, 0,
+      user,
+      nationalIdentityId,
+      nationalIdentityValue, birthDate, 0,
       0, location, status,
       [], [], ValidDate.nowUTC(), undefined, description
     )
@@ -71,7 +75,8 @@ export class Worker {
 
   static fromPrimitives(
     user: UserAuth,
-    nationalIdentity: NationalIdentity,
+    nationalIdentityId: string,
+    nationalIdentityValue: string,
     birthDate: Date | string,
     reviewCount: number,
     reviewAverage: number,
@@ -88,7 +93,7 @@ export class Worker {
     // reviews: Review[],
     createdAt: Date | string,
     verifiedAt?: Date | string,
-    description?: string,
+    description?: string
   ): Worker | Errors {
     const errors = []
 
@@ -97,7 +102,8 @@ export class Worker {
       errors.push( birthDateVO )
     }
 
-    const descriptionVO = wrapTypeDefault(undefined, (value) => ValidString.from( value ) ,description)
+    const descriptionVO = wrapTypeDefault( undefined,
+      ( value ) => ValidString.from( value ), description )
     if ( descriptionVO instanceof BaseException ) {
       errors.push( descriptionVO )
     }
@@ -128,10 +134,25 @@ export class Worker {
       errors.push( reviewAverageVO )
     }
 
-    const verifiedAtVO = wrapTypeDefault(undefined, (value) => ValidDate.from( value ), verifiedAt)
+    const verifiedAtVO = wrapTypeDefault( undefined,
+      ( value ) => ValidDate.from( value ), verifiedAt )
 
     if ( verifiedAtVO instanceof BaseException ) {
       errors.push( verifiedAtVO )
+    }
+
+    const vNationalIdentityId = wrapType(
+      () => UUID.from( nationalIdentityId ) )
+
+    if ( vNationalIdentityId instanceof BaseException ) {
+      errors.push( vNationalIdentityId )
+    }
+
+    const vNationalIdentityValue = wrapType(
+      () => ValidString.from( nationalIdentityValue ) )
+
+    if ( vNationalIdentityValue instanceof BaseException ) {
+      errors.push( vNationalIdentityValue )
     }
 
     if ( errors.length > 0 ) {
@@ -140,7 +161,8 @@ export class Worker {
 
     return new Worker(
       user,
-      nationalIdentity,
+      vNationalIdentityId as UUID,
+      vNationalIdentityValue as ValidString,
       birthDateVO as ValidDate,
       reviewCountVO as ValidDecimal,
       reviewAverageVO as ValidDecimal,
@@ -150,13 +172,14 @@ export class Worker {
       taxes,
       createdAtVO as ValidDate,
       verifiedAtVO as ValidDate | undefined,
-      descriptionVO as ValidString | undefined,
+      descriptionVO as ValidString | undefined
     )
   }
 
   static fromPrimitivesThrow(
     user: UserAuth,
-    nationalIdentity: NationalIdentity,
+    nationalIdentityId: string,
+    nationalIdentityValue: string,
     birthDate: Date | string,
     reviewCount: number,
     reviewAverage: number,
@@ -176,7 +199,10 @@ export class Worker {
     verifiedAt?: Date | string
   ): Worker {
     return new Worker(
-      user, nationalIdentity, ValidDate.from( birthDate ), ValidDecimal.from( reviewCount ),
+      user,
+      UUID.from( nationalIdentityId ),
+      ValidString.from( nationalIdentityValue ), ValidDate.from( birthDate ),
+      ValidDecimal.from( reviewCount ),
       ValidDecimal.from( reviewAverage ), Position.fromJSON( location ),
       WorkerStatus.from( status ), specialities,
       taxes,

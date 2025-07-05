@@ -1,9 +1,9 @@
 import {
-  NationalIdentity
-}                        from "@/modules/national_identity/domain/national_identity"
+  NationalIdentityFormat
+}                        from "@/modules/national_identity_format/domain/national_identity_format"
 import {
-  NationalIdentifierDTO
-}                        from "@/modules/national_identity/application/national_identity_dto"
+  NationalIdentityFormatDTO
+}                        from "@/modules/national_identity_format/application/national_identity_format_dto"
 import { CountryMapper } from "@/modules/country/application/country_mapper"
 import { Errors }        from "@/modules/shared/domain/exceptions/errors"
 import { wrapType }      from "@/modules/shared/utils/wrap_type"
@@ -19,26 +19,26 @@ import {
 }                        from "@/modules/shared/domain/value_objects/valid_string"
 import { CountryDTO }    from "@/modules/country/application/country_dto"
 
-export class NationalIdentityMapper {
-  static toDTO( nationalIdentity: NationalIdentity ): NationalIdentifierDTO {
+export class NationalIdentityFormatMapper {
+  static toDTO( nationalIdentity: NationalIdentityFormat ): NationalIdentityFormatDTO {
     return {
       id        : nationalIdentity.id.toString(),
-      identifier: nationalIdentity.identifier.value,
-      type      : nationalIdentity.type.value,
+      name: nationalIdentity.name.value,
+      regex      : nationalIdentity.regex.value,
       country   : CountryMapper.toDTO( nationalIdentity.country )
     }
   }
 
-  static toJSON( nationalIdentity: NationalIdentifierDTO ): Record<string, any> {
+  static toJSON( nationalIdentity: NationalIdentityFormatDTO ): Record<string, any> {
     return {
       id        : nationalIdentity.id,
-      identifier: nationalIdentity.identifier,
-      type      : nationalIdentity.type,
+      name: nationalIdentity.name,
+      regex      : nationalIdentity.regex,
       country   : CountryMapper.toJSON( nationalIdentity.country )
     }
   }
 
-  static fromJSON( nationalIdentity: Record<string, any> ): NationalIdentifierDTO | Errors {
+  static fromJSON( nationalIdentity: Record<string, any> ): NationalIdentityFormatDTO | Errors {
     const errors = []
 
     const id = wrapType( () => UUID.from( nationalIdentity.id ) )
@@ -47,17 +47,17 @@ export class NationalIdentityMapper {
       errors.push( id )
     }
 
-    const identifier = wrapType(
-      () => ValidString.from( nationalIdentity.identifier ) )
+    const name = wrapType(
+      () => ValidString.from( nationalIdentity.name ) )
 
-    if ( identifier instanceof BaseException ) {
-      errors.push( identifier )
+    if ( name instanceof BaseException ) {
+      errors.push( name )
     }
 
-    const type = wrapType( () => ValidString.from( nationalIdentity.type ) )
+    const regex = wrapType( () => ValidString.from( nationalIdentity.regex ) )
 
-    if ( type instanceof BaseException ) {
-      errors.push( type )
+    if ( regex instanceof BaseException ) {
+      errors.push( regex )
     }
 
     const country = CountryMapper.fromJSON( nationalIdentity.country )
@@ -74,27 +74,27 @@ export class NationalIdentityMapper {
       id        : (
         id as UUID
       ).toString(),
-      identifier: (
-        identifier as ValidString
+      name: (
+        name as ValidString
       ).value,
-      type      : (
-        type as ValidString
+      regex      : (
+        regex as ValidString
       ).value,
       country   : country as CountryDTO
     }
   }
 
-  static toDomain( json: Record<string, any> ): NationalIdentity | Errors {
+  static toDomain( json: Record<string, any> ): NationalIdentityFormat | Errors {
     const country = CountryMapper.toDomain( json.country )
 
     if ( country instanceof Errors ) {
       return country
     }
 
-    return NationalIdentity.fromPrimitives(
+    return NationalIdentityFormat.fromPrimitives(
       json.id,
-      json.identifier,
-      json.type,
+      json.name,
+      json.regex,
       country,
       json.created_at
     )

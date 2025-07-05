@@ -8,11 +8,11 @@ import {
   BaseException
 }                      from "@/modules/shared/domain/exceptions/base_exception"
 
-export class NationalIdentity {
+export class NationalIdentityFormat {
   private constructor(
     readonly id: UUID,
-    readonly identifier: ValidString,
-    readonly type: ValidString,
+    readonly name: ValidString,
+    readonly regex: ValidString,
     readonly country: Country,
     readonly createdAt: ValidDate
   )
@@ -21,25 +21,25 @@ export class NationalIdentity {
 
   static create(
     id: string,
-    identifier: string,
-    type: string,
+    name: string,
+    regex: string,
     country: Country
-  ): NationalIdentity | Errors {
-    return NationalIdentity.fromPrimitives( id, identifier, type, country,
+  ): NationalIdentityFormat | Errors {
+    return NationalIdentityFormat.fromPrimitives( id, name, regex, country,
       ValidDate.nowUTC() )
   }
 
   static fromPrimitivesThrow(
     id: string,
-    identifier: string,
-    type: string,
+    name: string,
+    regex: string,
     country: Country,
     createdAt: Date | string
-  ): NationalIdentity {
-    return new NationalIdentity(
+  ): NationalIdentityFormat {
+    return new NationalIdentityFormat(
       UUID.from( id ),
-      ValidString.from( identifier ),
-      ValidString.from( type ),
+      ValidString.from( name ),
+      ValidString.from( regex ),
       country,
       ValidDate.from( createdAt )
     )
@@ -47,11 +47,11 @@ export class NationalIdentity {
 
   static fromPrimitives(
     id: string,
-    identifier: string,
-    type: string,
+    name: string,
+    regex: string,
     country: Country,
     createdAt: Date | string
-  ): NationalIdentity | Errors {
+  ): NationalIdentityFormat | Errors {
     const errors = []
 
     const idVO = wrapType(
@@ -62,20 +62,20 @@ export class NationalIdentity {
       errors.push( idVO )
     }
 
-    const identifierVO = wrapType(
-      () => ValidString.from( identifier )
+    const nameVO = wrapType(
+      () => ValidString.from( name )
     )
 
-    if ( identifierVO instanceof BaseException ) {
-      errors.push( identifierVO )
+    if ( nameVO instanceof BaseException ) {
+      errors.push( nameVO )
     }
 
-    const typeVO = wrapType(
-      () => ValidString.from( type )
+    const regexVO = wrapType(
+      () => ValidString.from( regex )
     )
 
-    if ( typeVO instanceof BaseException ) {
-      errors.push( typeVO )
+    if ( regexVO instanceof BaseException ) {
+      errors.push( regexVO )
     }
 
     const created = wrapType(
@@ -90,10 +90,10 @@ export class NationalIdentity {
       return new Errors( errors )
     }
 
-    return new NationalIdentity(
+    return new NationalIdentityFormat(
       idVO as UUID,
-      identifierVO as ValidString,
-      typeVO as ValidString,
+      nameVO as ValidString,
+      regexVO as ValidString,
       country,
       created as ValidDate
     )

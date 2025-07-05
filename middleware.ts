@@ -4,10 +4,10 @@ import { getSessionCookie }                 from "better-auth/cookies"
 // type Session = typeof auth.$Infer.Session;
 
 export async function middleware( request: NextRequest ) {
-  // const sessionCookie = getSessionCookie( request )
-  // if ( !sessionCookie ) {
-  //   return NextResponse.redirect( new URL( "/login", request.url ) )
-  // }
+  const sessionCookie = getSessionCookie( request )
+  if ( !sessionCookie ) {
+    return NextResponse.redirect( new URL( "/login", request.url ) )
+  }
   return NextResponse.next()
 }
 

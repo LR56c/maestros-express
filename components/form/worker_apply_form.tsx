@@ -64,7 +64,7 @@ export default function WorkerApplyForm() {
 
   const formValues = watch()
 
-  const onSubmit = async ( data ) => {
+  const onSubmit = async ( data : any ) => {
     console.log( "Form submitted with data:", data )
   }
 

@@ -44,7 +44,7 @@ export const aiRepo = async () => new OpenaiWorkerEmbeddingData( await ai() )
 const prismaDao       = new PrismaWorkerEmbeddingData( prisma, await aiRepo() )
 const supabaseDao     = new SupabaseWorkerEmbeddingData( await aiRepo(), await supabase() )
 const add             = new UpsertWorkerEmbedding( prismaDao, await searchWorker(),
-  getStory )
+  await getStory() )
 const remove          = new RemoveWorkerEmbedding( prismaDao )
 const search          = new SearchWorkerEmbedding( supabaseDao, await searchWorker() )
 

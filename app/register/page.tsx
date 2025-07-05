@@ -12,11 +12,9 @@ export default function Register() {
   const { data: session, error, isPending, refetch } = authClient.useSession()
   const onLogout                                     = async () => {
     // await logoutUser()
-    // console.log("session", session, error, isPending)
     // const isClient = hasClient
     // const isWorker = hasWorker
     // const isAdmin = hasAdmin
-    // console.log("isClient", isClient, "isWorker", isWorker, "isAdmin", isAdmin.data.success)
   }
   const onRegister                                   = async () => {
     // await updateUser( {
