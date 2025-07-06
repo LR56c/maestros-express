@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
   output   = "../lib/generated/prisma"
@@ -16,7 +15,7 @@ model Notification {
   isEnabled Boolean   @map("is_enabled")
   viewedAt  DateTime? @map("viewed_at")
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
-  userId    String    @unique @map("user_id")
+  userId    String    @map("user_id") @db.Uuid
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
@@ -29,7 +28,7 @@ model NotificationConfig {
   deviceToken      String           @unique @map("device_token")
   notificationType NotificationType @map("notification_type")
   createdAt        DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
-  userId           String           @unique @map("user_id")
+  userId           String           @map("user_id") @db.Uuid
   user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
@@ -64,7 +63,7 @@ model Story {
   description   String          @map("description")
   createdAt     DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt     DateTime?       @map("updated_at") @db.Timestamptz(6)
-  workerId      String          @unique @map("worker_id")
+  workerId      String          @map("worker_id") @db.Uuid
   worker        Worker          @relation(fields: [workerId], references: [id], onDelete: Cascade)
   StoryDocument StoryDocument[]
 
@@ -95,7 +94,7 @@ model Package {
   reviewCount     Int               @default(0) @map("review_count")
   reviewAverage   Float             @default(0) @map("review_average")
   createdAt       DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
-  workerId        String            @unique
+  workerId        String            @db.Uuid
   Worker          Worker            @relation(fields: [workerId], references: [id], onDelete: Cascade)
   PackageDocument PackageDocument[]
 
@@ -122,8 +121,8 @@ model Quotation {
   status          QuotationStatus   @map("status")
   valueFormat     String            @map("value_format")
   createdAt       DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
-  workerId        String            @unique @map("worker_id")
-  clientId        String            @unique @map("client_id")
+  workerId        String            @map("worker_id") @db.Uuid
+  clientId        String            @map("client_id") @db.Uuid
   chatId          String            @map("chat_id") @db.Uuid
   chat            Chat              @relation(fields: [chatId], references: [id], onDelete: Cascade)
   client          User              @relation(fields: [clientId], references: [id], onDelete: Cascade)
@@ -148,12 +147,12 @@ model QuotationDetail {
 
 model Review {
   id          String     @id @default(uuid()) @db.Uuid
-  serviceId   String     @unique @map("service_id")
+  serviceId   String     @map("service_id") @db.Uuid
   serviceType ReviewType @map("service_type")
   description String     @map("description")
   value       Int        @map("value")
   createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
-  userId      String     @unique @map("user_id")
+  userId      String     @map("user_id") @db.Uuid
   user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
@@ -166,7 +165,7 @@ model WorkerSpeciality {
   createdAt    DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
   specialityId String     @map("speciality_id") @db.Uuid
   speciality   Speciality @relation(fields: [specialityId], references: [id], onDelete: Cascade)
-  workerId     String     @unique @map("worker_id")
+  workerId     String     @map("worker_id") @db.Uuid
   worker       Worker     @relation(fields: [workerId], references: [id], onDelete: Cascade)
 
   @@index([workerId])
@@ -180,7 +179,7 @@ model Certificate {
   url       String          @map("url")
   name      String          @map("name")
   createdAt DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
-  workerId  String          @unique @map("worker_id")
+  workerId  String          @map("worker_id") @db.Uuid
   worker    Worker          @relation(fields: [workerId], references: [id], onDelete: Cascade)
 
   @@map("certificate")
@@ -191,8 +190,8 @@ model WorkerBooking {
   status    WorkerBookingStatus @map("status")
   date      DateTime            @map("date") @db.Timestamptz(6)
   createdAt DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
-  workerId  String              @unique @map("worker_id")
-  clientId  String              @unique @map("client_id")
+  workerId  String              @map("worker_id") @db.Uuid
+  clientId  String              @map("client_id") @db.Uuid
   client    User                @relation(fields: [clientId], references: [id], onDelete: Cascade)
   worker    Worker              @relation(fields: [workerId], references: [id], onDelete: Cascade)
 
@@ -209,7 +208,7 @@ model WorkerSchedule {
   recurrentStartTime DateTime?            @map("recurrent_start_time") @db.Timestamptz(6)
   recurrentEndTime   DateTime?            @map("recurrent_end_time") @db.Timestamptz(6)
   createdAt          DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
-  workerId           String               @unique @map("worker_id")
+  workerId           String               @map("worker_id") @db.Uuid
   worker             Worker               @relation(fields: [workerId], references: [id], onDelete: Cascade)
 
   @@index([workerId])
@@ -222,7 +221,7 @@ model WorkerTax {
   valueFormat String   @map("value_format")
   value       Float    @map("value")
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-  workerId    String   @unique @map("worker_id")
+  workerId    String   @map("worker_id") @db.Uuid
   worker      Worker   @relation(fields: [workerId], references: [id], onDelete: Cascade)
 
   @@index([workerId])
@@ -230,7 +229,7 @@ model WorkerTax {
 }
 
 model Worker {
-  id                       String                 @id
+  id                       String                 @id @default(uuid()) @db.Uuid
   birthDate                DateTime               @map("birth_date") @db.Timestamptz(6)
   description              String?                @map("description")
   reviewCount              Int                    @default(0) @map("review_count")
@@ -259,8 +258,8 @@ model Report {
   id         String   @id @default(uuid()) @db.Uuid
   reason     String   @map("reason")
   createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-  fromUserId String   @unique @map("from_user_id")
-  toUserId   String   @unique @map("to_user_id")
+  fromUserId String   @map("from_user_id") @db.Uuid
+  toUserId   String   @map("to_user_id") @db.Uuid
   fromUser   User     @relation("FromUserReports", fields: [fromUserId], references: [id], onDelete: Cascade)
   toUser     User     @relation("ToUserReports", fields: [toUserId], references: [id], onDelete: Cascade)
 
@@ -276,7 +275,7 @@ model WorkerEmbedding {
   location  Unsupported("geography(POINT)")
   embedding Unsupported("vector(1536)")
   createdAt DateTime                        @default(now()) @map("created_at") @db.Timestamptz(6)
-  workerId  String                          @unique @map("worker_id")
+  workerId  String                          @map("worker_id") @db.Uuid
   worker    Worker                          @relation(fields: [workerId], references: [id], onDelete: Cascade)
 
   @@index([workerId])
@@ -322,7 +321,7 @@ model Zone {
   id        String   @id @default(uuid()) @db.Uuid
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   sectorId  String   @map("sector_id") @db.Uuid
-  workerId  String   @unique @map("worker_id")
+  workerId  String   @map("worker_id") @db.Uuid
   sector    Sector   @relation(fields: [sectorId], references: [id], onDelete: Cascade)
   worker    Worker   @relation(fields: [workerId], references: [id], onDelete: Cascade)
 
@@ -336,7 +335,7 @@ model Message {
   type      MessageType   @map("type")
   content   String        @map("content")
   createdAt DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
-  userId    String        @unique @map("user_id")
+  userId    String        @map("user_id") @db.Uuid
   chatId    String        @map("chat_id") @db.Uuid
   Chat      Chat          @relation(fields: [chatId], references: [id])
   user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -352,8 +351,8 @@ model Chat {
   acceptedDate      DateTime?   @map("accepted_date") @db.Timestamptz(6)
   workerArchived    DateTime?   @map("worker_archived") @db.Timestamptz(6)
   createdAt         DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
-  workerId          String      @unique @map("worker_id")
-  clientId          String      @unique @map("client_id")
+  workerId          String      @map("worker_id") @db.Uuid
+  clientId          String      @map("client_id") @db.Uuid
   client            User        @relation("ClientChats", fields: [clientId], references: [id], onDelete: Cascade)
   worker            User        @relation("WorkerChats", fields: [workerId], references: [id], onDelete: Cascade)
   messages          Message[]
@@ -366,29 +365,19 @@ model Chat {
 
 model Payment {
   id          String        @id @default(uuid()) @db.Uuid
-  serviceId   String        @unique @map("service_id")
+  serviceId   String        @map("service_id") @db.Uuid
   serviceType PaymentType   @map("service_type")
   status      PaymentStatus @map("status")
   token       String        @map("token")
   total       Float         @map("amount")
   valueFormat String        @map("value_format")
   createdAt   DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
-  userId      String        @unique @map("user_id")
+  userId      String        @map("user_id") @db.Uuid
   user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@map("payment")
 }
-
-// model UsersRoles {
-//   userId String @map("user_id") @unique
-//   roleId String @map("role_id") @db.Uuid
-//   role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
-//   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-//
-//   @@id([userId, roleId])
-//   @@map("users_roles")
-// }
 
 model Audit {
   auditId   String   @id @default(uuid()) @map("audit_id") @db.Uuid
@@ -401,12 +390,12 @@ model Audit {
 }
 
 enum AuthMethod {
-  EMAIL @map("email")
+  EMAIL  @map("email")
   GOOGLE @map("google")
 }
 
 enum QuotationStatus {
-  PENDING @map("pending")
+  PENDING  @map("pending")
   ACCEPTED @map("accepted")
   CANCELED @map("canceled")
 }
@@ -431,72 +420,65 @@ enum PaymentType {
 }
 
 enum PaymentStatus {
-  PENDING @map("pending")
+  PENDING   @map("pending")
   COMPLETED @map("completed")
 }
 
 enum MessageStatus {
-  SENDING @map("sending")
-  SENT @map("sent")
-  READ @map("read")
+  SENDING  @map("sending")
+  SENT     @map("sent")
+  READ     @map("read")
   CANCELED @map("canceled")
   ACCEPTED @map("accepted")
 }
 
 enum MessageType {
-  SUBJECT @map("subject")
-  IMAGE @map("image")
-  TEXT @map("text")
+  SUBJECT   @map("subject")
+  IMAGE     @map("image")
+  TEXT      @map("text")
   QUOTATION @map("quotation")
 }
 
 enum WorkerStatus {
   INCOMPLETE @map("incomplete")
-  PENDING @map("pending")
-  VERIFIED @map("verified")
+  PENDING    @map("pending")
+  VERIFIED   @map("verified")
 }
 
 enum PackageDocumentType {
   IMAGE @map("image")
   VIDEO @map("video")
-  FILE @map("file")
-  PDF @map("pdf")
+  FILE  @map("file")
+  PDF   @map("pdf")
 }
 
 enum WorkerScheduleStatus {
-  ACTIVE @map("active")
+  ACTIVE   @map("active")
   INACTIVE @map("inactive")
 }
 
 enum WorkerBookingStatus {
   AVAILABLE @map("available")
-  BOOKED @map("booked")
+  BOOKED    @map("booked")
 }
 
 enum WorkerEmbeddingType {
-  STORY @map("story")
+  STORY  @map("story")
   WORKER @map("worker")
 }
 
 enum CertificateType {
-  PDF @map("pdf")
+  PDF   @map("pdf")
   IMAGE @map("image")
 }
 
 model User {
-  id                 String               @id
+  id                 String               @db.Uuid @unique
   name               String
   email              String
-  emailVerified      Boolean
-  image              String?
+  avatar             String?
   createdAt          DateTime
-  updatedAt          DateTime
-  role               String?
-  banned             Boolean?
-  banReason          String?
-  banExpires         DateTime?
-  sessions           Session[]
-  accounts           Account[]
+  role               String
   Notification       Notification[]
   NotificationConfig NotificationConfig[]
   Quotation          Quotation[]
@@ -516,57 +498,12 @@ model User {
   @@map("user")
 }
 
-model Session {
-  id             String   @id
-  expiresAt      DateTime
-  token          String   @unique
-  createdAt      DateTime
-  updatedAt      DateTime
-  ipAddress      String?
-  userAgent      String?
-  userId         String
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  impersonatedBy String?
-
-  @@map("session")
-}
-
-model Account {
-  id                    String    @id
-  accountId             String
-  providerId            String
-  userId                String
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  accessToken           String?
-  refreshToken          String?
-  idToken               String?
-  accessTokenExpiresAt  DateTime?
-  refreshTokenExpiresAt DateTime?
-  scope                 String?
-  password              String?
-  createdAt             DateTime
-  updatedAt             DateTime
-
-  @@map("account")
-}
-
-model Verification {
-  id         String    @id
-  identifier String
-  value      String
-  expiresAt  DateTime
-  createdAt  DateTime?
-  updatedAt  DateTime?
-
-  @@map("verification")
-}
-
 model PhoneFormat {
   id        String   @id @default(uuid()) @db.Uuid
   countryId String   @db.Uuid
   country   Country  @relation(fields: [countryId], references: [id], onDelete: Cascade)
   regex     String
-  prefix     String
+  prefix    String
   example   String?
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 

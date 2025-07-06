@@ -9,8 +9,13 @@ import {
 import {
   ValidString
 }                 from "@/modules/shared/domain/value_objects/valid_string"
+import { UUID } from "@/modules/shared/domain/value_objects/uuid"
 
 export abstract class UserDAO {
+
+  abstract add( user: User ): Promise<Either<BaseException, boolean>>
+  abstract update( user: User ): Promise<Either<BaseException, boolean>>
+  abstract remove( id: UUID ): Promise<Either<BaseException, boolean>>
 
   abstract count( query: Record<string, any> ): Promise<Either<BaseException[], ValidInteger>>
 

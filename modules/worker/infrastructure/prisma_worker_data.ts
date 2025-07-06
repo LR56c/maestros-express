@@ -78,7 +78,8 @@ export const mapWorkerRelations = async ( w: any ): Promise<Either<BaseException
     w.user.name,
     w.user.createdAt,
     w.user.role,
-    w.user.image
+    w.user.status,
+    w.user.avatar
   )
 
   if ( userMapped instanceof Errors ) {
@@ -128,6 +129,7 @@ export class PrismaWorkerData implements WorkerDAO {
 
   async add( worker: Worker ): Promise<Either<BaseException, boolean>> {
     try {
+      console.log( "PrismaWorkerData.add", worker.user.userId.toString(), worker )
       await this.db.worker.create( {
         data: {
           id                      : worker.user.userId.toString(),
@@ -135,15 +137,18 @@ export class PrismaWorkerData implements WorkerDAO {
           description             : worker.description?.value,
           reviewCount             : worker.reviewCount.value,
           reviewAverage           : worker.reviewAverage.value,
-          status                  : worker.status.value,
           location                : worker.location.toPoint(),
+          status                  : worker.status.value,
+          nationalIdentityValue   : worker.nationalIdentityValue.value,
           nationalIdentityFormatId: worker.nationalIdentityId.toString(),
-          nationalIdentityValue   : worker.nationalIdentityValue.value
+          createdAt               : worker.createdAt.toString(),
+          verifiedAt              : null
         }
       } )
       return right( true )
     }
     catch ( e ) {
+      console.log( "PrismaWorkerData.add", e )
       return left( new InfrastructureException() )
     }
   }
@@ -205,11 +210,7 @@ export class PrismaWorkerData implements WorkerDAO {
         skip   : offset,
         take   : limit?.value,
         include: {
-          // nationalIdentityFormat: {
-          //   include: {
-          //     country: true
-          //   }
-          // },
+          user: true,
           WorkerSpeciality: {
             include: {
               speciality: true
@@ -282,7 +283,10 @@ export class PrismaWorkerData implements WorkerDAO {
             reviewCount  : worker.reviewCount.value,
             reviewAverage: worker.reviewAverage.value,
             status       : worker.status.value,
-            location     : worker.location.toPoint()
+            location     : worker.location.toPoint(),
+            verifiedAt   : worker.verifiedAt
+              ? worker.verifiedAt.toString()
+              : null
           }
         } )
       ] )

@@ -1,9 +1,6 @@
 "use server"
 
 import { NextRequest, NextResponse } from "next/server"
-import {
-  specialitySchema
-}                                    from "@/modules/speciality/application/speciality_dto"
 import prisma                        from "@/lib/prisma"
 import {
   querySchema
@@ -12,10 +9,6 @@ import {
   parseData
 }                                    from "@/modules/shared/application/parse_handlers"
 import { isLeft }                    from "fp-ts/Either"
-import {
-  SpecialityMapper
-}                                    from "@/modules/speciality/application/speciality_mapper"
-import { z }                         from "zod"
 import {
   PrismaNationalIdentityFormatData
 }                                    from "@/modules/national_identity_format/infrastructure/prisma_national_identity_format_data"
@@ -34,16 +27,21 @@ import {
 import { searchCountry }             from "@/app/api/country/route"
 import {
   nationalIdentityFormatSchema
-} from "@/modules/national_identity_format/application/national_identity_format_dto"
+}                                    from "@/modules/national_identity_format/application/national_identity_format_dto"
 import {
   NationalIdentityFormatMapper
-} from "@/modules/national_identity_format/application/national_identity_format_mapper"
+}                                    from "@/modules/national_identity_format/application/national_identity_format_mapper"
 
-const dao    = new PrismaNationalIdentityFormatData( prisma )
-const add    = new AddNationalIdentityFormat( dao, await searchCountry() )
-const remove = new RemoveNationalIdentityFormat( dao )
-const update = new UpdateNationalIdentityFormat( dao, await searchCountry() )
-const search = new SearchNationalIdentityFormat( dao )
+const dao                                 = new PrismaNationalIdentityFormatData(
+  prisma )
+const add                                 = new AddNationalIdentityFormat( dao,
+  await searchCountry() )
+const remove                              = new RemoveNationalIdentityFormat(
+  dao )
+const update                              = new UpdateNationalIdentityFormat(
+  dao, await searchCountry() )
+export const searchNationalIdentityFormat = async () => new SearchNationalIdentityFormat(
+  dao )
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
@@ -81,7 +79,7 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await search.execute(
+  const result = await (await searchNationalIdentityFormat()).execute(
     data.right.query,
     data.right.limit,
     data.right.skip,
@@ -93,7 +91,8 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { status: 500 } )
   }
 
-  return NextResponse.json( result.right.map( NationalIdentityFormatMapper.toDTO ),
+  return NextResponse.json(
+    result.right.map( NationalIdentityFormatMapper.toDTO ),
     { status: 200 } )
 }
 
@@ -105,7 +104,7 @@ export async function PUT( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await update.execute( data.right)
+  const result = await update.execute( data.right )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )

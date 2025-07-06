@@ -80,8 +80,8 @@ export class UpdateStory {
       dto.name,
       dto.description,
       docs.right,
-      oldStory.createdAt.value,
-      oldStory.updatedAt?.value
+      oldStory.createdAt.toString(),
+      oldStory.updatedAt?.toString()
     )
 
     if ( updatedStory instanceof Errors ) {

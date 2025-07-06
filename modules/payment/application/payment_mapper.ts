@@ -26,7 +26,7 @@ export class PaymentMapper {
       status      : payment.status.value,
       total       : payment.total.value,
       value_format: payment.valueFormat.value,
-      created_at  : payment.createdAt.value
+      created_at  : payment.createdAt.toString()
     }
   }
 

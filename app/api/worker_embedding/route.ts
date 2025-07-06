@@ -35,18 +35,20 @@ import {
 import {
   SupabaseWorkerEmbeddingData
 }                                    from "@/modules/worker_embedding/infrastructure/supabase_worker_embedding_data"
-import { ai, supabase } from "@/app/api/dependencies"
+import { ai, supabase }              from "@/app/api/dependencies"
 
 
 export const aiRepo = async () => new OpenaiWorkerEmbeddingData( await ai() )
 
 
-const prismaDao       = new PrismaWorkerEmbeddingData( prisma, await aiRepo() )
-const supabaseDao     = new SupabaseWorkerEmbeddingData( await aiRepo(), await supabase() )
-const add             = new UpsertWorkerEmbedding( prismaDao, await searchWorker(),
+const prismaDao   = new PrismaWorkerEmbeddingData( prisma, await aiRepo() )
+const supabaseDao = new SupabaseWorkerEmbeddingData( await aiRepo(),
+  await supabase() )
+export const upsertEmbedding         = async () => new UpsertWorkerEmbedding( prismaDao,
+  await searchWorker(),
   await getStory() )
-const remove          = new RemoveWorkerEmbedding( prismaDao )
-const search          = new SearchWorkerEmbedding( supabaseDao, await searchWorker() )
+const remove      = new RemoveWorkerEmbedding( prismaDao )
+const search      = new SearchWorkerEmbedding( supabaseDao, await searchWorker() )
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
@@ -55,7 +57,9 @@ export async function POST( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await add.execute( data.right )
+  const result = await (
+    await upsertEmbedding()
+  ).execute( data.right )
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
   }

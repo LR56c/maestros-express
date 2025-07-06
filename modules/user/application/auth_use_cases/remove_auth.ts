@@ -8,7 +8,7 @@ import {
 }                         from "@/modules/shared/domain/value_objects/valid_string"
 import { AuthRepository } from "@/modules/user/domain/auth_repository"
 
-export class RemoveUser {
+export class RemoveAuth {
   constructor( private readonly repo: AuthRepository ) {
   }
 

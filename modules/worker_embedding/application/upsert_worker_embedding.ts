@@ -39,6 +39,9 @@ import {
   WorkerEmbeddingRequest,
   WorkerEmbedRequest
 } from "@/modules/worker_embedding/application/worker_embedding_request"
+import {
+  WorkerEmbeddingTypeEnum
+} from "@/modules/worker_embedding/domain/worker_embedding_type"
 
 type DataType = {
   content: string
@@ -67,7 +70,8 @@ export class UpsertWorkerEmbedding {
   private async recoverData( dto: WorkerEmbeddingRequest ): Promise<Either<BaseException[], DataType>> {
     let workerId: string
     let content: string
-    if ( dto.data.type === "WORKER" ) {
+    console.log("UpsertWorkerEmbedding.recoverData", dto)
+    if ( dto.data.type === WorkerEmbeddingTypeEnum.WORKER ) {
       const workerResult = await this.searchWorker.execute( {
         id: dto.data.user.user_id
       }, 1 )
@@ -78,7 +82,7 @@ export class UpsertWorkerEmbedding {
       workerId = workerResult.right[0].user_id
       content  = this.workerPrompt( dto.data )
     }
-    else if ( dto.data.type === "STORY" ) {
+    else if ( dto.data.type === WorkerEmbeddingTypeEnum.STORY ) {
       const storyResult = await this.getStory.execute( dto.data.id )
 
       if ( isLeft( storyResult ) ) {
@@ -166,7 +170,9 @@ export class UpsertWorkerEmbedding {
 
       embed = updateResult.right
     }
+    console.log("UpsertWorkerEmbedding.execute", embed)
     const result = await this.repo.upsert( embed )
+    console.log("UpsertWorkerEmbedding.execute result", result)
     if ( isLeft( result ) ) {
       return left( [result.left] )
     }

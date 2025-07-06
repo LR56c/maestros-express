@@ -29,7 +29,7 @@ export class UpdateChat {
       oldChat.id.value,
       oldChat.worker,
       oldChat.client,
-      oldChat.createdAt.value,
+      oldChat.createdAt.toString(),
       oldChat.subject.value,
       oldChat.messages,
       chat.accepted_date ?? oldChat.acceptedDate?.value,

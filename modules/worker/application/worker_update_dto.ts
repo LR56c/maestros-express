@@ -1,8 +1,10 @@
 import { z }                  from "zod"
-import { userResponseSchema } from "@/modules/user/backup_application/user_response"
 import {
   specialitySchema
 }                             from "@/modules/speciality/application/speciality_dto"
+import {
+  userResponseSchema
+}                             from "@/modules/user/application/models/user_response"
 
 export const workerUpdateSchema = z.object( {
   user          : userResponseSchema,

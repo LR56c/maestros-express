@@ -1,14 +1,16 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { getSessionCookie }                 from "better-auth/cookies"
+import { updateSession }                  from "@/utils/supabase/middleware"
+// import { getSessionCookie }                 from "better-auth/cookies"
 
 // type Session = typeof auth.$Infer.Session;
 
 export async function middleware( request: NextRequest ) {
-  const sessionCookie = getSessionCookie( request )
-  if ( !sessionCookie ) {
-    return NextResponse.redirect( new URL( "/login", request.url ) )
-  }
-  return NextResponse.next()
+  // const sessionCookie = getSessionCookie( request )
+  // if ( !sessionCookie ) {
+  //   return NextResponse.redirect( new URL( "/login", request.url ) )
+  // }
+  // return NextResponse.next()
+  return await updateSession(request)
 }
 
 export const config = {
@@ -20,6 +22,6 @@ export const config = {
      * - favicon.ico (favicon file)
      * Feel free to modify this pattern to include more paths.
      */
-    "/((?!_next/static|_next/image|favicon.ico|register|login|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"
   ]
 }

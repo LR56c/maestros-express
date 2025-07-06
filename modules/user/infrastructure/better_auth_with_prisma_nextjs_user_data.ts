@@ -17,9 +17,9 @@ import {
 import {
   DataNotFoundException
 }                              from "@/modules/shared/domain/exceptions/data_not_found_exception"
-import { AuthRepository }      from "@/modules/user/domain/auth_repository"
-import { UserAnon, UserAuth }  from "@/modules/user/domain/user"
-import { Password }            from "@/modules/user/domain/password"
+import { AuthRepository }           from "@/modules/user/domain/auth_repository"
+import { User, UserAnon, UserAuth } from "@/modules/user/domain/user"
+import { Password }                 from "@/modules/user/domain/password"
 import { auth }                from "@/lib/auth"
 import { headers }             from "next/headers"
 import { PrismaClient }        from "@/lib/generated/prisma"
@@ -28,7 +28,7 @@ export class BetterAuthWithPrismaNextjsUserData implements AuthRepository {
   constructor( private readonly db: PrismaClient ) {
   }
 
-  async getByEmail( email: Email ): Promise<Either<BaseException[], UserAuth>> {
+  async getByEmail( email: Email ): Promise<Either<BaseException[], User>> {
     try {
       const result = await this.db.user.findUnique( {
         where: {
@@ -61,7 +61,7 @@ export class BetterAuthWithPrismaNextjsUserData implements AuthRepository {
     }
   }
 
-  private async getUser(): Promise<Either<BaseException[], UserAuth>> {
+  private async getUser(): Promise<Either<BaseException[], User>> {
     const session = await auth.api.getSession( { headers: await headers() } )
 
     if ( !session ) {
@@ -88,7 +88,7 @@ export class BetterAuthWithPrismaNextjsUserData implements AuthRepository {
   }
 
   async login( email: Email,
-    password: Password ): Promise<Either<BaseException[], UserAuth>> {
+    password: Password ): Promise<Either<BaseException[], User>> {
     try {
       await auth.api.signInEmail( {
         body: {
@@ -112,8 +112,8 @@ export class BetterAuthWithPrismaNextjsUserData implements AuthRepository {
     return right( true )
   }
 
-  async register( user: UserAuth,
-    password: Password ): Promise<Either<BaseException[], UserAuth>> {
+  async register( user: User,
+    password: Password ): Promise<Either<BaseException[], User>> {
     try {
       const result = await auth.api.signUpEmail( {
         body: {
@@ -153,11 +153,11 @@ export class BetterAuthWithPrismaNextjsUserData implements AuthRepository {
     return right( true )
   }
 
-  async update( data: UserAuth ): Promise<Either<BaseException[], boolean>> {
+  async update( data: User ): Promise<Either<BaseException[], boolean>> {
     try {
       await this.db.user.update( {
         where: {
-          id: data.userId.value
+          id: data.userId.toString()
         },
         data : {
           image: data.avatar?.value ?? null,
@@ -172,7 +172,7 @@ export class BetterAuthWithPrismaNextjsUserData implements AuthRepository {
     }
   }
 
-  async anonymous(): Promise<Either<BaseException[], UserAuth>> {
+  async anonymous(): Promise<Either<BaseException[], User>> {
     try {
       const result = await auth.api.signInAnonymous()
 

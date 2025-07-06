@@ -1,20 +1,19 @@
-import React, { useCallback, useState } from "react"
-import { Button }                       from "@/components/ui/button"
-import { Label }                        from "@/components/ui/label"
+import React, { useCallback, useState }               from "react"
+import {
+  Button
+}                                                     from "@/components/ui/button"
+import { Check, LoaderCircle, MapPin, TriangleAlert } from "lucide-react"
 
 interface LocationDetectorProps {
-  name: string,
-  label: string,
   onLocationChange?: ( location: {
     latitude: number,
     longitude: number
   } ) => void
+  onError?: ( error: string ) => void
 }
 
 export default function LocationDetector( {
-  onLocationChange,
-  name,
-  label
+  onLocationChange, onError
 }: LocationDetectorProps )
 {
   const [location, setLocation] = useState<any | null>( null )
@@ -46,16 +45,18 @@ export default function LocationDetector( {
     }
 
     const errorHandler = ( err: GeolocationPositionError ) => {
+      let errorMessage: string
       if ( err.code === err.TIMEOUT ) {
-        setError(
-          "Vuelva a intentarlo. Tiempo de espera agotado" )
+        errorMessage = "Vuelva a intentarlo. Tiempo de espera agotado"
       }
       else {
-        setError(
-          "No se pudo obtener la ubicación. Debes cambiarlo manualmente en la configuración de privacidad de tu navegador para este sitio web" )
+        errorMessage =
+          "No se pudo obtener la ubicación. Debes cambiarlo manualmente en la configuración de privacidad de tu navegador para este sitio web"
       }
+      setError( errorMessage )
       setLocation( null )
       setLoading( false )
+      onError?.( errorMessage )
     }
 
     const options = {
@@ -69,31 +70,24 @@ export default function LocationDetector( {
 
   if ( error ) {
     return (
-      <div className="flex flex-col gap-1">
-        <Label htmlFor={ name }>{ label }</Label>
-        <p className="text-red-500 text-sm">{ error }</p>
-        <Button className="w-48" onClick={ requestLocation } disabled={ loading }>
-          { loading ? "Reintentando..." : "Reintentar" }
-        </Button>
-      </div>
+      <Button className="w-10 h-10 rounded-xl">
+        <TriangleAlert/>
+      </Button>
     )
   }
 
   if ( !location ) {
     return (
-      <div className="flex flex-col gap-1">
-        <Label htmlFor={ name }>{ label }</Label>
-        <Button className="w-48" onClick={ requestLocation } disabled={ loading }>
-          { loading ? "Obteniendo..." : "Detectar ubicación" }
-        </Button>
-      </div>
+      <Button className="w-10 h-10 rounded-xl" onClick={ requestLocation }
+              disabled={ loading }>
+        { loading ? <LoaderCircle className={loading ? "animate-spin" : ""}/> : <MapPin/> }
+      </Button>
     )
   }
 
   return (
-    <div className="flex flex-col gap-1">
-      <Label htmlFor={ name }>{ label }</Label>
-      <p>Ubicacion establecida</p>
-    </div>
+    <Button className="w-10 h-10 rounded-xl">
+      <Check/>
+    </Button>
   )
 }

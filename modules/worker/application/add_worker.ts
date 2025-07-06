@@ -20,8 +20,8 @@ import {
   DataNotFoundException
 }                                      from "@/modules/shared/domain/exceptions/data_not_found_exception"
 import {
-  RegisterUser
-}                                      from "@/modules/user/application/auth_use_cases/register_user"
+  RegisterAuth
+}                                      from "@/modules/user/application/auth_use_cases/register_auth"
 import {
   SearchNationalIdentityFormat
 }                                      from "@/modules/national_identity_format/application/search_national_identity_format"
@@ -40,18 +40,20 @@ import {
 import {
   WorkerEmbeddingTypeEnum
 }                                      from "@/modules/worker_embedding/domain/worker_embedding_type"
+import { RoleLevelType }               from "@/modules/user/domain/role_type"
 
 export class AddWorker {
   constructor(
     private readonly dao: WorkerDAO,
     private readonly searchNationalIdentity: SearchNationalIdentityFormat,
-    private readonly register: RegisterUser,
-    private readonly embedding: UpsertWorkerEmbedding,
-  ) {
+    private readonly register: RegisterAuth,
+    private readonly embedding: UpsertWorkerEmbedding
+  )
+  {
   }
 
-  async execute( worker: WorkerRequest ): Promise<Either<BaseException[], Worker>>{
-    const exist = await ensureWorkerExist(this.dao, worker.user.email)
+  async execute( worker: WorkerRequest ): Promise<Either<BaseException[], Worker>> {
+    const exist = await ensureWorkerExist( this.dao, worker.user.email )
 
     if ( isLeft( exist ) ) {
       if ( !containError( exist.left, new DataNotFoundException() ) ) {
@@ -59,23 +61,24 @@ export class AddWorker {
       }
     }
 
-    const nationalIdentityResult = await this.searchNationalIdentity.execute({
+    const nationalIdentityResult = await this.searchNationalIdentity.execute( {
       id: worker.national_identity_id
-    }, 1)
+    }, 1 )
 
-    if ( isLeft(nationalIdentityResult) ) {
-      return left(nationalIdentityResult.left)
+    if ( isLeft( nationalIdentityResult ) ) {
+      return left( nationalIdentityResult.left )
     }
 
     const nationalIdentity = nationalIdentityResult.right[0]
 
-    const userResult = await this.register.execute(worker.user)
+    const userResult = await this.register.execute( worker.user,
+      RoleLevelType.WORKER )
 
-    if ( isLeft(userResult) ) {
-      return left(userResult.left)
+    if ( isLeft( userResult ) ) {
+      return left( userResult.left )
     }
 
-    const locationFormat = `(${worker.location.latitude},${worker.location.longitude})`
+    const locationFormat = `(${ worker.location.latitude },${ worker.location.longitude })`
 
     const newWorker = Worker.create(
       userResult.right,
@@ -84,32 +87,36 @@ export class AddWorker {
       worker.birth_date,
       locationFormat,
       WorkerStatusEnum.INCOMPLETE,
-      worker.description,
+      worker.description
     )
 
     if ( newWorker instanceof Errors ) {
-      return left(newWorker.values)
+      return left( newWorker.values )
     }
 
-    const embeddingResult = await this.embedding.execute({
-      id: UUID.create().toString(),
+    const result = await this.dao.add( newWorker )
+    console.log( "AddWorker.execute", result )
+
+    if ( isLeft( result ) ) {
+      return left( [result.left] )
+    }
+    const workerMapped = WorkerMapper.toDTO( newWorker )
+    console.log( "AddWorker.execute workerMapped", workerMapped )
+    const embeddingResult = await this.embedding.execute( {
+      id      : UUID.create().toString(),
       location: locationFormat,
-      data: {
+      data    : {
         type: WorkerEmbeddingTypeEnum.WORKER,
-        ...WorkerMapper.toDTO(newWorker)
+        ...workerMapped
       }
-    })
+    } )
+    console.log( "AddWorker.execute embeddingResult", embeddingResult )
 
-    if ( isLeft(embeddingResult) ) {
-      return left(embeddingResult.left)
+    if ( isLeft( embeddingResult ) ) {
+      return left( embeddingResult.left )
     }
 
-    const result = await this.dao.add(newWorker)
 
-    if ( isLeft(result) ) {
-      return left([result.left])
-    }
-
-    return right(newWorker)
+    return right( newWorker )
   }
 }

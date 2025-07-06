@@ -6,7 +6,7 @@ import {
 import { wrapTypeDefault } from "@/modules/shared/utils/wrap_type"
 import { AuthRepository }  from "@/modules/user/domain/auth_repository"
 
-export class LogoutUser {
+export class LogoutAuth {
   constructor( private readonly repo: AuthRepository ) {
   }
 

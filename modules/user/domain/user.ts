@@ -18,21 +18,23 @@ import {
 import { RoleType }                  from "@/modules/user/domain/role_type"
 
 export abstract class User {
-  abstract readonly userId: ValidString
+  abstract readonly userId: UUID
   abstract readonly email: Email
   abstract readonly fullName: ValidString
   abstract readonly createdAt: ValidDate
   abstract readonly role: RoleType
+  abstract readonly status: ValidString
   abstract readonly avatar?: ValidString
 }
 
 export class UserAnon implements User {
   private constructor(
-    readonly userId: ValidString,
+    readonly userId: UUID,
     readonly email: Email,
     readonly fullName: ValidString,
     readonly createdAt: ValidDate,
     readonly role: RoleType,
+    readonly status: ValidString,
     readonly avatar ?: ValidString
   )
   {
@@ -42,12 +44,13 @@ export class UserAnon implements User {
     userId: string,
     email: string,
     fullName: string,
+    status: string,
     createdAt: Date | string
   ): UserAuth | Errors {
     const errors = []
 
     const userIdValue = wrapType(
-      () => ValidString.from( userId ) )
+      () => UUID.from( userId ) )
 
     if ( userIdValue instanceof BaseException ) {
       errors.push( userIdValue )
@@ -81,6 +84,13 @@ export class UserAnon implements User {
       errors.push( vrole )
     }
 
+    const vstatus = wrapType(
+      () => ValidString.from( status ) )
+
+    if ( vstatus instanceof BaseException ) {
+      errors.push( vstatus )
+    }
+
     if ( errors.length > 0 ) {
       return new Errors( errors )
     }
@@ -91,6 +101,7 @@ export class UserAnon implements User {
       vname as ValidString,
       vcreatedAt as ValidDate,
       vrole as RoleType,
+      vstatus as ValidString,
       undefined
     )
   }
@@ -99,11 +110,12 @@ export class UserAnon implements User {
 
 export class UserAuth implements User {
   private constructor(
-    readonly userId: ValidString,
+    readonly userId: UUID,
     readonly email: Email,
     readonly fullName: ValidString,
     readonly createdAt: ValidDate,
     readonly role: RoleType,
+    readonly status: ValidString,
     readonly avatar?: ValidString
   )
   {
@@ -113,10 +125,12 @@ export class UserAuth implements User {
     userId: string,
     email: string,
     fullName: string,
-    role: string,
+    role: string | number,
+    status: string,
     avatar: string | null
   ): UserAuth | Errors {
     return UserAuth.fromPrimitives( userId, email, fullName, new Date(), role,
+      status,
       avatar )
   }
 
@@ -126,9 +140,11 @@ export class UserAuth implements User {
     fullName: ValidString,
     createdAt: ValidDate,
     role: RoleType,
+    status: ValidString,
     avatar   ?: ValidString
   ): UserAuth {
-    return new UserAuth( userId, email, fullName, createdAt, role, avatar )
+    return new UserAuth( userId, email, fullName, createdAt, role, status,
+      avatar )
   }
 
   static fromPrimitiveThrow(
@@ -136,15 +152,17 @@ export class UserAuth implements User {
     email: string,
     fullName: string,
     createdAt: Date | string,
-    role: string,
+    role: string | number,
+    status: string,
     avatar?: string
   ): UserAuth {
     return new UserAuth(
-      ValidString.from( userId ),
+      UUID.from( userId ),
       Email.from( email ),
       ValidString.from( fullName ),
       ValidDate.from( createdAt ),
       RoleType.from( role ),
+      ValidString.from( status ),
       avatar ? ValidString.from( avatar ) : undefined
     )
   }
@@ -154,13 +172,14 @@ export class UserAuth implements User {
     email: string,
     fullName: string,
     createdAt: Date | string,
-    role: string,
+    role: string | number,
+    status: string,
     avatar: string | null
   ): UserAuth | Errors {
     const errors = []
 
     const userIdValue = wrapType(
-      () => ValidString.from( userId ) )
+      () => UUID.from( userId ) )
 
     if ( userIdValue instanceof BaseException ) {
       errors.push( userIdValue )
@@ -194,6 +213,13 @@ export class UserAuth implements User {
       errors.push( vcreatedAt )
     }
 
+    const vstatus = wrapType(
+      () => ValidString.from( status ) )
+
+    if ( vstatus instanceof BaseException ) {
+      errors.push( vstatus )
+    }
+
     const vrole = wrapType(
       () => RoleType.from( role ) )
 
@@ -211,6 +237,7 @@ export class UserAuth implements User {
       vname as ValidString,
       vcreatedAt as ValidDate,
       vrole as RoleType,
+      vstatus as ValidString,
       vavatar as ValidString | undefined
     )
   }

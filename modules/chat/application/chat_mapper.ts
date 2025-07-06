@@ -43,7 +43,7 @@ export class ChatMapper {
       accepted_date     : chat.acceptedDate?.value,
       quotation_accepted: chat.quotationAccepted?.value,
       worker_archived   : chat.workerArchived?.value,
-      created_at        : chat.createdAt.value
+      created_at        : chat.createdAt.toString()
     }
   }
 

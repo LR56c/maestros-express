@@ -26,7 +26,7 @@ interface DateInputProps {
 export function DateInput( {
   name,
   label,
-  placeholder = "Select date"
+  placeholder
 }: DateInputProps )
 {
   const { control, formState: { errors } } = useFormContext()
@@ -46,20 +46,21 @@ export function DateInput( {
               <Button
                 variant="outline"
                 id="date"
-                className="w-48 justify-between font-normal"
+                className="w-full justify-between font-normal"
               >
-                { value ? value.toLocaleDateString() : placeholder }
+                { value ? value : placeholder }
                 <ChevronDownIcon/>
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto overflow-hidden p-0"
-                            align="start">
+                            align="end">
               <Calendar
                 mode="single"
                 selected={ value }
                 captionLayout="dropdown"
                 onSelect={ ( date ) => {
-                  onChange( date )
+                  const part =  date ? date.toISOString().split( "T" )[0] : ""
+                  onChange( part )
                   setOpen( false )
                 } }
               />

@@ -19,18 +19,33 @@ export class RoleType {
     return new RoleType( value )
   }
 
-  static from( value: string ): RoleType {
-    if (!value) throw new InvalidRoleTypeException()
-    const key = Object.keys(RoleLevelType).find( k => typeof RoleLevelType[k as any] === 'number' && k.toLowerCase() === value.toLowerCase()
-    );
-    if (!key) throw new InvalidRoleTypeException()
-    return new RoleType(RoleLevelType[key as keyof typeof RoleLevelType]);
+  static from( value: string | number ): RoleType {
+    if (value === undefined || value === null) throw new InvalidRoleTypeException();
+
+    if (typeof value === 'number' || !isNaN(Number(value))) {
+      const numValue = typeof value === 'number' ? value : Number(value);
+      if (Object.values(RoleLevelType).includes(numValue)) {
+        return new RoleType(numValue as RoleLevelType);
+      }
+    }
+
+    if (typeof value === 'string') {
+      const key = Object.keys(RoleLevelType)
+        .filter(k => isNaN(Number(k)))
+        .find(k => k.toLowerCase() === value.toLowerCase());
+      if (key) {
+        return new RoleType(RoleLevelType[key as keyof typeof RoleLevelType]);
+      }
+    }
+
+    throw new InvalidRoleTypeException();
   }
 
   toString(): string {
-    return Object.keys(RoleLevelType).find(
-      k => RoleLevelType[k as keyof typeof RoleLevelType] === this.value
-    )!
+    const key = Object.keys(RoleLevelType)
+      .filter(k => isNaN(Number(k)))
+      .find(k => RoleLevelType[k as keyof typeof RoleLevelType] === this.value);
+    return key ?? this.value.toString();
   }
 
   static fromOrNull( value: string ): RoleType | undefined {

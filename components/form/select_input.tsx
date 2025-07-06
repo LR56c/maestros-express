@@ -41,7 +41,6 @@ export default function SelectInput( {
 
   const handleChange = ( selectedValue: string ) => {
     const selected = valueMap.get( selectedValue )
-    console.log( "Selected value:", selected )
     if ( onChange && selected ) {
       onChange( selected )
     }
@@ -51,7 +50,7 @@ export default function SelectInput( {
     <div className="flex flex-col gap-1">
       <Label htmlFor={ name }>{ label }</Label>
       <Select disabled={loading} onValueChange={ handleChange }>
-        <SelectTrigger className="w-[180px]">
+        <SelectTrigger className="w-full">
           <SelectValue placeholder={ loading ? "Cargando" : placeholder }/>
         </SelectTrigger>
         <SelectContent>

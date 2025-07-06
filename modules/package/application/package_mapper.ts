@@ -44,7 +44,7 @@ export class PackageMapper {
       cover_url     : entity.coverUrl.value,
       value_format  : entity.valueFormat.value,
       documents     : entity.documents.map( PackageDocumentMapper.toDTO ),
-      created_at    : entity.createdAt.value
+      created_at    : entity.createdAt.toString()
     }
   }
 

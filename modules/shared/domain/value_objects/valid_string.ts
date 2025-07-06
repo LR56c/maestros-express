@@ -32,4 +32,8 @@ export class ValidString {
       return undefined
     }
   }
+
+  toString(): string {
+    return this.value
+  }
 }

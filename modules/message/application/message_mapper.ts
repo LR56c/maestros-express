@@ -23,7 +23,7 @@ export class MessageMapper {
       content  : message.content.value,
       type     : message.type.value,
       status   : message.status.value,
-      created_at: message.createdAt.value
+      created_at: message.createdAt.toString()
     }
   }
 

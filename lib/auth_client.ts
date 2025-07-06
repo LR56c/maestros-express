@@ -1,4 +1,4 @@
-import { createAuthClient }          from "better-auth/react" // make sure to import from better-auth/react
+import { createAuthClient }          from "better-auth/react"
 import { adminClient, anonymousClient }               from "better-auth/client/plugins"
 import { ac, admin, client, worker } from "./permissions"
 
@@ -56,3 +56,6 @@ export const checkAdmin = authClient.admin.checkRolePermission( {
   },
   role       : "admin"
 } )
+
+export type Session = typeof authClient.$Infer.Session;
+export type User = typeof authClient.$Infer.Session.user;

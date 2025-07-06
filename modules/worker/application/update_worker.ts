@@ -163,7 +163,7 @@ export class UpdateWorker {
       ).value,
       newSpecialities,
       oldWorker.taxes,
-      oldWorker.createdAt.value,
+      oldWorker.createdAt.toString(),
       updatedVerified instanceof ValidBool
         ? new Date()
         : oldWorker.verifiedAt?.value,

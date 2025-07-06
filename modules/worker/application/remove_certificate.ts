@@ -6,13 +6,13 @@ import {
 import {
   ensureCertificateExist
 }                                      from "@/modules/certificate/utils/ensure_certificate_exist"
-import { WorkerDAO }                   from "@/modules/worker/domain/worker_dao"
+import { WorkerDAO } from "@/modules/worker/domain/worker_dao"
 import {
-  RemoveUser
-}                                      from "@/modules/user/application/auth_use_cases/remove_user"
+  RemoveAuth
+}                    from "@/modules/user/application/auth_use_cases/remove_auth"
 import {
   ensureWorkerExist
-}                                      from "@/modules/worker/utils/ensure_worker_exist"
+}                    from "@/modules/worker/utils/ensure_worker_exist"
 import {
   ValidInteger
 }                                      from "@/modules/shared/domain/value_objects/valid_integer"
@@ -20,7 +20,7 @@ import {
 export class RemoveWorker {
   constructor(
     private readonly dao : WorkerDAO,
-    private readonly removeUser : RemoveUser,
+    private readonly removeUser : RemoveAuth,
   ) {}
 
   async execute( id: string ): Promise<Either<BaseException[], boolean>>{
@@ -34,7 +34,7 @@ export class RemoveWorker {
 
     const worker = exist.right[0]
 
-    const removeUser = await this.removeUser.execute(worker.user.userId.value)
+    const removeUser = await this.removeUser.execute(worker.user.userId.toString())
 
     if ( isLeft(removeUser) ) {
       return left([removeUser.left])

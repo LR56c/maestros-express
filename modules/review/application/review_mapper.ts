@@ -17,7 +17,7 @@ export class ReviewMapper {
   static toDTO(review : Review): ReviewDTO {
     return {
       id: review.id.value,
-      user_id: review.userId.value,
+      user_id: review.userId.toString(),
       service_id: review.serviceId.value,
       service_type: review.serviceType.value,
       description: review.description.value,

@@ -17,7 +17,7 @@ import {
 }                                      from "@/modules/user/application/models/user_update_dto"
 import { UserAuth }                    from "@/modules/user/domain/user"
 
-export class UpdateUser {
+export class UpdateAuth {
   constructor( private readonly repo: AuthRepository ) {
   }
 
@@ -36,10 +36,10 @@ export class UpdateUser {
     }
 
     const updatedUser = UserAuth.fromPrimitives(
-      exist.right.userId.value,
-      email.value,
+      exist.right.userId.toString(),
+      exist.right.email.value,
       exist.right.fullName.value,
-      exist.right.createdAt.value,
+      exist.right.createdAt.toString(),
       auth.role ? auth.role : exist.right.role.toString(),
       auth.avatar ? auth.avatar : exist.right.avatar?.value ?? null
     )

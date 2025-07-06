@@ -18,10 +18,66 @@ import {
 import {
   Errors
 }                                   from "@/modules/shared/domain/exceptions/errors"
+import {
+  UUID
+}                          from "@/modules/shared/domain/value_objects/uuid"
+import { boolean, string } from "fp-ts"
 
 export class PrismaUserData implements UserDAO {
   constructor( private readonly db: PrismaClient ) {
   }
+
+  async add( user: User ): Promise<Either<BaseException, boolean>> {
+    try {
+      await this.db.user.create( {
+        data: {
+          id       : user.userId.toString(),
+          email    : user.email.value,
+          name     : user.fullName.value,
+          createdAt: user.createdAt.toString(),
+          role     : user.role.toString(),
+          avatar   : user.avatar ? user.avatar.value : null
+        }
+      } )
+      return right( true )
+    }
+    catch ( e ) {
+      return left( new InfrastructureException() )
+    }
+  }
+
+  async remove( id: UUID ): Promise<Either<BaseException, boolean>> {
+    try {
+      await this.db.user.delete( {
+        where: {
+          id: id.value
+        }
+      } )
+      return right( true )
+    }
+    catch ( e ) {
+      return left( new InfrastructureException() )
+    }
+  }
+
+  async update( user: User ): Promise<Either<BaseException, boolean>> {
+    try {
+      await this.db.user.update( {
+        where: {
+          id: user.userId.toString()
+        },
+        data : {
+          role     : user.role.toString(),
+          avatar   : user.avatar ? user.avatar.value : null
+        }
+      } )
+      return right( true )
+    }
+    catch ( e ) {
+      return left( new InfrastructureException() )
+    }
+  }
+
 
   private queryWhere( query: Record<string, any> ): Record<string, any> {
     let where = {}
@@ -136,8 +192,8 @@ export class PrismaUserData implements UserDAO {
       // }
       const users: User[] = []
       for ( const e of response ) {
-        const user = this.parseUser(e)
-        if( user instanceof Errors ) {
+        const user = this.parseUser( e )
+        if ( user instanceof Errors ) {
           return left( user.values )
         }
         users.push( user )

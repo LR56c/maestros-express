@@ -11,7 +11,7 @@ import {
 }                         from "@/modules/user/application/models/user_login_request"
 import { UserAuth } from "@/modules/user/domain/user"
 
-export class LoginUser {
+export class LoginAuth {
   constructor( private readonly repo: AuthRepository ) {
   }
 
