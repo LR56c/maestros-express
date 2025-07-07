@@ -1,27 +1,26 @@
-import * as changeCase              from "change-case"
-import { UserDAO }                  from "@/modules/user/domain/user_dao"
-import { PrismaClient }             from "@/lib/generated/prisma"
+import * as changeCase         from "change-case"
+import { UserDAO }             from "@/modules/user/domain/user_dao"
+import { PrismaClient }        from "@/lib/generated/prisma"
 import {
   ValidString
-}                                   from "@/modules/shared/domain/value_objects/valid_string"
-import { Either, left, right }      from "fp-ts/Either"
+}                              from "@/modules/shared/domain/value_objects/valid_string"
+import { Either, left, right } from "fp-ts/Either"
 import {
   BaseException
-}                                   from "@/modules/shared/domain/exceptions/base_exception"
+}                              from "@/modules/shared/domain/exceptions/base_exception"
 import {
   InfrastructureException
-}                                   from "@/modules/shared/domain/exceptions/infrastructure_exception"
-import { User, UserAnon, UserAuth } from "@/modules/user/domain/user"
+}                              from "@/modules/shared/domain/exceptions/infrastructure_exception"
+import { User, UserAuth }      from "@/modules/user/domain/user"
 import {
   ValidInteger
-}                                   from "@/modules/shared/domain/value_objects/valid_integer"
+}                              from "@/modules/shared/domain/value_objects/valid_integer"
 import {
   Errors
-}                                   from "@/modules/shared/domain/exceptions/errors"
+}                              from "@/modules/shared/domain/exceptions/errors"
 import {
   UUID
-}                          from "@/modules/shared/domain/value_objects/uuid"
-import { boolean, string } from "fp-ts"
+}                              from "@/modules/shared/domain/value_objects/uuid"
 
 export class PrismaUserData implements UserDAO {
   constructor( private readonly db: PrismaClient ) {
@@ -36,6 +35,7 @@ export class PrismaUserData implements UserDAO {
           name     : user.fullName.value,
           createdAt: user.createdAt.toString(),
           role     : user.role.toString(),
+          status   : user.status.value,
           avatar   : user.avatar ? user.avatar.value : null
         }
       } )
@@ -67,8 +67,9 @@ export class PrismaUserData implements UserDAO {
           id: user.userId.toString()
         },
         data : {
-          role     : user.role.toString(),
-          avatar   : user.avatar ? user.avatar.value : null
+          role  : user.role.toString(),
+          avatar: user.avatar ? user.avatar.value : null,
+          status: user.status.value
         }
       } )
       return right( true )
@@ -147,27 +148,6 @@ export class PrismaUserData implements UserDAO {
     }
   }
 
-  private parseUser( e: any ): User | Errors {
-    if ( e.isAnonymous === true ) {
-      return UserAnon.fromPrimitives(
-        e.id.toString(),
-        e.email,
-        e.name,
-        e.createdAt
-      )
-    }
-    else {
-      return UserAuth.fromPrimitives(
-        e.id.toString(),
-        e.email,
-        e.name,
-        e.createdAt,
-        e.role as "admin" | "client" | "worker",
-        e.image
-      )
-    }
-  }
-
   async search( query: Record<string, any>, limit?: ValidInteger,
     skip?: ValidString,
     sortBy?: ValidString,
@@ -192,7 +172,15 @@ export class PrismaUserData implements UserDAO {
       // }
       const users: User[] = []
       for ( const e of response ) {
-        const user = this.parseUser( e )
+        const user = UserAuth.fromPrimitives(
+          e.id,
+          e.email,
+          e.name,
+          e.createdAt,
+          e.role,
+          e.status,
+          e.avatar ? e.avatar : null
+        )
         if ( user instanceof Errors ) {
           return left( user.values )
         }

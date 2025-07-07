@@ -35,8 +35,11 @@ import { z }                         from "zod"
 const dao    = new PrismaSpecialityData( prisma )
 const add    = new AddSpeciality( dao )
 const remove = new RemoveSpeciality( dao )
-const update                  = new UpdateSpeciality( dao )
-export const searchSpeciality =async ()=>new SearchSpeciality( dao )
+const update = new UpdateSpeciality( dao )
+
+export async function searchSpeciality() {
+  return new SearchSpeciality( dao )
+}
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
@@ -74,12 +77,14 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await (await searchSpeciality()).execute(
+  const result = await (
+    await searchSpeciality()
+  ).execute(
     data.right.query,
     data.right.limit,
     data.right.skip,
     data.right.sort_by,
-    data.right.sort_type,
+    data.right.sort_type
   )
 
   if ( isLeft( result ) ) {
@@ -92,10 +97,10 @@ export async function GET( request: NextRequest ) {
 
 export async function PUT( request: NextRequest ) {
   const body = await request.json()
-  const data = parseData( z.object({
+  const data = parseData( z.object( {
     prev_name: z.string(),
-    new_name: z.string(),
-  }), body )
+    new_name : z.string()
+  } ), body )
 
   if ( isLeft( data ) ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )

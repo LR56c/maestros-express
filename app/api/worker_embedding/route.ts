@@ -15,9 +15,6 @@ import {
   UpsertWorkerEmbedding
 }                                    from "@/modules/worker_embedding/application/upsert_worker_embedding"
 import {
-  RemoveWorkerEmbedding
-}                                    from "@/modules/worker_embedding/application/remove_worker_embedding"
-import {
   SearchWorkerEmbedding
 }                                    from "@/modules/worker_embedding/application/search_worker_embedding"
 import {
@@ -36,19 +33,28 @@ import {
   SupabaseWorkerEmbeddingData
 }                                    from "@/modules/worker_embedding/infrastructure/supabase_worker_embedding_data"
 import { ai, supabase }              from "@/app/api/dependencies"
+import {
+  RemoveWorkerEmbedding
+}                                    from "@/modules/worker_embedding/application/remove_worker_embedding"
 
 
-export const aiRepo = async () => new OpenaiWorkerEmbeddingData( await ai() )
+export async function  aiRepo (){
+  return new OpenaiWorkerEmbeddingData( await ai() )
+}
 
 
 const prismaDao   = new PrismaWorkerEmbeddingData( prisma, await aiRepo() )
 const supabaseDao = new SupabaseWorkerEmbeddingData( await aiRepo(),
   await supabase() )
-export const upsertEmbedding         = async () => new UpsertWorkerEmbedding( prismaDao,
-  await searchWorker(),
-  await getStory() )
-const remove      = new RemoveWorkerEmbedding( prismaDao )
-const search      = new SearchWorkerEmbedding( supabaseDao, await searchWorker() )
+
+export async function upsertEmbedding() {
+  return new UpsertWorkerEmbedding( prismaDao,
+    await searchWorker(),
+    await getStory() )
+
+}
+const remove = new RemoveWorkerEmbedding(prismaDao)
+const search = new SearchWorkerEmbedding( supabaseDao, await searchWorker() )
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()

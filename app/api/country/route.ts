@@ -35,7 +35,9 @@ const dao                  = new PrismaCountryData( prisma )
 const add                  = new AddCountry( dao )
 const remove               = new RemoveCountry( dao )
 const update               = new UpdateCountry( dao )
-export const searchCountry = async () => new SearchCountry( dao )
+export async function searchCountry(){
+  return new SearchCountry( dao )
+}
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()

@@ -1,16 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { updateSession }                  from "@/utils/supabase/middleware"
-// import { getSessionCookie }                 from "better-auth/cookies"
-
-// type Session = typeof auth.$Infer.Session;
 
 export async function middleware( request: NextRequest ) {
-  // const sessionCookie = getSessionCookie( request )
-  // if ( !sessionCookie ) {
-  //   return NextResponse.redirect( new URL( "/login", request.url ) )
-  // }
+  return await updateSession( request )
   // return NextResponse.next()
-  return await updateSession(request)
 }
 
 export const config = {

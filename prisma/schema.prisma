@@ -473,12 +473,13 @@ enum CertificateType {
 }
 
 model User {
-  id                 String               @db.Uuid @unique
+  id                 String               @unique @db.Uuid
   name               String
   email              String
   avatar             String?
   createdAt          DateTime
   role               String
+  status             String
   Notification       Notification[]
   NotificationConfig NotificationConfig[]
   Quotation          Quotation[]

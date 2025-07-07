@@ -23,7 +23,7 @@ import {
 import { searchSector }              from "@/app/api/sector/route"
 
 const dao    = new PrismaZoneData( prisma )
-const upsert    = new UpsertZones( dao ,searchSector)
+const upsert    = new UpsertZones( dao ,await searchSector())
 const getZonesWorker = new GetZonesByWorker( dao )
 
 export async function POST( request: NextRequest ) {

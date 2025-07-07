@@ -70,12 +70,10 @@ export class UpsertWorkerEmbedding {
   private async recoverData( dto: WorkerEmbeddingRequest ): Promise<Either<BaseException[], DataType>> {
     let workerId: string
     let content: string
-    console.log("UpsertWorkerEmbedding.recoverData", dto)
     if ( dto.data.type === WorkerEmbeddingTypeEnum.WORKER ) {
       const workerResult = await this.searchWorker.execute( {
         id: dto.data.user.user_id
       }, 1 )
-
       if ( isLeft( workerResult ) ) {
         return left( workerResult.left )
       }
@@ -170,9 +168,7 @@ export class UpsertWorkerEmbedding {
 
       embed = updateResult.right
     }
-    console.log("UpsertWorkerEmbedding.execute", embed)
     const result = await this.repo.upsert( embed )
-    console.log("UpsertWorkerEmbedding.execute result", result)
     if ( isLeft( result ) ) {
       return left( [result.left] )
     }

@@ -33,10 +33,12 @@ import {
 }                                    from "@/modules/region/application/region_mapper"
 
 const dao                 = new PrismaRegionData( prisma )
-const add                 = new AddRegion( dao, searchCountry )
+const add                 = new AddRegion( dao, await searchCountry() )
 const remove              = new RemoveRegion( dao )
 const update              = new UpdateRegion( dao )
-export const searchRegion = async ()=> new SearchRegion( dao )
+export async function searchRegion(){
+  return new SearchRegion( dao )
+}
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()

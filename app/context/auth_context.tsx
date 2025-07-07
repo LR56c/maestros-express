@@ -32,6 +32,13 @@ import {
 import {
   BaseException
 }                       from "@/modules/shared/domain/exceptions/base_exception"
+import {
+  WorkerStatusEnum
+}                       from "@/modules/worker/domain/worker_status"
+import {
+  usePathname,
+  useRouter
+}                       from "next/navigation"
 
 interface AuthContextType {
   user?: UserResponse
@@ -54,40 +61,67 @@ const AuthContext             = createContext<AuthContextType | undefined>(
   undefined )
 const service: AuthAppService = new SupabaseUserData( createClient() )
 
-const parseResponse = ( response: any ): UserResponse | undefined => {
-  if ( !response || !response.user ) {
+const parseResponse = ( user: any ): UserResponse | undefined => {
+  if ( !user ) {
     return undefined
   }
-  const { user } = response
   return {
     user_id  : user.id,
     email    : user.email || "",
     full_name: user.user_metadata?.name || "",
-    avatar   : user.user_metadata?.avatar || ""
+    role     : user.user_metadata?.role || "",
+    status   : user.user_metadata?.status || "",
+    avatar   : user.user_metadata.avatar
   } as UserResponse
 }
 
-// supabase.auth.getUser().then(({ data }) => {
-//   console.log("Initial user data:", data)
-// })
 export const AuthProvider = ( { children }: { children: ReactNode } ) => {
   const [user, setUser] = useState<UserResponse | undefined>( undefined )
+  const supabase        = createClient()
+  const pathname        = usePathname()
+  const router          = useRouter()
+
+  const checkWorker = async ( user?: UserResponse ) => {
+    if ( !user ) return
+    if ( pathname.startsWith( "/trabajador/aplicar" ) ) return
+    const check = user.role === "WORKER" && user.status ===
+      WorkerStatusEnum.INCOMPLETE
+    if ( check ) {
+      console.log( "User is not a worker, redirecting to apply page" )
+      await router.replace( "/trabajador/aplicar" )
+    }
+  }
+
 
   useEffect( () => {
-    const supabase           = createClient()
     const { data: listener } = supabase.auth.onAuthStateChange(
       async ( event, session ) => {
-        if ( (user && user.user_id !== session?.user?.id
-        ) || !user )
-        {
-          console.log( `User has changed (${event})` )
-          setUser( parseResponse( session?.user ) )
+        const parsed = parseResponse( session?.user )
+        if (!user || (session?.user?.id && user.user_id !== session.user.id)) {
+          console.log( `User has changed(${ event })`, session?.user.user_metadata )
+          setUser( parsed )
         }
+        await checkWorker( parsed )
       } )
     return () => {
       listener.subscription.unsubscribe()
     }
   }, [] )
+
+  useEffect( () => {
+    if ( !user ) {
+      const check = async () => {
+        const { data, error } = await supabase.auth.getSession()
+        if ( error || !data?.session ) {
+          await anonymous()
+        }
+        else {
+          setUser( parseResponse( data?.session?.user ) )
+        }
+      }
+      check()
+    }
+  }, [user] )
 
   const hasAccess = async ( level: RoleLevelType ): Promise<boolean> => {
     if ( !user ) {
@@ -121,7 +155,7 @@ export const AuthProvider = ( { children }: { children: ReactNode } ) => {
     setUser( userResponse )
   }
 
-  const  revalidate = async ( token: string ): Promise<void> => {
+  const revalidate = async ( token: string ): Promise<void> => {
 
   }
 

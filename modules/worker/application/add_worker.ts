@@ -28,26 +28,13 @@ import {
 import {
   WorkerStatusEnum
 }                                      from "@/modules/worker/domain/worker_status"
-import {
-  UpsertWorkerEmbedding
-}                                      from "@/modules/worker_embedding/application/upsert_worker_embedding"
-import {
-  UUID
-}                                      from "@/modules/shared/domain/value_objects/uuid"
-import {
-  WorkerMapper
-}                                      from "@/modules/worker/application/worker_mapper"
-import {
-  WorkerEmbeddingTypeEnum
-}                                      from "@/modules/worker_embedding/domain/worker_embedding_type"
 import { RoleLevelType }               from "@/modules/user/domain/role_type"
 
 export class AddWorker {
   constructor(
     private readonly dao: WorkerDAO,
     private readonly searchNationalIdentity: SearchNationalIdentityFormat,
-    private readonly register: RegisterAuth,
-    private readonly embedding: UpsertWorkerEmbedding
+    private readonly register: RegisterAuth
   )
   {
   }
@@ -71,22 +58,23 @@ export class AddWorker {
 
     const nationalIdentity = nationalIdentityResult.right[0]
 
+    const status = WorkerStatusEnum.INCOMPLETE
+
     const userResult = await this.register.execute( worker.user,
-      RoleLevelType.WORKER )
+      RoleLevelType.WORKER, status )
 
     if ( isLeft( userResult ) ) {
       return left( userResult.left )
     }
 
-    const locationFormat = `(${ worker.location.latitude },${ worker.location.longitude })`
 
     const newWorker = Worker.create(
       userResult.right,
       nationalIdentity.id.toString(),
       worker.national_identity_value,
       worker.birth_date,
-      locationFormat,
-      WorkerStatusEnum.INCOMPLETE,
+      `(${ worker.location.latitude },${ worker.location.longitude })`,
+      status,
       worker.description
     )
 
@@ -95,27 +83,10 @@ export class AddWorker {
     }
 
     const result = await this.dao.add( newWorker )
-    console.log( "AddWorker.execute", result )
 
     if ( isLeft( result ) ) {
       return left( [result.left] )
     }
-    const workerMapped = WorkerMapper.toDTO( newWorker )
-    console.log( "AddWorker.execute workerMapped", workerMapped )
-    const embeddingResult = await this.embedding.execute( {
-      id      : UUID.create().toString(),
-      location: locationFormat,
-      data    : {
-        type: WorkerEmbeddingTypeEnum.WORKER,
-        ...workerMapped
-      }
-    } )
-    console.log( "AddWorker.execute embeddingResult", embeddingResult )
-
-    if ( isLeft( embeddingResult ) ) {
-      return left( embeddingResult.left )
-    }
-
 
     return right( newWorker )
   }

@@ -33,10 +33,12 @@ import {
 }                                    from "@/modules/sector/application/sector_mapper"
 
 const dao    = new PrismaSectorData( prisma )
-const add    = new AddSector( dao, searchRegion )
+const add    = new AddSector( dao, await searchRegion() )
 const remove = new RemoveSector( dao )
 const update = new UpdateSector( dao )
-export const searchSector =async()=> new SearchSector( dao )
+export async function searchSector(){
+  return new SearchSector( dao )
+}
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()

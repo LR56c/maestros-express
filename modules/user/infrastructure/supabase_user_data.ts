@@ -44,7 +44,6 @@ export class SupabaseUserData implements AuthAppService {
   async login( request: UserLoginRequest ): Promise<UserResponse> {
     const { data, error } = await this.client.auth.signInWithPassword(
       { email: request.email, password: request.password } )
-    console.log( "SupabaseUserData.login", data, error )
     if ( error ) {
       throw new InfrastructureException( error.message )
     }

@@ -25,9 +25,11 @@ import {
 import {
   chatUpdateSchema
 }                                    from "@/modules/chat/application/chat_update_dto"
+import { searchUser }                from "@/app/api/user/route"
 
 const dao    = new PrismaChatData( prisma )
-const add    = new AddChat( dao )
+
+const add    = new AddChat( dao, await searchUser() )
 const update = new UpdateChat( dao )
 const search = new GetChatByUser( dao )
 

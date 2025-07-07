@@ -30,30 +30,22 @@ import {
 import {
   workerUpdateSchema
 }                                    from "@/modules/worker/application/worker_update_dto"
-import { searchSpeciality } from "@/app/api/speciality/route"
-import {
-  RegisterAuth
-}                           from "@/modules/user/application/auth_use_cases/register_auth"
-import {
-  SupabaseAdminUserData
-}                           from "@/modules/user/infrastructure/supabase_admin_user_data"
-import { createClient }              from "@/utils/supabase/server"
+import { searchSpeciality }          from "@/app/api/speciality/route"
 import { upsertEmbedding }           from "@/app/api/worker_embedding/route"
 import {
   searchNationalIdentityFormat
 }                                    from "@/app/api/national_identity_format/route"
+import { registerAuth }              from "@/app/api/user/route"
 
-const authDao  = new SupabaseAdminUserData( await createClient() )
-const register = new RegisterAuth( authDao )
 
 function dao() {
   return new PrismaWorkerData( prisma )
 }
 
-const add    = new AddWorker( dao(),
-  await searchNationalIdentityFormat(), register,
+const add    = new AddWorker( dao(), await searchNationalIdentityFormat(),
+  await registerAuth() )
+const update = new UpdateWorker( dao(), await searchSpeciality(),
   await upsertEmbedding() )
-const update = new UpdateWorker( dao(), await searchSpeciality() )
 
 export async function searchWorker() {
   return new SearchWorker( dao() )
@@ -68,7 +60,6 @@ export async function POST( request: NextRequest ) {
   }
 
   const result = await add.execute( data.right )
-  console.log( "Worker route POST result", result )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )

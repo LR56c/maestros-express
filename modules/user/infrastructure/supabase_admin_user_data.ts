@@ -51,13 +51,13 @@ export class SupabaseAdminUserData implements AuthRepository {
     const { data, error } = await this.client.auth.admin.createUser( {
       email        : auth.email.value,
       password     : password.value,
+      email_confirm: true,
       user_metadata: {
         name  : auth.fullName.value,
         role  : auth.role.toString(),
-        status: "INCOMPLETE"
+        status: auth.status.value,
       }
     } )
-    console.log( "SupabaseAdminUserData.register", data, error )
     if ( error ) {
       return left( [new InfrastructureException( error.message )] )
     }
@@ -69,9 +69,9 @@ export class SupabaseAdminUserData implements AuthRepository {
       metadata.name,
       data.user!.created_at,
       metadata.role,
+      metadata.status,
       metadata.avatar
     )
-    console.log( "SupabaseAdminUserData.register", user )
     if ( user instanceof Errors ) {
       return left( user.values )
     }

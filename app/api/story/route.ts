@@ -37,7 +37,9 @@ const add    = new AddStory( dao )
 const remove = new RemoveStory( dao )
 const update = new UpdateStory( dao )
 const getStories = new GetStoryByWorker( dao )
-export const getStory = async ()=>new GetStoryById(dao)
+export async function getStory(){
+  return new GetStoryById(dao)
+}
 export async function POST( request: NextRequest ) {
   const body = await request.json()
   const data = parseData( storySchema.extend( {

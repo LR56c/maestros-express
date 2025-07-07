@@ -35,20 +35,68 @@ import {
 import {
   SpecialityDTO
 }                                      from "@/modules/speciality/application/speciality_dto"
+import {
+  Position
+}                                      from "@/modules/shared/domain/value_objects/position"
+import {
+  WorkerTax
+}                                      from "@/modules/worker_tax/domain/worker_tax"
+import {
+  WorkerTaxDTO
+}                                      from "@/modules/worker_tax/application/worker_tax_dto"
+import {
+  UpsertWorkerEmbedding
+}                                      from "@/modules/worker_embedding/application/upsert_worker_embedding"
+import {
+  WorkerMapper
+}                                      from "@/modules/worker/application/worker_mapper"
+import {
+  UUID
+}                                      from "@/modules/shared/domain/value_objects/uuid"
+import {
+  WorkerEmbeddingTypeEnum
+}                                      from "@/modules/worker_embedding/domain/worker_embedding_type"
 
 export class UpdateWorker {
   constructor(
     private readonly dao: WorkerDAO,
-    private readonly searchSpecialities: SearchSpeciality
+    private readonly searchSpecialities: SearchSpeciality,
+    private readonly embedding: UpsertWorkerEmbedding
   )
   {
+  }
+
+  private async ensureTaxes( workerId: string, oldTaxes: WorkerTax[],
+    newTaxes: WorkerTaxDTO[] )
+  {
+    const mapTaxes = new Map<string, WorkerTax>(
+      oldTaxes.map( ( t ) => [t.id.toString(), t] ) )
+
+    for ( const tax of newTaxes ) {
+      const taxId = tax.id.toString()
+      if ( mapTaxes.has( taxId ) ) {
+        continue
+      }
+      const newTax = WorkerTax.create(
+        taxId,
+        workerId,
+        tax.name,
+        tax.value,
+        tax.value_format
+      )
+      if ( newTax instanceof Errors ) {
+        return left( newTax.values )
+      }
+      mapTaxes.set( taxId, newTax )
+    }
+    return right( Array.from( mapTaxes.values() ) )
   }
 
   private async ensureSpecialities( search: SearchSpeciality,
     oldSpecialities: Speciality[],
     newSpecialities: SpecialityDTO[] ): Promise<Either<BaseException[], Speciality[]>> {
     const specialitiesResult = await search.execute( {
-      ids: newSpecialities.map( ( s ) => s.id.toString() ).join(','),
+      ids: newSpecialities.map( ( s ) => s.id.toString() ).join( "," )
     } )
 
     if ( isLeft( specialitiesResult ) ) {
@@ -68,7 +116,7 @@ export class UpdateWorker {
           verifiedSpeciality )
       }
     }
-    return right(Array.from( mapSpecialities.values() ))
+    return right( Array.from( mapSpecialities.values() ) )
   }
 
   async execute( worker: WorkerUpdateDTO ): Promise<Either<BaseException[], Worker>> {
@@ -89,7 +137,7 @@ export class UpdateWorker {
     }
 
     const updatedLocation = wrapTypeDefault( oldWorker.location,
-      ( value ) => ValidString.from( value ), worker.location )
+      ( value ) => Position.fromJSON( value ), worker.location )
 
     if ( updatedLocation instanceof BaseException ) {
       errors.push( updatedLocation )
@@ -141,14 +189,33 @@ export class UpdateWorker {
       newSpecialities.push( ...oldWorker.specialities )
     }
 
+    let updatedTaxes: WorkerTax[] = []
+    if ( worker.taxes ) {
+      const taxes = await this.ensureTaxes(
+        oldWorker.user.userId.toString(), oldWorker.taxes, worker.taxes )
+      if ( isLeft( taxes ) ) {
+        errors.push( ...taxes.left )
+      }
+      else {
+        updatedTaxes.push( ...taxes.right )
+      }
+    }
+    else if ( worker.taxes === null ) {
+      updatedTaxes = []
+    }
+    else {
+      updatedTaxes.push( ...oldWorker.taxes )
+    }
+
     if ( errors.length > 0 ) {
       return left( errors )
     }
 
     const updatedWorker = Worker.fromPrimitives(
       oldWorker.user,
-      oldWorker.nationalIdentity,
-      oldWorker.birthDate.value,
+      oldWorker.nationalIdentityId.value,
+      oldWorker.nationalIdentityValue.value,
+      oldWorker.birthDate.toString(),
       (
         updatedReviewCount as ValidDecimal
       ).value,
@@ -156,20 +223,16 @@ export class UpdateWorker {
         updatedReviewAverage as ValidDecimal
       ).value,
       (
-        updatedLocation as ValidString
-      ).value,
+        updatedLocation as Position
+      ).toString(),
       (
         updatedStatus as WorkerStatus
       ).value,
       newSpecialities,
-      oldWorker.taxes,
+      updatedTaxes,
       oldWorker.createdAt.toString(),
-      updatedVerified instanceof ValidBool
-        ? new Date()
-        : oldWorker.verifiedAt?.value,
-      updatedDescription instanceof ValidString
-        ? updatedDescription.value
-        : undefined
+      updatedVerified instanceof ValidBool ? new Date() : oldWorker.verifiedAt?.value,
+      updatedDescription instanceof ValidString ? updatedDescription.value : undefined
     )
 
     if ( updatedWorker instanceof Errors ) {
@@ -180,6 +243,21 @@ export class UpdateWorker {
 
     if ( isLeft( updated ) ) {
       return left( [updated.left] )
+    }
+
+    const workerMapped = WorkerMapper.toDTO( updatedWorker )
+
+    const embeddingResult = await this.embedding.execute( {
+      id      : UUID.create().toString(),
+      location: updatedWorker.location.toString(),
+      data    : {
+        type: WorkerEmbeddingTypeEnum.WORKER,
+        ...workerMapped
+      }
+    } )
+
+    if ( isLeft( embeddingResult ) ) {
+      return left( embeddingResult.left )
     }
 
     return right( updatedWorker )

@@ -38,7 +38,7 @@ function getRunStrategy(): IdentityStrategy {
 function getIdentityStrategy( format: NationalIdentityFormatDTO | null ): IdentityStrategy | null {
   if ( !format ) return null
   switch ( format.name ) {
-    case "RUN":
+    case "RUT":
       return getRunStrategy()
     default:
       return null

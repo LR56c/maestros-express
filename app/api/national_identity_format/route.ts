@@ -40,8 +40,9 @@ const remove                              = new RemoveNationalIdentityFormat(
   dao )
 const update                              = new UpdateNationalIdentityFormat(
   dao, await searchCountry() )
-export const searchNationalIdentityFormat = async () => new SearchNationalIdentityFormat(
-  dao )
+export async function searchNationalIdentityFormat(){
+  return new SearchNationalIdentityFormat( dao )
+}
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()

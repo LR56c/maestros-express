@@ -154,7 +154,6 @@ export default function WorkerApplyForm() {
         <Button onClick={ handleSubmit( onSubmit ) }>Send</Button>
       </div>
       <pre>        { JSON.stringify( formValues, null, 2 ) }</pre>
-      <pre>        { user ? JSON.stringify( user, null, 2 ) : 'not' }</pre>
     </FormProvider>
   </>
 }

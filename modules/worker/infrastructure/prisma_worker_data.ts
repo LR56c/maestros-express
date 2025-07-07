@@ -129,7 +129,6 @@ export class PrismaWorkerData implements WorkerDAO {
 
   async add( worker: Worker ): Promise<Either<BaseException, boolean>> {
     try {
-      console.log( "PrismaWorkerData.add", worker.user.userId.toString(), worker )
       await this.db.worker.create( {
         data: {
           id                      : worker.user.userId.toString(),
@@ -148,7 +147,6 @@ export class PrismaWorkerData implements WorkerDAO {
       return right( true )
     }
     catch ( e ) {
-      console.log( "PrismaWorkerData.add", e )
       return left( new InfrastructureException() )
     }
   }
