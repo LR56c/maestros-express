@@ -33,13 +33,18 @@ import {
 import {
   packageUpdateSchema
 }                                    from "@/modules/package/application/package_update_dto"
+import {
+  UpsertPackages
+}                                    from "@/modules/package/application/upsert_packages"
 
 const dao    = new PrismaPackageData( prisma )
 const add    = new AddPackage( dao )
 const remove = new RemovePackage( dao )
 const update = new UpdatePackage( dao )
 const search = new SearchPackage( dao )
-
+export async function upsertPackages(){
+  return new UpsertPackages(dao,search)
+}
 export async function POST( request: NextRequest ) {
   const body = await request.json()
   const data = parseData( packageRequestSchema, body )

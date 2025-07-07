@@ -31,12 +31,19 @@ import {
 import {
   GetStoryById
 }                                    from "@/modules/story/application/get_story_by_id"
+import {
+  UpsertStories
+}                                    from "@/modules/story/application/upsert_stories"
 
 const dao    = new PrismaStoryData( prisma )
 const add    = new AddStory( dao )
 const remove = new RemoveStory( dao )
 const update = new UpdateStory( dao )
 const getStories = new GetStoryByWorker( dao )
+export async function upsertStories(){
+  return new UpsertStories(dao,getStories)
+}
+
 export async function getStory(){
   return new GetStoryById(dao)
 }

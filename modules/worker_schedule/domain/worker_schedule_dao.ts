@@ -17,6 +17,7 @@ export abstract class WorkerScheduleDAO {
   abstract search( query: Record<string, any>, limit?: ValidInteger,
     skip ?: ValidString, sortBy ?: ValidString,
     sortType ?: ValidString ): Promise<Either<BaseException[], WorkerSchedule[]>>
+  abstract upsert( workerId : UUID, schedules: WorkerSchedule[] ): Promise<Either<BaseException, boolean>>
   abstract add( schedule: WorkerSchedule ): Promise<Either<BaseException, boolean>>
   abstract update( schedule: WorkerSchedule ): Promise<Either<BaseException, boolean>>
   abstract remove( id: UUID ): Promise<Either<BaseException, boolean>>

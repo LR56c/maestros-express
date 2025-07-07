@@ -9,77 +9,86 @@ import {
 import {
   WorkerTax
 }                                      from "@/modules/worker_tax/domain/worker_tax"
+import {
+  Errors
+}                                      from "@/modules/shared/domain/exceptions/errors"
+import {
+  GetByWorkerTax
+}                                      from "@/modules/worker_tax/application/get_by_worker_tax"
 import { wrapType }                    from "@/modules/shared/utils/wrap_type"
 import {
   UUID
 }                                      from "@/modules/shared/domain/value_objects/uuid"
-import {
-  containError
-}                                      from "@/modules/shared/utils/contain_error"
-import {
-  DataNotFoundException
-}                                      from "@/modules/shared/domain/exceptions/data_not_found_exception"
-import {
-  Errors
-}                                      from "@/modules/shared/domain/exceptions/errors"
 
 export class UpsertWorkerTax {
-  constructor( private readonly dao: WorkerTaxDAO ) {
+  constructor(
+    private readonly dao: WorkerTaxDAO,
+    private readonly getTaxes: GetByWorkerTax
+  )
+  {
   }
 
-  private async ensureWorkerTaxExist( id: string ): Promise<Either<BaseException[], WorkerTax>> {
+  private async ensureWorkerTaxes( workerId: string,
+    tax: WorkerTaxDTO[] ): Promise<Either<BaseException[], WorkerTax[]>> {
 
-    const vId = wrapType( () => UUID.from( id ) )
+    const exist = await this.getTaxes.execute( workerId )
 
-    if ( vId instanceof BaseException ) {
-      return left( [vId] )
+    if ( isLeft( exist ) ) {
+      return left( exist.left )
     }
 
-    return await this.dao.getById( vId )
+    const existMap = new Map<string, WorkerTax>(
+      exist.right.map( t => [t.id.toString(), t] ) )
+
+    const taxes: WorkerTax[] = []
+
+    for ( const t of tax ) {
+      const taxExist = existMap.get( t.id )
+      if ( taxExist ) {
+        const updatedTax = WorkerTax.fromPrimitives(
+          t.id, workerId, t.name, t.value, t.value_format,
+          taxExist.createdAt.toString()
+        )
+
+        if ( updatedTax instanceof Errors ) {
+          return left( updatedTax.values )
+        }
+        taxes.push( updatedTax )
+      }
+      else {
+        const newTax = WorkerTax.create( t.id, workerId, t.name, t.value,
+          t.value_format )
+
+        if ( newTax instanceof Errors ) {
+          return left( newTax.values )
+        }
+        taxes.push( newTax )
+      }
+    }
+    return right( taxes )
   }
 
   async execute( workerId: string,
-    tax: WorkerTaxDTO ): Promise<Either<BaseException[], WorkerTax>> {
+    tax: WorkerTaxDTO[] ): Promise<Either<BaseException[], WorkerTax[]>> {
 
-    const existResult = await this.ensureWorkerTaxExist( tax.id )
+    const wId = wrapType( () => UUID.from( workerId ) )
 
-    let workerTax: WorkerTax
-    if ( isLeft( existResult ) ) {
-      const notFound = containError( existResult.left,
-        new DataNotFoundException() )
-      if ( !notFound ) {
-        return left( existResult.left )
-      }
-      const newTax = WorkerTax.create( tax.id, workerId, tax.name, tax.value,
-        tax.value_format )
-
-      if ( newTax instanceof Errors ) {
-        return left( newTax.values )
-      }
-
-      workerTax = newTax
+    if ( wId instanceof BaseException ) {
+      return left( [wId] )
     }
-    else {
-      const updateTax = WorkerTax.fromPrimitives(
-        tax.id,
-        workerId,
-        tax.name,
-        tax.value,
-        tax.value_format,
-        existResult.right.createdAt.toString()
-      )
 
-      if ( updateTax instanceof Errors ) {
-        return left( updateTax.values )
-      }
-      workerTax = updateTax
+    const updatedTaxes = await this.ensureWorkerTaxes( workerId, tax )
+
+    if ( isLeft( updatedTaxes ) ) {
+      return left( updatedTaxes.left )
     }
-    const result = await this.dao.upsert( workerTax )
+
+    const result = await this.dao.upsert( wId, updatedTaxes.right )
 
     if ( isLeft( result ) ) {
       return left( [result.left] )
     }
 
-    return right( workerTax )
+    return right( updatedTaxes.right )
   }
 }

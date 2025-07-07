@@ -15,7 +15,13 @@ export abstract class PackageDAO {
   abstract search( query: Record<string, any>, limit?: ValidInteger,
     skip ?: ValidString, sortBy ?: ValidString,
     sortType ?: ValidString ): Promise<Either<BaseException[], Package[]>>
+
   abstract add( entity: Package ): Promise<Either<BaseException, boolean>>
+
   abstract update( entity: Package ): Promise<Either<BaseException, boolean>>
+
+  abstract upsert( workerId: UUID,
+    entities: Package[] ): Promise<Either<BaseException, boolean>>
+
   abstract remove( id: UUID ): Promise<Either<BaseException, boolean>>
 }

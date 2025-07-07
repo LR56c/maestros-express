@@ -48,27 +48,28 @@ import {
 }                                    from "@/modules/worker_tax/application/worker_tax_mapper"
 
 const dao    = new PrismaWorkerTaxData( prisma )
-const upsert    = new UpsertWorkerTax( dao )
 const getWorkerTax = new GetByWorkerTax( dao )
+const upsert    = new UpsertWorkerTax( dao,getWorkerTax )
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
-  const data = parseData( workerTaxSchema.extend({
-    worker_id: z.string()
+  const data = parseData( z.object({
+    worker_id: z.string(),
+    taxes: z.array(workerTaxSchema)
   }), body )
 
   if ( isLeft( data ) ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const { worker_id, ...rest } = data.right
-  const result = await upsert.execute( worker_id,rest )
+  const { worker_id, taxes } = data.right
+  const result = await upsert.execute( worker_id,taxes )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
   }
 
-  return NextResponse.json( WorkerTaxMapper.toDTO( result.right ),
+  return NextResponse.json( result.right.map(WorkerTaxMapper.toDTO),
     { status: 201 } )
 }
 

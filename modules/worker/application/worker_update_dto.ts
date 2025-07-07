@@ -5,9 +5,6 @@ import {
 import {
   userResponseSchema
 }            from "@/modules/user/application/models/user_response"
-import {
-  workerTaxSchema
-}            from "@/modules/worker_tax/application/worker_tax_dto"
 
 export const workerUpdateSchema = z.object( {
   user          : userResponseSchema,
@@ -17,9 +14,6 @@ export const workerUpdateSchema = z.object( {
   status        : z.string().optional(),
   location      : z.string().optional(),
   verified      : z.boolean().optional(),
-  specialities  : z.union( [z.array( specialitySchema ).optional(), z.null()] ),
-  taxes         : z.union( [z.array( workerTaxSchema ).optional(), z.null()] )
+  specialities  : z.union( [z.array( specialitySchema ).optional(), z.null()] )
 } )
-
 export type WorkerUpdateDTO = z.infer<typeof workerUpdateSchema>
-

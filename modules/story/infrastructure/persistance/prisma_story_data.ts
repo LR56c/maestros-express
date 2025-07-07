@@ -4,22 +4,76 @@ import {
 }                              from "@/modules/shared/domain/exceptions/base_exception"
 import { PrismaClient }        from "@/lib/generated/prisma"
 import { Either, left, right } from "fp-ts/Either"
-import { UUID }                from "@/modules/shared/domain/value_objects/uuid"
+import {
+  UUID
+}                              from "@/modules/shared/domain/value_objects/uuid"
 import { Story }               from "@/modules/story/domain/story"
 import {
   InfrastructureException
 }                              from "@/modules/shared/domain/exceptions/infrastructure_exception"
-import { Errors }              from "@/modules/shared/domain/exceptions/errors"
+import {
+  Errors
+}                              from "@/modules/shared/domain/exceptions/errors"
 import {
   StoryDocument
 }                              from "@/modules/story/modules/story_document/domain/story_document"
 import {
   DataNotFoundException
-} from "@/modules/shared/domain/exceptions/data_not_found_exception"
+}                              from "@/modules/shared/domain/exceptions/data_not_found_exception"
 
 export class PrismaStoryData implements StoryDAO {
   constructor( private readonly db: PrismaClient ) {
   }
+
+  async upsert( workerId: UUID,
+    stories: Story[] ): Promise<Either<BaseException, boolean>> {
+    try {
+      await this.db.$transaction( [
+        this.db.story.deleteMany( {
+          where: {
+            workerId: workerId.value
+          }
+        } ),
+        this.db.storyDocument.deleteMany( {
+          where: {
+            storyId: {
+              in: stories.map( s => s.id.value )
+            }
+          }
+        } ),
+        this.db.story.createMany( {
+          data: stories.map( story => (
+            {
+              id         : story.id.value,
+              workerId   : workerId.value,
+              name       : story.name.value,
+              description: story.description.value,
+              createdAt  : story.createdAt.toString(),
+              updatedAt  : story.updatedAt?.toString()
+            }
+          ) )
+        } ),
+        this.db.storyDocument.createMany( {
+          data: stories.flatMap( story => (
+            story.documents.map( doc => (
+              {
+                id       : doc.id.value,
+                storyId  : story.id.value,
+                url      : doc.url.value,
+                type     : doc.type.value,
+                createdAt: doc.createdAt.toString()
+              }
+            ) )
+          ) )
+        } )
+      ] )
+      return right( true )
+    }
+    catch ( e ) {
+      return left( new InfrastructureException() )
+    }
+  }
+
 
   async add( workerId: UUID,
     story: Story ): Promise<Either<BaseException, boolean>> {
@@ -57,7 +111,7 @@ export class PrismaStoryData implements StoryDAO {
   async getById( id: UUID ): Promise<Either<BaseException[], Story>> {
     try {
       const response = await this.db.story.findUnique( {
-        where: {
+        where  : {
           id: id.value
         },
         include: {
@@ -163,14 +217,14 @@ export class PrismaStoryData implements StoryDAO {
   async remove( id: UUID ): Promise<Either<BaseException, boolean>> {
     try {
       await this.db.$transaction( [
-        this.db.story.delete( {
-          where: {
-            id: id.value
-          }
-        } ),
         this.db.storyDocument.deleteMany( {
           where: {
             storyId: id.value
+          }
+        } ),
+        this.db.story.delete( {
+          where: {
+            id: id.value
           }
         } )
       ] )

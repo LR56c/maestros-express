@@ -39,12 +39,6 @@ import {
   Position
 }                                      from "@/modules/shared/domain/value_objects/position"
 import {
-  WorkerTax
-}                                      from "@/modules/worker_tax/domain/worker_tax"
-import {
-  WorkerTaxDTO
-}                                      from "@/modules/worker_tax/application/worker_tax_dto"
-import {
   UpsertWorkerEmbedding
 }                                      from "@/modules/worker_embedding/application/upsert_worker_embedding"
 import {
@@ -66,34 +60,7 @@ export class UpdateWorker {
   {
   }
 
-  private async ensureTaxes( workerId: string, oldTaxes: WorkerTax[],
-    newTaxes: WorkerTaxDTO[] )
-  {
-    const mapTaxes = new Map<string, WorkerTax>(
-      oldTaxes.map( ( t ) => [t.id.toString(), t] ) )
-
-    for ( const tax of newTaxes ) {
-      const taxId = tax.id.toString()
-      if ( mapTaxes.has( taxId ) ) {
-        continue
-      }
-      const newTax = WorkerTax.create(
-        taxId,
-        workerId,
-        tax.name,
-        tax.value,
-        tax.value_format
-      )
-      if ( newTax instanceof Errors ) {
-        return left( newTax.values )
-      }
-      mapTaxes.set( taxId, newTax )
-    }
-    return right( Array.from( mapTaxes.values() ) )
-  }
-
   private async ensureSpecialities( search: SearchSpeciality,
-    oldSpecialities: Speciality[],
     newSpecialities: SpecialityDTO[] ): Promise<Either<BaseException[], Speciality[]>> {
     const specialitiesResult = await search.execute( {
       ids: newSpecialities.map( ( s ) => s.id.toString() ).join( "," )
@@ -103,20 +70,7 @@ export class UpdateWorker {
       return left( specialitiesResult.left )
     }
 
-    const verifiedSpecialities = specialitiesResult.right
-
-    const mapSpecialities = new Map<string, Speciality>(
-      oldSpecialities.map( ( s ) => [s.name.value, s] ) )
-
-    for ( const verifiedSpeciality of verifiedSpecialities ) {
-      const speciality = mapSpecialities.get( verifiedSpeciality.name.value )
-
-      if ( !speciality ) {
-        mapSpecialities.set( verifiedSpeciality.name.value,
-          verifiedSpeciality )
-      }
-    }
-    return right( Array.from( mapSpecialities.values() ) )
+    return right( specialitiesResult.right )
   }
 
   async execute( worker: WorkerUpdateDTO ): Promise<Either<BaseException[], Worker>> {
@@ -174,7 +128,7 @@ export class UpdateWorker {
     let newSpecialities: Speciality[] = []
     if ( worker.specialities ) {
       const specialities = await this.ensureSpecialities(
-        this.searchSpecialities, oldWorker.specialities, worker.specialities )
+        this.searchSpecialities, worker.specialities )
       if ( isLeft( specialities ) ) {
         errors.push( ...specialities.left )
       }
@@ -187,24 +141,6 @@ export class UpdateWorker {
     }
     else {
       newSpecialities.push( ...oldWorker.specialities )
-    }
-
-    let updatedTaxes: WorkerTax[] = []
-    if ( worker.taxes ) {
-      const taxes = await this.ensureTaxes(
-        oldWorker.user.userId.toString(), oldWorker.taxes, worker.taxes )
-      if ( isLeft( taxes ) ) {
-        errors.push( ...taxes.left )
-      }
-      else {
-        updatedTaxes.push( ...taxes.right )
-      }
-    }
-    else if ( worker.taxes === null ) {
-      updatedTaxes = []
-    }
-    else {
-      updatedTaxes.push( ...oldWorker.taxes )
     }
 
     if ( errors.length > 0 ) {
@@ -229,10 +165,14 @@ export class UpdateWorker {
         updatedStatus as WorkerStatus
       ).value,
       newSpecialities,
-      updatedTaxes,
+      oldWorker.taxes,
       oldWorker.createdAt.toString(),
-      updatedVerified instanceof ValidBool ? new Date() : oldWorker.verifiedAt?.value,
-      updatedDescription instanceof ValidString ? updatedDescription.value : undefined
+      updatedVerified instanceof ValidBool
+        ? new Date()
+        : oldWorker.verifiedAt?.value,
+      updatedDescription instanceof ValidString
+        ? updatedDescription.value
+        : undefined
     )
 
     if ( updatedWorker instanceof Errors ) {

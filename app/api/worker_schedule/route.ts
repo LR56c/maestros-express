@@ -31,24 +31,31 @@ import {
 }                                    from "@/modules/worker_schedule/application/worker_schedule_mapper"
 import { isLeft }                    from "fp-ts/Either"
 import { z }                         from "zod"
+import {
+  UpsertSchedules
+}                                    from "@/modules/worker_schedule/application/upsert_schedules"
 
 const dao    = new PrismaWorkerScheduleData( prisma )
 const add    = new AddWorkerSchedule( dao )
 const remove = new RemoveWorkerSchedule( dao )
-const update                  = new UpdateWorkerSchedule( dao )
+const update = new UpdateWorkerSchedule( dao )
 const search = new SearchWorkerSchedule( dao )
+
+export async function upsertSchedules() {
+  return new UpsertSchedules( dao, search )
+}
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
-  const data = parseData( workerScheduleSchema.extend({
-    worker_id : z.string()
-  }), body )
+  const data = parseData( workerScheduleSchema.extend( {
+    worker_id: z.string()
+  } ), body )
 
   if ( isLeft( data ) ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const {worker_id, ...rest} = data.right
+  const { worker_id, ...rest } = data.right
 
   const result = await add.execute( worker_id, rest )
 
@@ -83,7 +90,7 @@ export async function GET( request: NextRequest ) {
     data.right.limit,
     data.right.skip,
     data.right.sort_by,
-    data.right.sort_type,
+    data.right.sort_type
   )
 
   if ( isLeft( result ) ) {
@@ -102,7 +109,7 @@ export async function PUT( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await update.execute( data.right)
+  const result = await update.execute( data.right )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )

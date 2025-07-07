@@ -5,7 +5,9 @@ import {
   BaseException
 }                              from "@/modules/shared/domain/exceptions/base_exception"
 import { Either, left, right } from "fp-ts/Either"
-import { UUID }                from "@/modules/shared/domain/value_objects/uuid"
+import {
+  UUID
+}                              from "@/modules/shared/domain/value_objects/uuid"
 import {
   ValidInteger
 }                              from "@/modules/shared/domain/value_objects/valid_integer"
@@ -16,7 +18,9 @@ import {
   InfrastructureException
 }                              from "@/modules/shared/domain/exceptions/infrastructure_exception"
 import * as changeCase         from "change-case"
-import { Errors }              from "@/modules/shared/domain/exceptions/errors"
+import {
+  Errors
+}                              from "@/modules/shared/domain/exceptions/errors"
 import {
   PackageDocument
 }                              from "@/modules/package/modules/package_document/domain/package_document"
@@ -24,6 +28,61 @@ import {
 export class PrismaPackageData implements PackageDAO {
   constructor( private readonly db: PrismaClient ) {
   }
+
+  async upsert( workerId: UUID,
+    entities: Package[] ): Promise<Either<BaseException, boolean>> {
+    try {
+      await this.db.$transaction( [
+        this.db.packageDocument.deleteMany( {
+          where: {
+            packageId: {
+              in: entities.map( ( e ) => e.id.toString() )
+            }
+          }
+        } ),
+        this.db.package.deleteMany( {
+          where: {
+            workerId: workerId.toString()
+          }
+        } ),
+        this.db.package.createMany( {
+          data: entities.map( ( entity ) => {
+            return {
+              id           : entity.id.toString(),
+              name         : entity.name.value,
+              description  : entity.description.value,
+              specification: entity.specification.value,
+              workerId     : entity.workerId.value,
+              createdAt    : entity.createdAt.toString(),
+              coverUrl     : entity.coverUrl.value,
+              reviewAverage: entity.reviewAverage.value,
+              total        : entity.value.value,
+              reviewCount  : entity.reviewCount.value,
+              valueFormat  : entity.valueFormat.value
+            }
+          } )
+        } ),
+        this.db.packageDocument.createMany( {
+          data: entities.flatMap( ( entity ) => {
+            return entity.documents.map( ( doc ) => {
+              return {
+                id       : doc.id.toString(),
+                packageId: entity.id.toString(),
+                url      : doc.url.value,
+                type     : doc.type.value,
+                createdAt: doc.createdAt.toString()
+              }
+            } )
+          } )
+        } )
+      ] )
+      return right( true )
+    }
+    catch ( e ) {
+      return left( new InfrastructureException() )
+    }
+  }
+
 
   async add( entity: Package ): Promise<Either<BaseException, boolean>> {
     try {

@@ -17,7 +17,6 @@ export class WorkerTaxMapper {
   static toDTO( workerTax: WorkerTax ): WorkerTaxDTO {
     return {
       id          : workerTax.id.toString(),
-      worker_id   : workerTax.workerId.toString(),
       value       : workerTax.value.value,
       name        : workerTax.name.value,
       value_format: workerTax.valueFormat.value
@@ -27,7 +26,6 @@ export class WorkerTaxMapper {
   static toJSON( workerTax: WorkerTaxDTO ): Record<string, any> {
     return {
       id          : workerTax.id,
-      worker_id   : workerTax.worker_id,
       value       : workerTax.value,
       name        : workerTax.name,
       value_format: workerTax.value_format
@@ -42,13 +40,6 @@ export class WorkerTaxMapper {
 
     if ( id instanceof BaseException ) {
       errors.push( id )
-    }
-
-    const workerId = wrapType(
-      () => UUID.from( workerTax.worker_id ) )
-
-    if ( workerId instanceof BaseException ) {
-      errors.push( workerId )
     }
 
     const value = wrapType(
@@ -78,7 +69,6 @@ export class WorkerTaxMapper {
 
     return {
       id          : ( id as UUID ).toString(),
-      worker_id   : ( workerId as UUID ).toString(),
       value       : ( value as ValidInteger ).value,
       name        : ( name as ValidString ).value,
       value_format: ( valueFormat as ValidString ).value

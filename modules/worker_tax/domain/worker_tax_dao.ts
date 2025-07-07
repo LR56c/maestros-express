@@ -6,7 +6,6 @@ import {
 import { WorkerTax }   from "@/modules/worker_tax/domain/worker_tax"
 
 export abstract class WorkerTaxDAO {
-  abstract upsert( tax : WorkerTax ): Promise<Either<BaseException, boolean>>
+  abstract upsert( workerId: UUID, tax : WorkerTax[] ): Promise<Either<BaseException, boolean>>
   abstract getByWorker( workerId: UUID ): Promise<Either<BaseException[], WorkerTax[]>>
-  abstract getById( id: UUID ): Promise<Either<BaseException[], WorkerTax>>
 }
