@@ -8,7 +8,7 @@ interface InputTextProps {
   placeholder?: string
   name: string
   label: string
-  type: "text" | "email" | "password"
+  type: "text" | "email" | "password" | "number"
 }
 
 export default function InputText( {
@@ -29,7 +29,7 @@ export default function InputText( {
         name={ name }
         render={ ( { field: { value, onBlur, onChange } } ) =>
           <div className="flex flex-col gap-1">
-            <Label htmlFor={name}>{label}</Label>
+            <Label className="font-semibold" htmlFor={name}>{label}</Label>
             <Input type={ type }
                    placeholder={ placeholder }
                    value={ value }

@@ -79,7 +79,7 @@ export default function NationalIdentityInput( {
 
   return (
     <div className="flex flex-col gap-1">
-      <Label htmlFor={ name }>
+      <Label className="font-semibold" htmlFor={ name }>
         { label } { identityFormat
         ? `(${ identityFormat.name.toUpperCase() })`
         : "" }

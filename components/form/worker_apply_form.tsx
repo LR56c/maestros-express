@@ -67,12 +67,9 @@ export default function WorkerApplyForm() {
     resolver: zodResolver( workerFormSchema )
   } )
 
-  const { handleSubmit, setValue, watch } = methods
-
-  const formValues = watch()
+  const { handleSubmit, setValue } = methods
 
   const onSubmit = async ( data: any ) => {
-    console.log( "Form submitted with data:", data )
     const result = await createWorker( {
       user: data.user,
       national_identity_id: data.national_identity_id,
@@ -153,7 +150,6 @@ export default function WorkerApplyForm() {
         <InputLocationDetector name="location" label="Ubicacion"/>
         <Button onClick={ handleSubmit( onSubmit ) }>Send</Button>
       </div>
-      <pre>        { JSON.stringify( formValues, null, 2 ) }</pre>
     </FormProvider>
   </>
 }

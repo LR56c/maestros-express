@@ -1,9 +1,9 @@
-import { z }            from "zod"
+import { z } from "zod"
 
 export const workerTaxSchema = z.object( {
   id          : z.string(),
   name        : z.string(),
-  value       : z.number().int(),
+  value       : z.coerce.number().int(),
   value_format: z.string()
 } )
 

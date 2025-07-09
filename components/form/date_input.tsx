@@ -36,7 +36,7 @@ export function DateInput( {
 
   return (
     <div className="flex flex-col gap-3">
-      <Label htmlFor={ name } className="px-1">{ label }</Label>
+      <Label htmlFor={ name } className="font-semibold px-1">{ label }</Label>
       <Controller
         control={ control }
         name={ name }

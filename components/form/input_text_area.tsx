@@ -27,7 +27,7 @@ export default function InputTextArea( {
         name={ name }
         render={ ( { field: { value, onBlur, onChange } } ) =>
           <div className="flex flex-col gap-1">
-            <Label htmlFor={name}>{label}</Label>
+            <Label className="font-semibold" htmlFor={name}>{label}</Label>
             <Textarea
                    placeholder={ placeholder }
                    value={ value }

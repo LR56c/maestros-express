@@ -4,11 +4,20 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue
-}                               from "@/components/ui/select"
-import { capitalCase }          from "change-case"
-import { useFormContext }       from "react-hook-form"
-import { getNestedErrorObject } from "@/utils/get_nested_error_object"
-import { Label }                from "@/components/ui/label"
+}                         from "@/components/ui/select"
+import { capitalCase }    from "change-case"
+import { useFormContext } from "react-hook-form"
+import {
+  getNestedErrorObject
+}                         from "@/utils/get_nested_error_object"
+import { Label }          from "@/components/ui/label"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger
+}                           from "@/components/ui/tooltip"
+import { HelpCircle, Info } from "lucide-react"
+import type React from "react"
 
 export type SelectInputValue = {
   value: any
@@ -18,6 +27,7 @@ export type SelectInputValue = {
 interface SelectInputProps {
   values: SelectInputValue[]
   label: string
+  helperText?: string
   name: string
   loading: boolean
   placeholder?: string
@@ -28,6 +38,7 @@ export default function SelectInput( {
   values,
   label,
   name,
+  helperText,
   onChange,
   placeholder,
   loading
@@ -48,8 +59,21 @@ export default function SelectInput( {
 
   return (
     <div className="flex flex-col gap-1">
-      <Label htmlFor={ name }>{ label }</Label>
-      <Select disabled={loading} onValueChange={ handleChange }>
+      <div className="flex gap-2">
+        <Label className="font-semibold" htmlFor={ name }>{ label }</Label>
+        { helperText ?
+          <Tooltip>
+            <TooltipTrigger>
+              <HelpCircle className="h-4 w-4 text-muted-foreground"/>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{ helperText }</p>
+            </TooltipContent>
+          </Tooltip>
+          : null }
+
+      </div>
+      <Select disabled={ loading } onValueChange={ handleChange }>
         <SelectTrigger className="w-full">
           <SelectValue placeholder={ loading ? "Cargando" : placeholder }/>
         </SelectTrigger>
