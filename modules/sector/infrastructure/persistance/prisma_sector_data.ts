@@ -145,38 +145,6 @@ export class PrismaSectorData implements SectorDAO {
           }
         } )
       }
-      if ( query.province_id ) {
-        where = queryMerger( where, {
-          municipality: {
-            province: {
-              id: query.province_id
-            }
-          }
-        } )
-      }
-      if ( query.province_name ) {
-        where = queryMerger( where, {
-          municipality: {
-            province: {
-              name: query.province_name
-            }
-          }
-        } )
-      }
-      if ( query.municipality_id ) {
-        where = queryMerger( where, {
-          municipality: {
-            id: query.municipality_id
-          }
-        } )
-      }
-      if ( query.municipality_name ) {
-        where = queryMerger( where, {
-          municipality: {
-            name: query.municipality_name
-          }
-        } )
-      }
       const orderBy = {}
       if ( sortBy ) {
         const key    = changeCase.camelCase( sortBy.value )

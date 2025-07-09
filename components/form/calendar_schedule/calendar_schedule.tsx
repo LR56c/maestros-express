@@ -421,7 +421,7 @@ export default function CalendarSchedule( {
       <Dialog open={ isScheduleModalOpen }
               onOpenChange={ setIsScheduleModalOpen }>
         <DialogContent
-          className={ `sm:${ getMaxWidthClass() } max-h-[80vh] overflow-y-auto` }>
+          className="p-3 overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center justify-center gap-4">
               <Button variant="ghost" size="icon"
@@ -484,11 +484,11 @@ export default function CalendarSchedule( {
 
                 {/* Day Cards - Central Area */ }
                 <div
-                  className={ `grid ${ getGridColsClass() } gap-2 flex-1 ${ getMaxWidthClass() }` }>
+                  className={ `grid ${ getGridColsClass() } gap-2 flex-1` }>
                   { getVisibleDays().map( ( dayData, index ) => (
-                    <Card key={ index } className="bg-muted/50">
+                    <Card key={ index } className="bg-muted/50 py-0">
                       <CardContent
-                        className="p-3 text-center h-16 flex flex-col justify-center">
+                        className="p-3 text-center h-18 flex flex-col justify-center">
                         <div
                           className="text-sm font-medium">{ dayData.formatted.day }</div>
                         <div
@@ -516,10 +516,9 @@ export default function CalendarSchedule( {
               <div className="flex items-start justify-between">
                 {/* Left Spacer - mismo ancho que la flecha */ }
                 <div style={ { width: "40px" } }></div>
-
                 {/* Schedule Cards - mismo grid que los días */ }
-                <div
-                  className={ `grid ${ getGridColsClass() } gap-2 flex-1 ${ getMaxWidthClass() }` }>
+                { schedules.length > 0 ? <div
+                  className={ `grid ${ getGridColsClass() } gap-2 flex-1` }>
                   { getSchedulesByVisibleDays()
                     .map( ( dayData, dayIndex ) => (
                       <div key={ dayIndex }
@@ -529,7 +528,7 @@ export default function CalendarSchedule( {
                           <Card key={ `${ schedule.id }-${ index }` }
                                 className="bg-muted/30 p-0">
                             <CardContent
-                              className="p-3 text-center relative h-28 flex flex-col justify-center">
+                              className="p-3 text-center relative h-18 flex flex-col justify-center">
                               <div
                                 className="text-sm font-medium">{ formatTimeFromDateTime(
                                 schedule.start_date ) }</div>
@@ -540,7 +539,7 @@ export default function CalendarSchedule( {
                               { canEdit ? <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="absolute bottom-2 right-2 h-5 w-5"
+                                  className="absolute bottom-1 right-1 h-4 w-4"
                                   onClick={ () => handleEditSchedule( schedule,
                                     index ) }
                                 >
@@ -559,14 +558,13 @@ export default function CalendarSchedule( {
                         ) ) }
                       </div>
                     ) ) }
-                </div>
-
+                </div> : null}
                 {/* Right Spacer - mismo ancho que la flecha */ }
                 <div style={ { width: "40px" } }></div>
               </div>
 
               {/* Single Add Button at the bottom */ }
-              { canEdit ? <div className="flex justify-center pt-4">
+              { canEdit ? <div className="flex justify-center">
                 <Button
                   type="button"
                   variant="outline"

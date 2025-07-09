@@ -11,8 +11,8 @@ import {
   zoneSchema
 }                                     from "@/modules/zone/application/zone_dto"
 import {
-  certificateSchema
-}                                     from "@/modules/certificate/application/certificate_dto"
+  CertificateDTO, certificateSchema
+} from "@/modules/certificate/application/certificate_dto"
 import {
   storySchema
 }                                     from "@/modules/story/application/story_dto"
@@ -30,7 +30,9 @@ import { FormProvider, useForm }      from "react-hook-form"
 import {
   zodResolver
 }                                     from "@hookform/resolvers/zod"
-import { Button }                     from "@/components/ui/button"
+import {
+  Button
+}                                     from "@/components/ui/button"
 import React, { useEffect, useState } from "react"
 import MultiSelectInput, {
   MultiSelectInputValue
@@ -44,20 +46,48 @@ import ListInput                      from "@/components/form/list_input"
 import {
   TaxDialog
 }                                     from "@/components/form/tax_dialog"
-import { StoryDialog }                from "@/components/form/story_dialog"
+import {
+  StoryDialog, storyFormSchema
+} from "@/components/form/story_dialog"
 import CalendarScheduleInput
                                       from "@/components/form/calendar_schedule/calendar_schedule_input"
 import {
-  DateTimePicker
-}                                     from "@/components/form/calendar_schedule/date_time_picker"
+  parseData
+}                                     from "@/modules/shared/application/parse_handlers"
+import {
+  CertificateType,
+  CertificateTypeEnum
+}                                     from "@/modules/certificate/domain/certificate_type"
+import {
+  wrapType
+}                                     from "@/modules/shared/utils/wrap_type"
+import {
+  BaseException
+}                                     from "@/modules/shared/domain/exceptions/base_exception"
+import { isLeft }                     from "fp-ts/Either"
+
+const certificateFormSchema = z.instanceof( File ).refine(
+  ( file ) => {
+    const typePart = file.type.split( "/" )[ 0 ]
+    const type = wrapType( () => CertificateType.from( typePart.toUpperCase() ) )
+    return !(
+      type instanceof BaseException
+    )
+  },
+  {
+    message: `Solo se aceptan archivos de tipo: ${ Object.values(
+      CertificateTypeEnum ).join(', ') }`
+  }
+)
+export type CertificateForm = z.infer<typeof certificateFormSchema>
 
 
 const workerExtraFormSchema = z.object( {
   specialities: z.array( specialitySchema ),
   taxes       : z.array( workerTaxSchema ),
   zones       : z.array( zoneSchema ),
-  certificates: z.array( certificateSchema ),
-  stories     : z.array( storySchema ),
+  certificates: z.array( certificateFormSchema ),
+  stories     : z.array( storyFormSchema ),
   schedules   : z.array( workerScheduleSchema )
 } )
 
@@ -111,7 +141,7 @@ export default function WorkerExtraForm() {
   const { user }                                               = useAuthContext()
 
   const methods = useForm( {
-    resolver     : zodResolver( workerExtraFormSchema ),
+    resolver: zodResolver( workerExtraFormSchema )
   } )
 
   const { handleSubmit, setValue, watch, control } = methods
@@ -145,8 +175,22 @@ export default function WorkerExtraForm() {
     setSpecialityValues( parseSpecialities( specialityData ?? [] ) )
   }, [specialityData] )
 
-  const [openAddTax, setOpenAddTax]       = useState( false )
-  const [openUpdateTax, setOpenUpdateTax] = useState( false )
+  const parseFileCertificates = ( files: File[] | null ) => {
+    if( !files || files.length === 0 ) {
+      setValue( "certificates", [] )
+      return
+    }
+    let certificates: CertificateForm[] = []
+    for ( const file of files ) {
+      const parsedFileResult = parseData( certificateFormSchema, file )
+      if ( isLeft( parsedFileResult ) ) {
+        certificates = []
+        break
+      }
+      certificates.push( parsedFileResult.right )
+    }
+    setValue( "certificates", certificates )
+  }
   return (
     <>
       <FormProvider { ...methods } >
@@ -170,6 +214,7 @@ export default function WorkerExtraForm() {
                             placeholderLoader="Cargando..."
           />
           <FileUploadInput
+            onChange={ parseFileCertificates }
             helperText="Certificado de Trabajo, Licencia de Conducir, documento que demuestre tu experiencia"
             placeholder="Suelta los archivos aquí o haz click para subir"
             name="" label="Certificados" dropzone={ dropzone }/>
@@ -181,7 +226,7 @@ export default function WorkerExtraForm() {
             tooltip="Añade las tarifas que deseas cobrar por tus servicios"
             createTitle="Nueva tarifa"
             editTitle="Editar tarifa"
-            customModal={TaxDialog}
+            customModal={ TaxDialog }
           />
           <ListInput
             name="stories"
@@ -191,14 +236,14 @@ export default function WorkerExtraForm() {
             tooltip="Añade los trabajos que has realizado"
             createTitle="Nuevo trabajo"
             editTitle="Editar trabajo"
-            customModal={StoryDialog}
+            customModal={ StoryDialog }
           />
           <CalendarScheduleInput
             name="schedules"
-            label="Gestionar mi horario"
-            placeholder="Gestionar mi horario"
-            tooltip="Configura tus horarios de trabajo"
-            visibleDays={3}
+            label="Horarios"
+            placeholder="Ajustar mi horario"
+            tooltip="Indique sus horarios de trabajo"
+            visibleDays={ 5 }
           />
           <Button onClick={ handleSubmit( onSubmit ) }>Finish</Button>
           <pre>{ JSON.stringify( formValues, null, 2 ) }</pre>

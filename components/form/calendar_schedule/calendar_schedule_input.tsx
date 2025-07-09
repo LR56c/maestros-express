@@ -76,7 +76,9 @@ export default function CalendarScheduleInput( {
         <CalendarSchedule
           canEdit={ true }
           schedules={ schedules }
-          placeholder={ placeholder }
+          placeholder={ schedules.length === 0
+            ? "No hay horarios establecidos"
+            : placeholder }
           onChange={ values => setValue( name, values ) }
           visibleDays={ visibleDays }
         />
