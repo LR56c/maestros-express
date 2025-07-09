@@ -89,7 +89,7 @@ export const StoryDialog: React.FC<ListInputModalProps> = ( {
 
   const dropzone = {
     accept  : {
-      "image/*": [".jpg", ".jpeg", ".png"]
+      "image/*": [".jpg", ".jpeg", ".png"],
     },
     multiple: true,
     maxFiles: 4,

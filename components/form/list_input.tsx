@@ -29,7 +29,9 @@ import {
 import {
   getNestedErrorObject
 }                   from "@/utils/get_nested_error_object"
-import { Label }    from "@/components/ui/label"
+import {
+  Label
+}                   from "@/components/ui/label"
 
 interface ListInputModalProps {
   isOpen: boolean
@@ -84,9 +86,9 @@ export default function ListInput( {
     setEditModalOpen( true )
   }
 
-  const handleUpdateItem = (data : any) => {
+  const handleUpdateItem = ( data: any ) => {
     if ( editingIndex === null ) return
-    update( editingIndex,data )
+    update( editingIndex, data )
     setEditModalOpen( false )
   }
 
@@ -155,19 +157,16 @@ export default function ListInput( {
             } name={ name }/>
           ) ) }
         </div>
-
+        { fieldArray.length === 0 ?
+          <p className="text-sm text-gray-500">{ placeholder } </p>
+          : null
+        }
         {
           errorMessage
             ?
             <p className="text-red-500 text-sm">{ errorMessage }</p>
             : null
         }
-
-        {fieldArray.length === 0 ?
-          <p className="text-sm text-gray-500">{placeholder} </p>
-          : null
-        }
-
         {/* Add Button */ }
         <div className="flex justify-center">
           <Button

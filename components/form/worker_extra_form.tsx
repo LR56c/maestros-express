@@ -83,13 +83,14 @@ export type CertificateForm = z.infer<typeof certificateFormSchema>
 
 
 const workerExtraFormSchema = z.object( {
-  specialities: z.array( specialitySchema ),
-  taxes       : z.array( workerTaxSchema ),
-  zones       : z.array( zoneSchema ),
-  certificates: z.array( certificateFormSchema ),
+  specialities: z.array( specialitySchema ).min(1, "Debe seleccionar al menos una especialidad" ),
+  taxes       : z.array( workerTaxSchema ).min(1, "Debe agregar al menos una tarifa" ),
+  zones       : z.array( zoneSchema ).min(1, "Debe seleccionar al menos un sector" ),
+  certificates: z.array( certificateFormSchema ).min(1, "Debe agregar al menos un certificado" ),
   stories     : z.array( storyFormSchema ),
-  schedules   : z.array( workerScheduleSchema )
+  schedules   : z.array( workerScheduleSchema ).min(1, "Debe agregar al menos un horario" ),
 } )
+
 
 const specialitiesOption = {
   queryKey: ["specialities"],
@@ -144,12 +145,18 @@ export default function WorkerExtraForm() {
     resolver: zodResolver( workerExtraFormSchema )
   } )
 
-  const { handleSubmit, setValue, watch, control } = methods
+  const { handleSubmit, setValue, watch, formState:{errors}, reset } = methods
+
 
   const formValues = watch()
 
   const onSubmit = async ( data: any ) => {
     console.log( "Form submitted with data:", data )
+    const result = await updateWorker(data)
+    if(!result){
+      console.log("Error updating worker data")
+    }
+    reset()
   }
 
   const [sectorValues, setSectorValues] = useState<MultiSelectInputValue[]>(
@@ -160,7 +167,8 @@ export default function WorkerExtraForm() {
 
   const dropzone = {
     accept  : {
-      "image/*": [".jpg", ".jpeg", ".png"]
+      "image/*": [".jpg", ".jpeg", ".png"],
+      "pdf"   : [".pdf"],
     },
     multiple: true,
     maxFiles: 4,

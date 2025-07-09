@@ -4,7 +4,7 @@ import React, { createContext, ReactNode, useContext } from "react"
 import { WorkerRequest } from "@/modules/worker/application/worker_request"
 
 interface WorkerContextType {
-  updateWorker: ( worker: WorkerResponse ) => Promise<void>
+  updateWorker: ( worker: any ) => Promise<boolean>
   createWorker: ( worker: WorkerRequest ) => Promise<boolean>
 }
 
@@ -12,7 +12,10 @@ const WorkerContext = createContext<WorkerContextType | undefined>( undefined )
 
 export const WorkerProvider = ( { children }: { children: ReactNode } ) => {
 
-  const updateWorker = async ( worker: WorkerResponse ) => {
+  const updateWorker = async ( worker: any ) => {
+    // upload files, get urls
+    // validate update data
+    // remove urls if fails
     const response = await fetch( "/api/worker", {
       method : "POST",
       headers: {
@@ -21,9 +24,10 @@ export const WorkerProvider = ( { children }: { children: ReactNode } ) => {
       body   : JSON.stringify( worker )
     } )
     if ( !response.ok ) {
-      return
+      return false
     }
     const data = await response.json()
+    return true
   }
 
   const createWorker = async ( worker: WorkerRequest ): Promise<boolean> => {
