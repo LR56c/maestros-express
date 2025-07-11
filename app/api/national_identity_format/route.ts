@@ -31,18 +31,10 @@ import {
 import {
   NationalIdentityFormatMapper
 }                                    from "@/modules/national_identity_format/application/national_identity_format_mapper"
-
-const dao                                 = new PrismaNationalIdentityFormatData(
-  prisma )
-const add                                 = new AddNationalIdentityFormat( dao,
-  await searchCountry() )
-const remove                              = new RemoveNationalIdentityFormat(
-  dao )
-const update                              = new UpdateNationalIdentityFormat(
-  dao, await searchCountry() )
-export async function searchNationalIdentityFormat(){
-  return new SearchNationalIdentityFormat( dao )
-}
+import {
+  addNationalIdentity, removeNationalIdentity,
+  searchNationalIdentityFormat, updateNationalIdentity
+} from "@/app/api/dependencies"
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
@@ -52,7 +44,7 @@ export async function POST( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await add.execute( data.right )
+  const result = await (await addNationalIdentity()).execute( data.right )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
@@ -105,7 +97,7 @@ export async function PUT( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await update.execute( data.right )
+  const result = await (await updateNationalIdentity()).execute( data.right )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
@@ -119,7 +111,7 @@ export async function DELETE( request: NextRequest ) {
   const { searchParams } = new URL( request.url )
   const id               = searchParams.get( "id" )
 
-  const result = await remove.execute( id ?? "" )
+  const result = await (await removeNationalIdentity()).execute( id ?? "" )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
