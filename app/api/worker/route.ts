@@ -1,55 +1,24 @@
 "use server"
 
-import { NextRequest, NextResponse } from "next/server"
-import prisma                        from "@/lib/prisma"
+import { NextRequest, NextResponse }             from "next/server"
 import {
   querySchema
-}                                    from "@/modules/shared/application/query_dto"
+}                                                from "@/modules/shared/application/query_dto"
 import {
   parseData
-}                                    from "@/modules/shared/application/parse_handlers"
-import { isLeft }                    from "fp-ts/Either"
-import {
-  PrismaWorkerData
-}                                    from "@/modules/worker/infrastructure/prisma_worker_data"
-import {
-  AddWorker
-}                                    from "@/modules/worker/application/add_worker"
-import {
-  UpdateWorker
-}                                    from "@/modules/worker/application/update_worker"
-import {
-  SearchWorker
-}                                    from "@/modules/worker/application/search_worker"
+}                                                from "@/modules/shared/application/parse_handlers"
+import { isLeft }                                from "fp-ts/Either"
 import {
   workerRequestSchema
-}                                    from "@/modules/worker/application/worker_request"
+}                                                from "@/modules/worker/application/worker_request"
 import {
   WorkerMapper
-}                                    from "@/modules/worker/application/worker_mapper"
+}                                                from "@/modules/worker/application/worker_mapper"
 import {
   workerUpdateSchema
-}                                    from "@/modules/worker/application/worker_update_dto"
-import { searchSpeciality }          from "@/app/api/speciality/route"
-import { upsertEmbedding }           from "@/app/api/worker_embedding/route"
-import {
-  searchNationalIdentityFormat
-}                                    from "@/app/api/national_identity_format/route"
-import { registerAuth }              from "@/app/api/user/route"
+}                                                from "@/modules/worker/application/worker_update_dto"
+import { addWorker, searchWorker, updateWorker } from "@/app/api/dependencies"
 
-
-function dao() {
-  return new PrismaWorkerData( prisma )
-}
-
-const add    = new AddWorker( dao(), await searchNationalIdentityFormat(),
-  await registerAuth() )
-const update = new UpdateWorker( dao(), await searchSpeciality(),
-  await upsertEmbedding() )
-
-export async function searchWorker() {
-  return new SearchWorker( dao() )
-}
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
@@ -59,7 +28,9 @@ export async function POST( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await add.execute( data.right )
+  const result = await (
+    await addWorker()
+  ).execute( data.right )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
@@ -111,7 +82,9 @@ export async function PUT( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await update.execute( data.right )
+  const result = await (
+    await updateWorker()
+  ).execute( data.right )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )

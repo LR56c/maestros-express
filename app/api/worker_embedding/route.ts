@@ -1,6 +1,5 @@
 "use server"
 import { NextRequest, NextResponse } from "next/server"
-import prisma                        from "@/lib/prisma"
 import {
   querySchema
 }                                    from "@/modules/shared/application/query_dto"
@@ -9,52 +8,17 @@ import {
 }                                    from "@/modules/shared/application/parse_handlers"
 import { isLeft }                    from "fp-ts/Either"
 import {
-  PrismaWorkerEmbeddingData
-}                                    from "@/modules/worker_embedding/infrastructure/prisma_worker_embedding_data"
-import {
-  UpsertWorkerEmbedding
-}                                    from "@/modules/worker_embedding/application/upsert_worker_embedding"
-import {
-  SearchWorkerEmbedding
-}                                    from "@/modules/worker_embedding/application/search_worker_embedding"
-import {
   WorkerEmbeddingMapper
 }                                    from "@/modules/worker_embedding/application/worker_embedding_mapper"
-import {
-  OpenaiWorkerEmbeddingData
-}                                    from "@/modules/worker_embedding/infrastructure/openai_worker_embedding_data"
-import { getStory }                  from "@/app/api/story/route"
-import { searchWorker }              from "@/app/api/worker/route"
-// import { createClient }              from "@supabase/supabase-js"
 import {
   workerEmbeddingRequestSchema
 }                                    from "@/modules/worker_embedding/application/worker_embedding_request"
 import {
-  SupabaseWorkerEmbeddingData
-}                                    from "@/modules/worker_embedding/infrastructure/supabase_worker_embedding_data"
-import { ai, supabase }              from "@/app/api/dependencies"
-import {
-  RemoveWorkerEmbedding
-}                                    from "@/modules/worker_embedding/application/remove_worker_embedding"
+  removeEmbedding,
+  searchEmbedding,
+  upsertEmbedding
+}                                    from "@/app/api/dependencies"
 
-
-export async function  aiRepo (){
-  return new OpenaiWorkerEmbeddingData( await ai() )
-}
-
-
-const prismaDao   = new PrismaWorkerEmbeddingData( prisma, await aiRepo() )
-const supabaseDao = new SupabaseWorkerEmbeddingData( await aiRepo(),
-  await supabase() )
-
-export async function upsertEmbedding() {
-  return new UpsertWorkerEmbedding( prismaDao,
-    await searchWorker(),
-    await getStory() )
-
-}
-const remove = new RemoveWorkerEmbedding(prismaDao)
-const search = new SearchWorkerEmbedding( supabaseDao, await searchWorker() )
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
@@ -92,7 +56,9 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await search.execute(
+  const result = await (
+    await searchEmbedding()
+  ).execute(
     data.right.query,
     data.right.limit,
     data.right.skip,
@@ -112,7 +78,9 @@ export async function DELETE( request: NextRequest ) {
   const { searchParams } = new URL( request.url )
   const id               = searchParams.get( "id" )
 
-  const result = await remove.execute( id ?? "" )
+  const result = await (
+    await removeEmbedding()
+  ).execute( id ?? "" )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )

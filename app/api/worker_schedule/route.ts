@@ -1,28 +1,12 @@
 "use server"
 
 import { NextRequest, NextResponse } from "next/server"
-import prisma                        from "@/lib/prisma"
 import {
   querySchema
 }                                    from "@/modules/shared/application/query_dto"
 import {
   parseData
 }                                    from "@/modules/shared/application/parse_handlers"
-import {
-  PrismaWorkerScheduleData
-}                                    from "@/modules/worker_schedule/infrastructure/prisma_worker_schedule_data"
-import {
-  AddWorkerSchedule
-}                                    from "@/modules/worker_schedule/application/add_worker_schedule"
-import {
-  RemoveWorkerSchedule
-}                                    from "@/modules/worker_schedule/application/remove_worker_schedule"
-import {
-  UpdateWorkerSchedule
-}                                    from "@/modules/worker_schedule/application/update_worker_schedule"
-import {
-  SearchWorkerSchedule
-}                                    from "@/modules/worker_schedule/application/search_worker_schedule"
 import {
   workerScheduleSchema
 }                                    from "@/modules/worker_schedule/application/worker_schedule_dto"
@@ -32,18 +16,12 @@ import {
 import { isLeft }                    from "fp-ts/Either"
 import { z }                         from "zod"
 import {
-  UpsertSchedules
-}                                    from "@/modules/worker_schedule/application/upsert_schedules"
+  addWorkerSchedule,
+  removeWorkerSchedule,
+  searchWorkerSchedule,
+  updateWorkerSchedule
+}                                    from "@/app/api/dependencies"
 
-const dao    = new PrismaWorkerScheduleData( prisma )
-const add    = new AddWorkerSchedule( dao )
-const remove = new RemoveWorkerSchedule( dao )
-const update = new UpdateWorkerSchedule( dao )
-const search = new SearchWorkerSchedule( dao )
-
-export async function upsertSchedules() {
-  return new UpsertSchedules( dao, search )
-}
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
@@ -57,7 +35,9 @@ export async function POST( request: NextRequest ) {
 
   const { worker_id, ...rest } = data.right
 
-  const result = await add.execute( worker_id, rest )
+  const result = await (
+    await addWorkerSchedule()
+  ).execute( worker_id, rest )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
@@ -85,7 +65,9 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await search.execute(
+  const result = await (
+    await searchWorkerSchedule()
+  ).execute(
     data.right.query,
     data.right.limit,
     data.right.skip,
@@ -109,7 +91,9 @@ export async function PUT( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await update.execute( data.right )
+  const result = await (
+    await updateWorkerSchedule()
+  ).execute( data.right )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
@@ -123,7 +107,9 @@ export async function DELETE( request: NextRequest ) {
   const { searchParams } = new URL( request.url )
   const id               = searchParams.get( "id" )
 
-  const result = await remove.execute( id ?? "" )
+  const result = await (
+    await removeWorkerSchedule()
+  ).execute( id ?? "" )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )

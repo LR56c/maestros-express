@@ -1,25 +1,7 @@
 "use server"
 
 import { NextRequest, NextResponse } from "next/server"
-import {
-  specialitySchema
-}                                    from "@/modules/speciality/application/speciality_dto"
-import {
-  AddSpeciality
-}                                    from "@/modules/speciality/application/add_speciality"
-import {
-  PrismaSpecialityData
-}                                    from "@/modules/speciality/infrastructure/persistance/prisma_speciality_data"
 import prisma                        from "@/lib/prisma"
-import {
-  RemoveSpeciality
-}                                    from "@/modules/speciality/application/remove_speciality"
-import {
-  UpdateSpeciality
-}                                    from "@/modules/speciality/application/update_speciality"
-import {
-  SearchSpeciality
-}                                    from "@/modules/speciality/application/search_speciality"
 import {
   querySchema
 }                                    from "@/modules/shared/application/query_dto"
@@ -27,10 +9,6 @@ import {
   parseData
 }                                    from "@/modules/shared/application/parse_handlers"
 import { isLeft }                    from "fp-ts/Either"
-import {
-  SpecialityMapper
-}                                    from "@/modules/speciality/application/speciality_mapper"
-import { z }                         from "zod"
 import {
   PrismaCurrencyData
 }                                    from "@/modules/currency/infrastructure/prisma_currency_data"
@@ -51,13 +29,13 @@ import {
 }                                    from "@/modules/currency/application/currency_dto"
 import {
   CurrencyMapper
-}                                    from "@/modules/currency/application/currency_mapper"
+}                                      from "@/modules/currency/application/currency_mapper"
+import {
+  addCurrency, removeCurrency,
+  searchCurrency,
+  updateCurrency
+} from "@/app/api/dependencies"
 
-const dao    = new PrismaCurrencyData( prisma )
-const add    = new AddCurrency( dao )
-const remove = new RemoveCurrency( dao )
-const update = new UpdateCurrency( dao )
-const search = new SearchCurrency(dao)
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
@@ -67,7 +45,7 @@ export async function POST( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await add.execute( data.right )
+  const result = await (await addCurrency()).execute( data.right )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
@@ -95,7 +73,7 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await search.execute(
+  const result = await (await searchCurrency()).execute(
     data.right.query,
     data.right.limit,
     data.right.skip,
@@ -119,7 +97,7 @@ export async function PUT( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await update.execute(data.right)
+  const result = await (await updateCurrency()).execute( data.right )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
@@ -131,9 +109,9 @@ export async function PUT( request: NextRequest ) {
 
 export async function DELETE( request: NextRequest ) {
   const { searchParams } = new URL( request.url )
-  const code               = searchParams.get( "code" )
+  const code             = searchParams.get( "code" )
 
-  const result = await remove.execute( code ?? "" )
+  const result = await (await removeCurrency()).execute( code ?? "" )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )

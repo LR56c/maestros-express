@@ -1,44 +1,28 @@
 "use server"
 
 import { NextRequest, NextResponse } from "next/server"
-import prisma                        from "@/lib/prisma"
 import {
   querySchema
 }                                    from "@/modules/shared/application/query_dto"
 import {
   parseData
 }                                    from "@/modules/shared/application/parse_handlers"
-import { isLeft }                    from "fp-ts/Either"
 import {
-  PrismaRegionData
-}                                    from "@/modules/region/infrastructure/persistance/prisma_region_data"
-import {
-  AddRegion
-}                                    from "@/modules/region/application/add_region"
-import {
-  RemoveRegion
-}                                    from "@/modules/region/application/remove_region"
-import {
-  UpdateRegion
-}                                    from "@/modules/region/application/update_region"
-import {
-  SearchRegion
-}                                    from "@/modules/region/application/search_region"
-import { searchCountry }             from "@/app/api/country/route"
+  isLeft
+}                                    from "fp-ts/Either"
 import {
   regionSchema
 }                                    from "@/modules/region/application/region_dto"
 import {
   RegionMapper
 }                                    from "@/modules/region/application/region_mapper"
+import {
+  addRegion,
+  removeRegion,
+  searchRegion,
+  updateRegion
+}                                    from "@/app/api/dependencies"
 
-const dao                 = new PrismaRegionData( prisma )
-const add                 = new AddRegion( dao, await searchCountry() )
-const remove              = new RemoveRegion( dao )
-const update              = new UpdateRegion( dao )
-export async function searchRegion(){
-  return new SearchRegion( dao )
-}
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
@@ -48,7 +32,9 @@ export async function POST( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await add.execute( data.right )
+  const result = await (
+    await addRegion()
+  ).execute( data.right )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
@@ -76,7 +62,9 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await (await searchRegion()).execute( data.right )
+  const result = await (
+    await searchRegion()
+  ).execute( data.right )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
@@ -94,7 +82,9 @@ export async function PUT( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await update.execute( data.right )
+  const result = await (
+    await updateRegion()
+  ).execute( data.right )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
@@ -108,7 +98,9 @@ export async function DELETE( request: NextRequest ) {
   const { searchParams } = new URL( request.url )
   const id               = searchParams.get( "id" )
 
-  const result = await remove.execute( id ?? "" )
+  const result = await (
+    await removeRegion()
+  ).execute( id ?? "" )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )

@@ -1,4 +1,3 @@
-import { upsertPackages }            from "@/app/api/package/route"
 import { NextRequest, NextResponse } from "next/server"
 import {
   parseData
@@ -11,6 +10,7 @@ import {
   PackageMapper
 }                                    from "@/modules/package/application/package_mapper"
 import { z }                         from "zod"
+import { upsertPackages }            from "@/app/api/dependencies"
 
 
 export async function POST( request: NextRequest ) {

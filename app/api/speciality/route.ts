@@ -5,22 +5,6 @@ import {
   specialitySchema
 }                                    from "@/modules/speciality/application/speciality_dto"
 import {
-  AddSpeciality
-}                                    from "@/modules/speciality/application/add_speciality"
-import {
-  PrismaSpecialityData
-}                                    from "@/modules/speciality/infrastructure/persistance/prisma_speciality_data"
-import prisma                        from "@/lib/prisma"
-import {
-  RemoveSpeciality
-}                                    from "@/modules/speciality/application/remove_speciality"
-import {
-  UpdateSpeciality
-}                                    from "@/modules/speciality/application/update_speciality"
-import {
-  SearchSpeciality
-}                                    from "@/modules/speciality/application/search_speciality"
-import {
   querySchema
 }                                    from "@/modules/shared/application/query_dto"
 import {
@@ -31,15 +15,13 @@ import {
   SpecialityMapper
 }                                    from "@/modules/speciality/application/speciality_mapper"
 import { z }                         from "zod"
+import {
+  addSpeciality,
+  removeSpeciality,
+  searchSpeciality,
+  updateSpeciality
+}                                    from "@/app/api/dependencies"
 
-const dao    = new PrismaSpecialityData( prisma )
-const add    = new AddSpeciality( dao )
-const remove = new RemoveSpeciality( dao )
-const update = new UpdateSpeciality( dao )
-
-export async function searchSpeciality() {
-  return new SearchSpeciality( dao )
-}
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
@@ -49,7 +31,9 @@ export async function POST( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await add.execute( data.right )
+  const result = await (
+    await addSpeciality()
+  ).execute( data.right )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
@@ -106,7 +90,9 @@ export async function PUT( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await update.execute(
+  const result = await (
+    await updateSpeciality()
+  ).execute(
     data.right.prev_name,
     data.right.new_name
   )
@@ -123,7 +109,9 @@ export async function DELETE( request: NextRequest ) {
   const { searchParams } = new URL( request.url )
   const id               = searchParams.get( "id" )
 
-  const result = await remove.execute( id ?? "" )
+  const result = await (
+    await removeSpeciality()
+  ).execute( id ?? "" )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )

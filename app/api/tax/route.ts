@@ -1,87 +1,53 @@
 "use server"
 
-import { NextRequest, NextResponse } from "next/server"
-import {
-  specialitySchema
-}                                    from "@/modules/speciality/application/speciality_dto"
-import {
-  AddSpeciality
-}                                    from "@/modules/speciality/application/add_speciality"
-import {
-  PrismaSpecialityData
-}                                    from "@/modules/speciality/infrastructure/persistance/prisma_speciality_data"
-import prisma                        from "@/lib/prisma"
-import {
-  RemoveSpeciality
-}                                    from "@/modules/speciality/application/remove_speciality"
-import {
-  UpdateSpeciality
-}                                    from "@/modules/speciality/application/update_speciality"
-import {
-  SearchSpeciality
-}                                    from "@/modules/speciality/application/search_speciality"
-import {
-  querySchema
-}                                    from "@/modules/shared/application/query_dto"
+import { NextRequest, NextResponse }     from "next/server"
 import {
   parseData
-}                                    from "@/modules/shared/application/parse_handlers"
-import { isLeft }                    from "fp-ts/Either"
-import {
-  SpecialityMapper
-}                                    from "@/modules/speciality/application/speciality_mapper"
-import { z }                         from "zod"
-import {
-  PrismaWorkerTaxData
-}                                    from "@/modules/worker_tax/infrastructure/persistance/prisma_worker_tax_data"
-import {
-  UpsertWorkerTax
-}                                    from "@/modules/worker_tax/application/upsert_worker_tax"
-import {
-  GetByWorkerTax
-}                                    from "@/modules/worker_tax/application/get_by_worker_tax"
+}                                        from "@/modules/shared/application/parse_handlers"
+import { isLeft }                        from "fp-ts/Either"
+import { z }                             from "zod"
 import {
   workerTaxSchema
-}                                    from "@/modules/worker_tax/application/worker_tax_dto"
+}                                        from "@/modules/worker_tax/application/worker_tax_dto"
 import {
   WorkerTaxMapper
-}                                    from "@/modules/worker_tax/application/worker_tax_mapper"
+}                                        from "@/modules/worker_tax/application/worker_tax_mapper"
+import { getWorkerTax, upsertWorkerTax } from "@/app/api/dependencies"
 
-const dao    = new PrismaWorkerTaxData( prisma )
-const getWorkerTax = new GetByWorkerTax( dao )
-const upsert    = new UpsertWorkerTax( dao,getWorkerTax )
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
-  const data = parseData( z.object({
+  const data = parseData( z.object( {
     worker_id: z.string(),
-    taxes: z.array(workerTaxSchema)
-  }), body )
+    taxes    : z.array( workerTaxSchema )
+  } ), body )
 
   if ( isLeft( data ) ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
   const { worker_id, taxes } = data.right
-  const result = await upsert.execute( worker_id,taxes )
+  const result               = await (
+    await upsertWorkerTax()
+  ).execute( worker_id, taxes )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
   }
 
-  return NextResponse.json( result.right.map(WorkerTaxMapper.toDTO),
+  return NextResponse.json( result.right.map( WorkerTaxMapper.toDTO ),
     { status: 201 } )
 }
 
 export async function GET( request: NextRequest ) {
-  const { searchParams }                             = new URL( request.url )
-  const paramsObject                                 = Object.fromEntries(
+  const { searchParams } = new URL( request.url )
+  const paramsObject     = Object.fromEntries(
     searchParams.entries() )
-  const { id } = paramsObject
+  const { id }           = paramsObject
 
-  const data = parseData( z.object({
+  const data = parseData( z.object( {
     worker_id: z.string()
-  }), {
+  } ), {
     worker_id: id
   } )
 
@@ -89,7 +55,9 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await getWorkerTax.execute(data.right.worker_id)
+  const result = await (
+    await getWorkerTax()
+  ).execute( data.right.worker_id )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )

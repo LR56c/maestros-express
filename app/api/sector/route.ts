@@ -1,44 +1,28 @@
 "use server"
 
 import { NextRequest, NextResponse } from "next/server"
-import prisma                        from "@/lib/prisma"
 import {
   querySchema
 }                                    from "@/modules/shared/application/query_dto"
 import {
   parseData
 }                                    from "@/modules/shared/application/parse_handlers"
-import { isLeft }                    from "fp-ts/Either"
 import {
-  PrismaSectorData
-}                                    from "@/modules/sector/infrastructure/persistance/prisma_sector_data"
-import {
-  AddSector
-}                                    from "@/modules/sector/application/add_sector"
-import {
-  RemoveSector
-}                                    from "@/modules/sector/application/remove_sector"
-import {
-  UpdateSector
-}                                    from "@/modules/sector/application/update_sector"
-import {
-  SearchSector
-}                                    from "@/modules/sector/application/search_sector"
-import { searchRegion }              from "@/app/api/region/route"
+  isLeft
+}                                    from "fp-ts/Either"
 import {
   sectorSchema
 }                                    from "@/modules/sector/application/sector_dto"
 import {
   SectorMapper
 }                                    from "@/modules/sector/application/sector_mapper"
+import {
+  addSector,
+  removeSector,
+  searchSector,
+  updateSector
+}                                    from "@/app/api/dependencies"
 
-const dao    = new PrismaSectorData( prisma )
-const add    = new AddSector( dao, await searchRegion() )
-const remove = new RemoveSector( dao )
-const update = new UpdateSector( dao )
-export async function searchSector(){
-  return new SearchSector( dao )
-}
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
@@ -48,7 +32,9 @@ export async function POST( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await add.execute( data.right )
+  const result = await (
+    await addSector()
+  ).execute( data.right )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
@@ -76,11 +62,13 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await (await searchSector()).execute(     data.right.query,
+  const result = await (
+    await searchSector()
+  ).execute( data.right.query,
     data.right.limit,
     data.right.skip,
     data.right.sort_by,
-    data.right.sort_type, )
+    data.right.sort_type )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
@@ -98,7 +86,9 @@ export async function PUT( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await update.execute( data.right )
+  const result = await (
+    await updateSector()
+  ).execute( data.right )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
@@ -112,7 +102,9 @@ export async function DELETE( request: NextRequest ) {
   const { searchParams } = new URL( request.url )
   const id               = searchParams.get( "id" )
 
-  const result = await remove.execute( id ?? "" )
+  const result = await (
+    await removeSector()
+  ).execute( id ?? "" )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )

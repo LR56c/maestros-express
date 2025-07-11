@@ -36,15 +36,13 @@ import {
 import {
   UpsertPackages
 }                                    from "@/modules/package/application/upsert_packages"
+import {
+  addPackage, removePackage,
+  searchPackage,
+  updatePackage
+} from "@/app/api/dependencies"
 
-const dao    = new PrismaPackageData( prisma )
-const add    = new AddPackage( dao )
-const remove = new RemovePackage( dao )
-const update = new UpdatePackage( dao )
-const search = new SearchPackage( dao )
-export async function upsertPackages(){
-  return new UpsertPackages(dao,search)
-}
+
 export async function POST( request: NextRequest ) {
   const body = await request.json()
   const data = parseData( packageRequestSchema, body )
@@ -53,7 +51,7 @@ export async function POST( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await add.execute( data.right )
+  const result = await (await addPackage()).execute( data.right )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
@@ -81,7 +79,7 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await search.execute(
+  const result = await (await searchPackage()).execute(
     data.right.query,
     data.right.limit,
     data.right.skip,
@@ -105,7 +103,7 @@ export async function PUT( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await update.execute( data.right)
+  const result = await (await updatePackage()).execute( data.right)
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
@@ -119,7 +117,7 @@ export async function DELETE( request: NextRequest ) {
   const { searchParams } = new URL( request.url )
   const id               = searchParams.get( "id" )
 
-  const result = await remove.execute( id ?? "" )
+  const result = await (await removePackage()).execute( id ?? "" )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )

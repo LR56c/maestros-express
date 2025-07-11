@@ -29,12 +29,14 @@ import {
 }                                    from "@/modules/quotation/application/quotation_mapper"
 import {
   quotationUpdateSchema
-}                                    from "@/modules/quotation/application/quotation_update_dto"
+}                                        from "@/modules/quotation/application/quotation_update_dto"
+import {
+  addQuotation,
+  searchQuotation,
+  updateQuotation
+} from "@/app/api/dependencies"
 
-const dao    = new PrismaQuotationData( prisma )
-const add    = new AddQuotation( dao )
-const update = new UpdateQuotation( dao )
-const search = new SearchQuotation( dao )
+
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
@@ -44,7 +46,7 @@ export async function POST( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await add.execute( data.right )
+  const result = await (await addQuotation()).execute( data.right )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
@@ -72,7 +74,7 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await search.execute(
+  const result = await (await searchQuotation()).execute(
     data.right.query,
     data.right.limit,
     data.right.skip,
@@ -96,7 +98,7 @@ export async function PUT( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await update.execute( data.right)
+  const result = await (await updateQuotation()).execute( data.right)
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )

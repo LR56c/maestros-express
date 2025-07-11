@@ -1,37 +1,20 @@
 "use server"
 
-import { NextRequest, NextResponse } from "next/server"
-import prisma                        from "@/lib/prisma"
+import { NextRequest, NextResponse }       from "next/server"
 import {
   parseData
-}                                    from "@/modules/shared/application/parse_handlers"
-import { isLeft }                    from "fp-ts/Either"
-import {
-  PrismaChatData
-}                                    from "@/modules/chat/infrastructure/prisma_chat_data"
-import { AddChat }                   from "@/modules/chat/application/add_chat"
-import {
-  UpdateChat
-}                                    from "@/modules/chat/application/update_chat"
-import {
-  GetChatByUser
-}                                    from "@/modules/chat/application/get_chat_by_user"
+}                                          from "@/modules/shared/application/parse_handlers"
+import { isLeft }                          from "fp-ts/Either"
 import {
   ChatMapper
-}                                    from "@/modules/chat/application/chat_mapper"
+}                                          from "@/modules/chat/application/chat_mapper"
 import {
   chatRequestSchema
-}                                    from "@/modules/chat/application/chat_request"
+}                                          from "@/modules/chat/application/chat_request"
 import {
   chatUpdateSchema
-}                                    from "@/modules/chat/application/chat_update_dto"
-import { searchUser }                from "@/app/api/user/route"
-
-const dao    = new PrismaChatData( prisma )
-
-const add    = new AddChat( dao, await searchUser() )
-const update = new UpdateChat( dao )
-const search = new GetChatByUser( dao )
+}                                          from "@/modules/chat/application/chat_update_dto"
+import { addChat, chatByUser, updateChat } from "@/app/api/dependencies"
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
@@ -42,7 +25,9 @@ export async function POST( request: NextRequest ) {
   }
 
 
-  const result = await add.execute(data.right)
+  const result = await (
+    await addChat()
+  ).execute( data.right )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
@@ -56,7 +41,9 @@ export async function GET( request: NextRequest ) {
   const { searchParams } = new URL( request.url )
   const id               = searchParams.get( "id" )
 
-  const result = await search.execute( id ?? '' )
+  const result = await (
+    await chatByUser()
+  ).execute( id ?? "" )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
@@ -74,7 +61,9 @@ export async function PUT( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await update.execute( data.right )
+  const result = await (
+    await updateChat()
+  ).execute( data.right )
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
   }

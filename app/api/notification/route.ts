@@ -51,12 +51,14 @@ import {
 }                                    from "@/modules/notification/application/notification_mapper"
 import {
   notificationUpdateSchema
-}                                    from "@/modules/notification/application/notification_update_dto"
+}                                                from "@/modules/notification/application/notification_update_dto"
+import {
+  searchNotifications,
+  sendNotification,
+  updateNotification
+} from "@/app/api/dependencies"
 
-const dao    = new PrismaNotificationData( prisma )
-const send    = new SendNotification( dao )
-const update                  = new UpdateNotification( dao )
-const search = new SearchNotifications( dao )
+
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
@@ -66,7 +68,7 @@ export async function POST( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await send.execute( data.right )
+  const result = await (await sendNotification()).execute( data.right )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
@@ -94,7 +96,7 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await search.execute(
+  const result = await (await searchNotifications()).execute(
     data.right.query,
     data.right.limit ?? 10,
     data.right.skip,
@@ -118,7 +120,7 @@ export async function PUT( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await update.execute( data.right  )
+  const result = await (await updateNotification()).execute( data.right  )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )

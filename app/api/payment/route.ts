@@ -1,7 +1,6 @@
 "use server"
 
 import { NextRequest, NextResponse } from "next/server"
-import prisma                        from "@/lib/prisma"
 import {
   querySchema
 }                                    from "@/modules/shared/application/query_dto"
@@ -10,31 +9,20 @@ import {
 }                                    from "@/modules/shared/application/parse_handlers"
 import { isLeft }                    from "fp-ts/Either"
 import {
-  PrismaPaymentData
-}                                    from "@/modules/payment/infrastructure/prisma_payment_data"
-import {
-  AddPayment
-}                                    from "@/modules/payment/application/add_payment"
-import {
-  SearchPayment
-}                                    from "@/modules/payment/application/search_payment"
-import {
   paymentRequestSchema
 }                                    from "@/modules/payment/application/payment_request"
 import {
   PaymentMapper
 }                                    from "@/modules/payment/application/payment_mapper"
 import {
-  UpdatePayment
-}                                    from "@/modules/payment/application/update_payment"
-import {
   paymentUpdateSchema
 }                                    from "@/modules/payment/application/payment_update_dto"
+import {
+  addPayment,
+  searchPayment,
+  updatePayment
+}                                    from "@/app/api/dependencies"
 
-const dao    = new PrismaPaymentData( prisma )
-const add    = new AddPayment( dao )
-const update = new UpdatePayment( dao )
-const search = new SearchPayment( dao )
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
@@ -44,7 +32,9 @@ export async function POST( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await add.execute( data.right )
+  const result = await (
+    await addPayment()
+  ).execute( data.right )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
@@ -72,7 +62,9 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await search.execute(
+  const result = await (
+    await searchPayment()
+  ).execute(
     data.right.query,
     data.right.limit,
     data.right.skip,
@@ -96,7 +88,9 @@ export async function PUT( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await update.execute( data.right )
+  const result = await (
+    await updatePayment()
+  ).execute( data.right )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )

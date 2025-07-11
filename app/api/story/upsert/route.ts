@@ -10,7 +10,7 @@ import { isLeft }                    from "fp-ts/Either"
 import {
   StoryMapper
 }                                    from "@/modules/story/application/story_mapper"
-import { upsertStories }             from "@/app/api/story/route"
+import { upsertStories }             from "@/app/api/dependencies"
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()

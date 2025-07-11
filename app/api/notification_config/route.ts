@@ -1,7 +1,6 @@
 "use server"
 
 import { NextRequest, NextResponse } from "next/server"
-import prisma                        from "@/lib/prisma"
 import {
   querySchema
 }                                    from "@/modules/shared/application/query_dto"
@@ -10,32 +9,18 @@ import {
 }                                    from "@/modules/shared/application/parse_handlers"
 import { isLeft }                    from "fp-ts/Either"
 import {
-  PrismaNotificationConfigData
-}                                    from "@/modules/notification_config/infrastructure/persistance/prisma_notification_config_data"
-import {
-  AddNotificationConfig
-}                                    from "@/modules/notification_config/application/add_notification_config"
-import {
-  RemoveNotificationConfig
-}                                    from "@/modules/notification_config/application/remove_notification_config"
-import {
-  UpdateNotificationConfig
-}                                    from "@/modules/notification_config/application/update_notification_config"
-import {
-  SearchNotificationConfig
-}                                    from "@/modules/notification_config/application/search_notification_config"
-import {
   notificationConfigSchema
 }                                    from "@/modules/notification_config/application/notification_config_dto"
 import {
   NotificationConfigMapper
 }                                    from "@/modules/notification_config/application/notification_config_mapper"
+import {
+  addNotificationConfig,
+  removeNotificationConfig,
+  searchNotificationConfig,
+  updateNotificationConfig
+}                                    from "@/app/api/dependencies"
 
-const dao    = new PrismaNotificationConfigData( prisma )
-const add    = new AddNotificationConfig( dao )
-const remove = new RemoveNotificationConfig( dao )
-const update = new UpdateNotificationConfig( dao )
-const search = new SearchNotificationConfig( dao )
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
@@ -45,7 +30,9 @@ export async function POST( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await add.execute( data.right )
+  const result = await (
+    await addNotificationConfig()
+  ).execute( data.right )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
@@ -73,7 +60,9 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await search.execute(
+  const result = await (
+    await searchNotificationConfig()
+  ).execute(
     data.right.query,
     data.right.limit ?? 10,
     data.right.skip,
@@ -97,7 +86,9 @@ export async function PUT( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await update.execute( data.right )
+  const result = await (
+    await updateNotificationConfig()
+  ).execute( data.right )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
@@ -111,7 +102,9 @@ export async function DELETE( request: NextRequest ) {
   const { searchParams } = new URL( request.url )
   const id               = searchParams.get( "id" )
 
-  const result = await remove.execute( id ?? "" )
+  const result = await (
+    await removeNotificationConfig()
+  ).execute( id ?? "" )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )

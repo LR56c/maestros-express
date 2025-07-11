@@ -10,7 +10,7 @@ import { isLeft }                    from "fp-ts/Either"
 import {
   WorkerScheduleMapper
 }                                    from "@/modules/worker_schedule/application/worker_schedule_mapper"
-import { upsertSchedules }           from "@/app/api/worker_schedule/route"
+import { upsertSchedules }           from "@/app/api/dependencies"
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
