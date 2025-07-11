@@ -1,11 +1,9 @@
 interface PageProps {
-  params: {
-    id: string;
-  };
+  params: Promise<{ id: string }>
 }
 
-export default function DirectChat( { params }: PageProps ) {
-  const { id } = params
+export default async function DirectChat( { params }: PageProps ) {
+  const { id } = await params
 
   return <div>id: { id }</div>
 }
