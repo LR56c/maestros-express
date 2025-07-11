@@ -341,6 +341,15 @@ import {
 import {
   UpsertSchedules
 }                       from "@/modules/worker_schedule/application/upsert_schedules"
+import {
+  PrismaReportData
+}                       from "@/modules/report/infrastructure/persistance/prisma_report_data"
+import {
+  AddReport
+}                       from "@/modules/report/application/add_report"
+import {
+  SearchReport
+}                       from "@/modules/report/application/search_report"
 
 export async function ai() {
   return new OpenAI( {
@@ -351,6 +360,16 @@ export async function ai() {
 
 export async function aiRepo() {
   return new OpenaiWorkerEmbeddingData( await ai() )
+}
+
+const reportData = new PrismaReportData( prisma )
+
+export async function addReport() {
+  return new AddReport( reportData, await searchUser() )
+}
+
+export async function searchReport() {
+  return new SearchReport( reportData )
 }
 
 const scheduleData = new PrismaWorkerScheduleData( prisma )

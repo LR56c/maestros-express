@@ -1,7 +1,6 @@
 "use server"
 
 import { NextRequest, NextResponse } from "next/server"
-import prisma                        from "@/lib/prisma"
 import {
   querySchema
 }                                    from "@/modules/shared/application/query_dto"
@@ -10,25 +9,13 @@ import {
 }                                    from "@/modules/shared/application/parse_handlers"
 import { isLeft }                    from "fp-ts/Either"
 import {
-  PrismaReportData
-}                                    from "@/modules/report/infrastructure/persistance/prisma_report_data"
-import {
-  AddReport
-}                                    from "@/modules/report/application/add_report"
-import {
-  SearchReport
-}                                    from "@/modules/report/application/search_report"
-import {
   ReportMapper
 }                                    from "@/modules/report/application/report_mapper"
 import {
   reportSchema
 }                                    from "@/modules/report/application/report_dto"
-import { searchUser }                from "@/app/api/user/route"
+import { addReport, searchReport }   from "@/app/api/dependencies"
 
-const dao    = new PrismaReportData( prisma )
-const add    = new AddReport( dao, await searchUser() )
-const search = new SearchReport( dao )
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
@@ -38,7 +25,9 @@ export async function POST( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await add.execute( data.right )
+  const result = await (
+    await addReport()
+  ).execute( data.right )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
@@ -66,7 +55,9 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await search.execute(
+  const result = await (
+    await searchReport()
+  ).execute(
     data.right.query,
     data.right.limit,
     data.right.skip,
