@@ -172,6 +172,7 @@ export class PrismaChatData implements ChatDAO {
         if ( mapped instanceof Errors ) {
           return left( mapped.values )
         }
+        chats.push( mapped )
       }
 
       return right( chats )

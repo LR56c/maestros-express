@@ -167,7 +167,7 @@ model Review {
   serviceId   String     @map("service_id") @db.Uuid
   serviceType ReviewType @map("service_type")
   description String     @map("description")
-  value       Int        @map("value")
+  value       Decimal        @map("value")
   createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
   userId      String     @map("user_id") @db.Uuid
   user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
