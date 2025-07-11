@@ -3,7 +3,7 @@ import {
   FileUploader,
   FileUploaderContent,
   FileUploaderItem
-}                          from "@/components/form/file_upload"
+}                          from "@/components/form/file_upload_lib"
 import React, { useState } from "react"
 import { DropzoneOptions } from "react-dropzone"
 import { useFormContext }  from "react-hook-form"

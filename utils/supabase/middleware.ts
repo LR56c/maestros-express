@@ -41,7 +41,6 @@ export async function updateSession(request: NextRequest) {
     !user &&
     !request.nextUrl.pathname.startsWith('/ingresar')
     && !request.nextUrl.pathname.startsWith('/registrar')
-    && !request.nextUrl.pathname.startsWith('/trabajador/aplicar')
   ) {
     const url = request.nextUrl.clone()
     url.pathname = '/ingresar'
