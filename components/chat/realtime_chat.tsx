@@ -14,14 +14,14 @@ import {
   useRealtimeChat
 }                                                    from "@/app/hooks/use_realtime_chat"
 import {
-  ChatMessageItem
-}                                                    from "@/app/components/chat_message"
-import {
   useChatScroll
 }                                                    from "@/app/hooks/use_chat_scroll"
 import {
   UserResponse
 }                                                    from "@/modules/user/application/models/user_response"
+import {
+  ChatMessageItem
+}                                                    from "@/components/chat/chat_message"
 
 interface RealtimeChatProps {
   roomName: string
