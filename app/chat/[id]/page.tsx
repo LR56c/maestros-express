@@ -1,9 +1,11 @@
-import { redirect } from "next/navigation"
+interface PageProps {
+  params: {
+    id: string;
+  };
+}
 
-export default async function DirectChat( { params } ) {
-  const { id } = await params
+export default function DirectChat( { params }: PageProps ) {
+  const { id } = params
 
-  return <div>
-    id: { id }
-  </div>
+  return <div>id: { id }</div>
 }
