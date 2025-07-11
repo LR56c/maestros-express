@@ -11,10 +11,10 @@ export const chatResponseSchema = z.object( {
   worker            : userResponseSchema,
   client            : userResponseSchema,
   subject           : z.string(),
-  accepted_date     : z.date().optional(),
+  accepted_date     : z.string().datetime().optional(),
   quotation_accepted: z.string().optional(),
-  worker_archived   : z.date().optional(),
-  created_at        : z.date(),
+  worker_archived   : z.string().datetime().optional(),
+  created_at        : z.string().datetime(),
   messages          : z.array( messageResponseSchema )
 } )
 

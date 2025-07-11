@@ -40,9 +40,9 @@ export class ChatMapper {
       worker            : UserMapper.toDTO( chat.worker ),
       messages          : chat.messages.map( MessageMapper.toDTO ),
       subject           : chat.subject?.value,
-      accepted_date     : chat.acceptedDate?.value,
+      accepted_date     : chat.acceptedDate?.toString(),
       quotation_accepted: chat.quotationAccepted?.value,
-      worker_archived   : chat.workerArchived?.value,
+      worker_archived   : chat.workerArchived?.toString(),
       created_at        : chat.createdAt.toString()
     }
   }
@@ -142,18 +142,14 @@ export class ChatMapper {
       subject           : (
         subject as ValidString
       ).value,
-      accepted_date     : acceptedDate ? (
-        acceptedDate as ValidDate
-      ).value : undefined,
+      accepted_date     : acceptedDate instanceof ValidDate ? acceptedDate.toString() : undefined,
       quotation_accepted: quotationAccepted ? (
         quotationAccepted as UUID
       ).value : undefined,
-      worker_archived   : workerArchived ? (
-        workerArchived as ValidDate
-      ).value : undefined,
+      worker_archived   : workerArchived instanceof ValidDate ? workerArchived.toString() : undefined,
       created_at        : (
         createdAt as ValidDate
-      ).value
+      ).toString()
     }
   }
 
