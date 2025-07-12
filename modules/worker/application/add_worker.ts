@@ -62,7 +62,6 @@ export class AddWorker {
 
     const userResult = await this.register.execute( worker.user,
       RoleLevelType.WORKER, status )
-
     if ( isLeft( userResult ) ) {
       return left( userResult.left )
     }

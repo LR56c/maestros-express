@@ -7,3 +7,8 @@ export const makeLocalDate = (yyyyMmDd: string) => {
   const [y, m, d] = yyyyMmDd.split("-").map(Number)
   return new Date(y, m - 1, d)   // constructor con (año, mes-0-based, día)
 }
+
+export function formatUTCDateTime(date: Date) {
+  const pad = (n: number) => n.toString().padStart(2, '0')
+  return `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())}T${pad(date.getUTCHours())}:${pad(date.getUTCMinutes())}Z`
+}

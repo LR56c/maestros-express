@@ -14,6 +14,9 @@ import {
 import {
   AuthAppService
 }                         from "@/modules/user/application/auth_app_service"
+import { string }         from "fp-ts"
+import { undefined }      from "zod"
+import { metadata }       from "@/app/layout"
 
 // function checkSupabaseProvider( value: string ): value is Provider {
 //   return value === "google"
@@ -22,6 +25,27 @@ import {
 export class SupabaseUserData implements AuthAppService {
   constructor( private readonly client: SupabaseClient ) {
   }
+
+  async revalidate( token?: string ): Promise<UserResponse> {
+    const { data, error } = await this.client.auth.refreshSession()
+    console.log("Revalidating user session", data, error)
+    if ( error ) {
+      throw new InfrastructureException( error.message )
+    }
+
+    const metadata = data.user!.user_metadata
+
+    return {
+      user_id  : data.user!.id,
+      email    : data.user!.email!,
+      full_name: metadata.name,
+      avatar   : metadata.avatar,
+      role     : metadata.role,
+      status   : metadata.status
+    }
+  }
+
+
 
   async anonymous(): Promise<UserResponse> {
     const { data, error } = await this.client.auth.signInAnonymously()

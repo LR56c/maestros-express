@@ -27,6 +27,7 @@ interface MultiSelectInputProps {
   loading: boolean
   placeholder: string
   helperText?: string
+  onChange?: ( values: any[] ) => void
   searchPlaceholder: string
   placeholderLoader: string
 }
@@ -36,6 +37,7 @@ export default function MultiSelectInput( {
   placeholder,
   label,
   helperText,
+  onChange,
   values,
   loading,
   placeholderLoader,
@@ -64,7 +66,7 @@ export default function MultiSelectInput( {
       </div>
       <MultiSelect
         values={ values } loading={ loading } placeholder={ placeholder }
-        onChange={ ( values ) => setValue( name, values ) }
+        onChange={ ( values ) => onChange ? onChange( values ) : setValue( name, values )}
         searchPlaceholder={ searchPlaceholder }
         placeholderLoader={ placeholderLoader }/>
       {

@@ -25,6 +25,7 @@ import {
 }                                        from "@/modules/national_identity_format/application/national_identity_format_dto"
 import { useWorkerContext }              from "@/app/context/worker_context"
 import { useAuthContext }                from "@/app/context/auth_context"
+import { useRouter }                     from "next/navigation"
 
 const workerFormSchema = workerRequestSchema.extend( {
   confirm   : z.string(),
@@ -51,6 +52,7 @@ export default function WorkerApplyForm() {
   const { login, user }        = useAuthContext()
   const { createWorker }    = useWorkerContext()
 
+  const router = useRouter()
   const [inputCountries, setInputCountries] = useState<SelectInputValue[]>( [] )
   useEffect( () => {
     if ( !data ) return
@@ -86,6 +88,7 @@ export default function WorkerApplyForm() {
       email   : data.user.email,
       password: data.user.password
     })
+    await router.replace( "/trabajador/aplicar" )
   }
 
   const [selectedCountry, setSelectedCountry] = useState<CountryDTO | null>(

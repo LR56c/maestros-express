@@ -49,7 +49,7 @@ interface AuthContextType {
 
   logout( token?: string ): Promise<void>
 
-  revalidate( token: string ): Promise<void>
+  revalidate( token?: string ): Promise<void>
 
   register( request: UserRegisterRequest ): Promise<void>
 
@@ -97,8 +97,12 @@ export const AuthProvider = ( { children }: { children: ReactNode } ) => {
     const { data: listener } = supabase.auth.onAuthStateChange(
       async ( event, session ) => {
         const parsed = parseResponse( session?.user )
-        if (!user || (session?.user?.id && user.user_id !== session.user.id)) {
-          console.log( `User has changed(${ event })`, session?.user.user_metadata )
+        if ( !user || (
+          session?.user?.id && user.user_id !== session.user.id
+        ) )
+        {
+          console.log( `User has changed(${ event })`,
+            session?.user.user_metadata )
           setUser( parsed )
         }
         await checkWorker( parsed )
@@ -155,8 +159,9 @@ export const AuthProvider = ( { children }: { children: ReactNode } ) => {
     setUser( userResponse )
   }
 
-  const revalidate = async ( token: string ): Promise<void> => {
-
+  const revalidate = async ( token?: string ): Promise<void> => {
+    const userResponse = await service.revalidate( token )
+    setUser( userResponse )
   }
 
   return (

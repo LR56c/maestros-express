@@ -50,12 +50,16 @@ import {
 import {
   WorkerEmbeddingTypeEnum
 }                                      from "@/modules/worker_embedding/domain/worker_embedding_type"
+import {
+  UploadFileRepository
+}                                      from "@/modules/shared/domain/upload_file_repository"
 
 export class UpdateWorker {
   constructor(
     private readonly dao: WorkerDAO,
     private readonly searchSpecialities: SearchSpeciality,
-    private readonly embedding: UpsertWorkerEmbedding
+    private readonly embedding: UpsertWorkerEmbedding,
+    private readonly uploader: UploadFileRepository
   )
   {
   }
@@ -75,7 +79,7 @@ export class UpdateWorker {
 
   async execute( worker: WorkerUpdateDTO ): Promise<Either<BaseException[], Worker>> {
     const errors = []
-    const exist  = await ensureWorkerExist( this.dao, worker.user.user_id )
+    const exist  = await ensureWorkerExist( this.dao, worker.user.email )
 
     if ( isLeft( exist ) ) {
       return left( exist.left )

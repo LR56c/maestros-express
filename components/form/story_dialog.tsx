@@ -83,7 +83,6 @@ export const StoryDialog: React.FC<ListInputModalProps> = ( {
   const { handleSubmit, setValue } = methods
 
   const onSubmit = async ( data: any ) => {
-    console.log( "Form submitted with data:", data )
     onSave( data )
   }
 

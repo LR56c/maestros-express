@@ -20,6 +20,7 @@ export class StoryDocumentMapper {
     return {
       id    : storyDocument.id.toString(),
       url: storyDocument.url.value,
+      name: storyDocument.name.value,
       type: storyDocument.type.value,
     }
   }
@@ -28,6 +29,7 @@ export class StoryDocumentMapper {
     return {
       id    : storyDocument.id,
       url   : storyDocument.url,
+      name   : storyDocument.name,
       type  : storyDocument.type,
     }
   }
@@ -48,6 +50,13 @@ export class StoryDocumentMapper {
       errors.push( url )
     }
 
+    const name = wrapType(
+      () => ValidString.from( storyDocument.name ) )
+
+    if ( name instanceof BaseException ) {
+      errors.push( name )
+    }
+
     const type = wrapType(
       () => StoryDocumentType.from( storyDocument.type ) )
 
@@ -61,6 +70,7 @@ export class StoryDocumentMapper {
 
     return {
       id: (id as UUID).toString(),
+      name: (name as ValidString).value,
       url: (url as ValidString).value,
       type: (type as StoryDocumentType).value,
     }
@@ -71,6 +81,7 @@ export class StoryDocumentMapper {
       json.id,
       json.story_id,
       json.url,
+      json.name,
       json.type,
       json.created_at
     )

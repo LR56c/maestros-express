@@ -15,6 +15,7 @@ export class StoryDocument {
     readonly id: UUID,
     readonly storyId: UUID,
     readonly url: ValidString,
+    readonly name: ValidString,
     readonly type: StoryDocumentType,
     readonly createdAt: ValidDate
   )
@@ -25,12 +26,14 @@ export class StoryDocument {
     id: string,
     storyId: string,
     url: string,
+    name: string,
     type: string
   ): StoryDocument  | Errors {
     return StoryDocument.fromPrimitives(
       id,
       storyId,
       url,
+      name,
       type,
       ValidDate.nowUTC()
     )
@@ -40,6 +43,7 @@ export class StoryDocument {
     id: string,
     storyId: string,
     url: string,
+    name: string,
     type: string,
     createdAt: Date | string
   ): StoryDocument {
@@ -47,6 +51,7 @@ export class StoryDocument {
       UUID.from( id ),
       UUID.from( storyId ),
       ValidString.from( url ),
+      ValidString.from( name ),
       StoryDocumentType.from( type ),
       ValidDate.from( createdAt )
     )
@@ -56,6 +61,7 @@ export class StoryDocument {
     id: string,
     storyId: string,
     url: string,
+    name: string,
     type: string,
     createdAt: Date | string
   ): StoryDocument | Errors {
@@ -82,6 +88,13 @@ export class StoryDocument {
       errors.push( urlVO )
     }
 
+    const nameVO = wrapType(
+      () => ValidString.from( name ) )
+
+    if ( nameVO instanceof BaseException ) {
+      errors.push( nameVO )
+    }
+
     const typeVO = wrapType(
       () => StoryDocumentType.from( type ) )
 
@@ -104,6 +117,7 @@ export class StoryDocument {
       idVO as UUID,
       storyIdVO as UUID,
       urlVO as ValidString,
+      nameVO as ValidString,
       typeVO as StoryDocumentType,
       createdAtVO as ValidDate
     )

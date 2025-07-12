@@ -12,6 +12,7 @@ export abstract class AuthAppService {
   abstract login( request: UserLoginRequest ): Promise<UserResponse>
 
   abstract logout( token?: string ): Promise<void>
+  abstract revalidate( token?: string ): Promise<UserResponse>
 
   abstract register( request: UserRegisterRequest ): Promise<UserResponse>
 

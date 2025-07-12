@@ -5,7 +5,6 @@ import {
   SelectTrigger,
   SelectValue
 }                         from "@/components/ui/select"
-import { capitalCase }    from "change-case"
 import { useFormContext } from "react-hook-form"
 import {
   getNestedErrorObject
@@ -15,9 +14,9 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger
-}                           from "@/components/ui/tooltip"
-import { HelpCircle, Info } from "lucide-react"
-import type React from "react"
+}                         from "@/components/ui/tooltip"
+import { HelpCircle }     from "lucide-react"
+import type React         from "react"
 
 export type SelectInputValue = {
   value: any
@@ -46,10 +45,11 @@ export default function SelectInput( {
 {
   const valueMap                  = new Map<string, any>(
     values.map( ( v ) => [String( v.label ), v.value] ) )
-  const { formState: { errors } } = useFormContext()
+  const { formState: { errors }, watch } = useFormContext()
   const errorMessage              = getNestedErrorObject( errors,
     name )?.message as string | undefined
 
+  const selectedValue             = watch( name )
   const handleChange = ( selectedValue: string ) => {
     const selected = valueMap.get( selectedValue )
     if ( onChange && selected ) {
@@ -73,14 +73,15 @@ export default function SelectInput( {
           : null }
 
       </div>
-      <Select disabled={ loading } onValueChange={ handleChange }>
+      <Select value={selectedValue} disabled={ loading } onValueChange={ handleChange }>
         <SelectTrigger className="w-full">
           <SelectValue placeholder={ loading ? "Cargando" : placeholder }/>
         </SelectTrigger>
         <SelectContent>
           { values.map( ( { label } ) => (
-            <SelectItem key={ String( label ) } value={ String( label ) }>
-              { capitalCase( label ) }
+            <SelectItem className="capitalize" key={ String( label ) }
+                        value={ String( label ) }>
+              { label }
             </SelectItem>
           ) ) }
         </SelectContent>

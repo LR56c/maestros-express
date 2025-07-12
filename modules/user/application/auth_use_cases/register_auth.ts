@@ -31,7 +31,6 @@ import {
 export class RegisterAuth {
   constructor(
     private readonly repo: AuthRepository,
-    private readonly addUser: AddUser
   )
   {
   }
@@ -66,13 +65,6 @@ export class RegisterAuth {
       return left( resultAuth.left )
     }
 
-    const resultUser = await this.addUser.execute( UserMapper.toDTO( user ) )
-
-
-    if ( isLeft( resultUser ) ) {
-      return left( resultUser.left )
-    }
-
-    return right( user )
+    return right( resultAuth.right )
   }
 }

@@ -1,13 +1,20 @@
-import { z } from "zod"
+import { z }                 from "zod"
+import { formatUTCDateTime } from "@/modules/shared/utils/format_date_time"
 
 export const workerScheduleSchema = z.object( {
   id                  : z.string(),
   week_day            : z.number().int(),
   status              : z.string(),
-  start_date          : z.string().datetime(),
-  end_date            : z.string().datetime(),
-  recurrent_start_date: z.string().datetime().optional(),
-  recurrent_end_date  : z.string().datetime().optional()
+  start_date          : z.string()
+                         .transform( t => formatUTCDateTime( new Date( t ) ) ),
+  end_date            : z.string()
+                         .transform( t => formatUTCDateTime( new Date( t ) ) ),
+  recurrent_start_date: z.string()
+                         .transform( t => formatUTCDateTime( new Date( t ) ) )
+                         .optional(),
+  recurrent_end_date  : z.string()
+                         .transform( t => formatUTCDateTime( new Date( t ) ) )
+                         .optional()
 } )
 
 export type WorkerScheduleDTO = z.infer<typeof workerScheduleSchema>

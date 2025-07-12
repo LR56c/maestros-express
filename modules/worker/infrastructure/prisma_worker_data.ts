@@ -28,6 +28,9 @@ import {
 import {
   UUID
 }                                      from "@/modules/shared/domain/value_objects/uuid"
+import {
+  DataNotFoundException
+}                                      from "@/modules/shared/domain/exceptions/data_not_found_exception"
 
 type WorkerRelations = {
   user: UserAuth,
@@ -129,7 +132,7 @@ export class PrismaWorkerData implements WorkerDAO {
 
   async add( worker: Worker ): Promise<Either<BaseException, boolean>> {
     try {
-      await this.db.worker.create( {
+      const r = await this.db.worker.create( {
         data: {
           id                      : worker.user.userId.toString(),
           birthDate               : worker.birthDate.toString(),
@@ -217,6 +220,10 @@ export class PrismaWorkerData implements WorkerDAO {
           WorkerTax       : true
         }
       } )
+
+      if ( !response || response.length === 0 ) {
+        return left( [new DataNotFoundException()] )
+      }
 
       if ( idsCount && response.length !== idsCount ) {
         return left( [new InfrastructureException( "Not all workers found" )] )

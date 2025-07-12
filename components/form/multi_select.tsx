@@ -103,26 +103,26 @@ export default function MultiSelect( {
     <div className="relative w-full" ref={ componentRef }>
       {/* Main input with selected values */ }
       <div
-        className={ `h-full flex items-center gap-2 p-3 bg-white border border-gray-300 rounded-md cursor-pointer hover:border-gray-400 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 ${ loading
+        className={ `h-full flex items-center gap-2 p-3 bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 rounded-md cursor-pointer hover:border-gray-400 dark:hover:border-zinc-500 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 ${ loading
           ? "opacity-50 pointer-events-none"
           : "" }` }
         onClick={ () => !loading && setIsOpen( !isOpen ) }
       >
         <div className="flex flex-wrap gap-1 flex-1 min-h-[20px]">
           { selectedNames.length === 0 && !!placeholder && (
-            <span className="text-gray-400 select-none">{ placeholder }</span>
+            <span className="text-gray-400 dark:text-zinc-500 select-none">{ placeholder }</span>
           ) }
           { selectedNames.map( ( input ) => (
             <Badge
               key={ input?.value.id }
               variant="secondary"
-              className="flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 hover:bg-gray-200"
+              className="flex items-center gap-1 px-2 py-1 bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-200 hover:bg-gray-200 dark:hover:bg-zinc-700"
             >
               { input.label }
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-4 w-4 p-0 hover:bg-gray-300 rounded-full"
+                className="h-4 w-4 p-0 hover:bg-gray-300 dark:hover:bg-zinc-700 rounded-full"
                 onClick={ ( e ) => {
                   e.stopPropagation()
                   const getInput = values.find(
@@ -136,19 +136,19 @@ export default function MultiSelect( {
           ) ) }
         </div>
         <ChevronDown
-          className={ `h-4 w-4 text-gray-400 transition-transform ${ isOpen
+          className={ `h-4 w-4 text-gray-400 dark:text-zinc-500 transition-transform ${ isOpen
             ? "rotate-180"
             : "" }` }/>
       </div>
       {/* Dropdown content */ }
       { isOpen && (
         <div
-          className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+          className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-lg shadow-lg z-50">
           {/* Search input */ }
-          <div className="p-3 border-b border-gray-200">
+          <div className="p-3 border-b border-gray-200 dark:border-zinc-700">
             <div className="relative">
               <Search
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400"/>
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-zinc-500"/>
               <Input
                 type="text"
                 placeholder={ loading
@@ -156,7 +156,7 @@ export default function MultiSelect( {
                   : searchPlaceholder }
                 value={ searchQuery }
                 onChange={ e => setSearchQuery( e.target.value ) }
-                className="pl-10 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                className="pl-10 border-gray-300 dark:border-zinc-700 focus:border-blue-500 focus:ring-blue-500 bg-white dark:bg-zinc-900 text-gray-900 dark:text-zinc-100"
                 onClick={ e => e.stopPropagation() }
                 disabled={ loading }
               />
@@ -166,17 +166,17 @@ export default function MultiSelect( {
           <div className="max-h-64 overflow-y-auto">
             { loading ? (
               <div
-                className="p-4 text-center text-gray-400">{ placeholderLoader }</div>
+                className="p-4 text-center text-gray-400 dark:text-zinc-500">{ placeholderLoader }</div>
             ) : hasGroups ? (
               Object.entries( grouped )
                     .map( ( [group, items] ) => (
                       <div key={ group }>
                         <div
-                          className="px-3 py-1 text-xs font-semibold text-gray-500 uppercase bg-gray-50">{ group }</div>
+                          className="px-3 py-1 text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase bg-gray-50 dark:bg-zinc-800">{ group }</div>
                         { items.map( ( select ) => (
                           <div
                             key={ select.value.id }
-                            className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 cursor-pointer"
+                            className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 dark:hover:bg-zinc-800 cursor-pointer"
                             onClick={ e => {
                               e.stopPropagation()
                               handleValueToggle( select.value.id )
@@ -191,7 +191,7 @@ export default function MultiSelect( {
                               disabled={ loading }
                             />
                             <span
-                              className="text-sm text-gray-700 capitalize">{ select.label }</span>
+                              className="text-sm text-gray-700 dark:text-zinc-200 capitalize">{ select.label }</span>
                           </div>
                         ) ) }
                       </div>
@@ -200,7 +200,7 @@ export default function MultiSelect( {
               filteredLabels.map( ( select ) => (
                 <div
                   key={ select.value.id }
-                  className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 cursor-pointer"
+                  className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 dark:hover:bg-zinc-800 cursor-pointer"
                   onClick={ e => {
                     e.stopPropagation()
                     handleValueToggle( select.value.id )
@@ -214,7 +214,7 @@ export default function MultiSelect( {
                     disabled={ loading }
                   />
                   <span
-                    className="text-sm text-gray-700 capitalize">{ select.label }</span>
+                    className="text-sm text-gray-700 dark:text-zinc-200 capitalize">{ select.label }</span>
                 </div>
               ) )
             ) }

@@ -61,6 +61,9 @@ import {
 import {
   parseSectors
 }                                     from "@/utils/multi_select_parser"
+import {
+  UUID
+}                                     from "@/modules/shared/domain/value_objects/uuid"
 
 const certificateFormSchema = z.instanceof( File ).refine(
   ( file ) => {
@@ -119,7 +122,7 @@ export default function WorkerExtraForm() {
   const { isPending: sectorPending, data: sectorData }         = useQuery(
     sectorsOption )
   const { updateWorker }                                       = useWorkerContext()
-  const { user }                                               = useAuthContext()
+  const { user, revalidate }                                               = useAuthContext()
 
   const methods = useForm( {
     resolver: zodResolver( workerExtraFormSchema )
@@ -134,15 +137,20 @@ export default function WorkerExtraForm() {
         } = methods
 
 
+  useEffect( () => {
+    console.log( "errors", errors )
+  }, [errors] )
+
   const formValues = watch()
 
   const onSubmit = async ( data: any ) => {
-    console.log( "Form submitted with data:", data )
-    const result = await updateWorker( data )
+    if ( !user ) return
+    const result = await updateWorker( user, data )
     if ( !result ) {
       console.log( "Error updating worker data" )
     }
     reset()
+    await revalidate()
   }
 
   const [sectorValues, setSectorValues] = useState<MultiSelectInputValue[]>(
@@ -204,6 +212,13 @@ export default function WorkerExtraForm() {
                             label="Sector"
                             placeholder="Seleccione Sectores"
                             searchPlaceholder="Buscar sector"
+                            onChange={ ( values ) => setValue( "zones",
+                              values.map( value => (
+                                {
+                                  id    : UUID.create().toString(),
+                                  sector: value
+                                }
+                              ) ) ) }
                             name="zones"
                             placeholderLoader="Cargando..."
           />

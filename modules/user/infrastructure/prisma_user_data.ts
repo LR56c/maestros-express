@@ -21,6 +21,9 @@ import {
 import {
   UUID
 }                              from "@/modules/shared/domain/value_objects/uuid"
+import {
+  DataNotFoundException
+} from "@/modules/shared/domain/exceptions/data_not_found_exception"
 
 export class PrismaUserData implements UserDAO {
   constructor( private readonly db: PrismaClient ) {
@@ -167,9 +170,9 @@ export class PrismaUserData implements UserDAO {
         skip   : offset,
         take   : limit?.value
       } )
-      // if ( !response || response.length === 0 ) {
-      //   return left( [new DataNotFoundException()] )
-      // }
+      if ( !response || response.length === 0 ) {
+        return left( [new DataNotFoundException()] )
+      }
       const users: User[] = []
       for ( const e of response ) {
         const user = UserAuth.fromPrimitives(

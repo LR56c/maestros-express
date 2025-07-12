@@ -350,6 +350,12 @@ import {
 import {
   SearchReport
 }                       from "@/modules/report/application/search_report"
+import {
+  UploadFileRepository
+} from "@/modules/shared/domain/upload_file_repository"
+import {
+  SupabaseFileUploadData
+} from "@/modules/shared/infrastructure/supabase_file_upload_data"
 
 export async function ai() {
   return new OpenAI( {
@@ -357,6 +363,9 @@ export async function ai() {
     baseURL: process.env.OPENAI_API_BASE_URL
   } )
 }
+
+const uploader: UploadFileRepository = new SupabaseFileUploadData(
+  await createClient() )
 
 export async function aiRepo() {
   return new OpenaiWorkerEmbeddingData( await ai() )
@@ -428,7 +437,7 @@ export async function addWorker() {
 
 export async function updateWorker() {
   return new UpdateWorker( workerData, await searchSpeciality(),
-    await upsertEmbedding() )
+    await upsertEmbedding(), uploader )
 }
 
 export async function searchWorker() {
@@ -453,7 +462,7 @@ export async function addUser() {
 }
 
 export async function registerAuth() {
-  return new RegisterAuth( authDao, await addUser() )
+  return new RegisterAuth( authDao )
 }
 
 export async function getUser() {

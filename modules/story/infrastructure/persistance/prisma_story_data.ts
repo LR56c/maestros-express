@@ -60,6 +60,7 @@ export class PrismaStoryData implements StoryDAO {
                 id       : doc.id.value,
                 storyId  : story.id.value,
                 url      : doc.url.value,
+                name      : doc.name.value,
                 type     : doc.type.value,
                 createdAt: doc.createdAt.toString()
               }
@@ -95,6 +96,7 @@ export class PrismaStoryData implements StoryDAO {
               id       : doc.id.value,
               storyId  : story.id.value,
               url      : doc.url.value,
+              name      : doc.name.value,
               type     : doc.type.value,
               createdAt: doc.createdAt.toString()
             }
@@ -129,6 +131,7 @@ export class PrismaStoryData implements StoryDAO {
           doc.id,
           response.id,
           doc.url,
+          doc.name,
           doc.type,
           doc.createdAt
         )
@@ -180,6 +183,7 @@ export class PrismaStoryData implements StoryDAO {
             doc.id,
             story.id,
             doc.url,
+            doc.name,
             doc.type,
             doc.createdAt
           )
@@ -260,6 +264,7 @@ export class PrismaStoryData implements StoryDAO {
               id       : doc.id.value,
               storyId  : story.id.value,
               url      : doc.url.value,
+              name      : doc.name.value,
               type     : doc.type.value,
               createdAt: doc.createdAt.toString()
             }
