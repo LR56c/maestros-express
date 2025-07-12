@@ -1,9 +1,10 @@
-import { QuotationResponse } from "@/modules/quotation/application/quotation_response"
-import { Quotation }         from "@/modules/quotation/domain/quotation"
+import {
+  QuotationResponse
+}                                    from "@/modules/quotation/application/quotation_response"
+import { Quotation }                 from "@/modules/quotation/domain/quotation"
 import {
   Errors
 }                                    from "@/modules/shared/domain/exceptions/errors"
-import { Zone }                      from "@/modules/zone/domain/zone"
 import { wrapType, wrapTypeDefault } from "@/modules/shared/utils/wrap_type"
 import {
   UUID
@@ -23,6 +24,15 @@ import {
 import {
   QuotationStatus
 }                                    from "@/modules/quotation/domain/quotation_status"
+import {
+  QuotationDetail
+}                                    from "@/modules/quotation/modules/quotation_detail/domain/quotation_detail"
+import {
+  QuotationDetailMapper
+}                                    from "@/modules/quotation/modules/quotation_detail/application/quotation_detail_mapper"
+import {
+  QuotationDetailDTO
+}                                    from "@/modules/quotation/modules/quotation_detail/application/quotation_detail_dto"
 
 export class QuotationMapper {
   static toDTO( quotation: Quotation ): QuotationResponse {
@@ -31,8 +41,9 @@ export class QuotationMapper {
       status        : quotation.status.value,
       title         : quotation.title.value,
       total         : quotation.total.value,
-      estimated_time: quotation.estimatedTime?.value,
-      value_format  : quotation.valueFormat.value
+      estimated_time: quotation.estimatedTime?.toString(),
+      value_format  : quotation.valueFormat.value,
+      details       : quotation.details.map( QuotationDetailMapper.toDTO )
     }
   }
 
@@ -43,7 +54,8 @@ export class QuotationMapper {
       title         : quotation.title,
       total         : quotation.total,
       estimated_time: quotation.estimated_time,
-      value_format  : quotation.value_format
+      value_format  : quotation.value_format,
+      details       : quotation.details.map( QuotationDetailMapper.toJSON )
     }
   }
 
@@ -92,6 +104,17 @@ export class QuotationMapper {
       errors.push( estimatedTime )
     }
 
+    const details: QuotationDetailDTO[] = []
+    for ( const detail of quotation.details ) {
+      const detailMapped = QuotationDetailMapper.fromJSON( detail )
+      if ( detailMapped instanceof Errors ) {
+        errors.push( ...detailMapped.values )
+      }
+      else {
+        details.push( detailMapped )
+      }
+    }
+
     if ( errors.length > 0 ) {
       return new Errors( errors )
     }
@@ -112,13 +135,24 @@ export class QuotationMapper {
       value_format  : (
         valueFormat as ValidString
       ).value,
-      estimated_time: estimatedTime === undefined ? undefined : (
-        estimatedTime as ValidDate
-      ).value
+      estimated_time: estimatedTime instanceof ValidDate
+        ? estimatedTime.toString()
+        : undefined,
+      details
     }
   }
 
   static toDomain( json: Record<string, any> ): Quotation | Errors {
+    const details: QuotationDetail[] = []
+
+    for ( const detail of json.details ) {
+      const detailMapped = QuotationDetailMapper.toDomain( detail )
+      if ( detailMapped instanceof Errors ) {
+        return detailMapped
+      }
+      details.push( detailMapped )
+    }
+
     return Quotation.fromPrimitives(
       json.id,
       json.user_id,
@@ -129,6 +163,7 @@ export class QuotationMapper {
       json.status,
       json.value_format,
       json.created_at,
+      details,
       json.estimated_time
     )
   }
