@@ -8,11 +8,11 @@ import { ensureReportExist } from "@/modules/report/utils/ensure_report_exist"
 import { Report }               from "@/modules/report/domain/report"
 import { Errors } from "@/modules/shared/domain/exceptions/errors"
 import {
-  SearchUser
-}                 from "@/modules/user/backup_application/search_user"
-import {
   InfrastructureException
 }                 from "@/modules/shared/domain/exceptions/infrastructure_exception"
+import {
+  SearchUser
+}                                      from "@/modules/user/application/user_use_cases/search_user"
 
 export class AddReport {
   constructor(
