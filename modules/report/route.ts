@@ -46,7 +46,7 @@ import {
 import {
   reportSchema
 }                                    from "@/modules/report/application/report_dto"
-import { searchUser }                from "@/app/api/user/route"
+import { searchUser }                from "@/app/api/dependencies"
 
 const dao    = new PrismaReportData( prisma )
 const add    = new AddReport( dao,await searchUser() )
