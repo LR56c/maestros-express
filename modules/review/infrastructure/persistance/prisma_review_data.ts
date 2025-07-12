@@ -57,7 +57,7 @@ export class PrismaReviewData implements ReviewDAO {
         response.serviceId,
         response.serviceType,
         response.description,
-        response.value,
+        response.value.toNumber(),
         response.createdAt
       )
 
@@ -90,7 +90,7 @@ export class PrismaReviewData implements ReviewDAO {
           element.serviceId,
           element.serviceType,
           element.description,
-          element.value,
+          element.value.toNumber(),
           element.createdAt
         )
 
