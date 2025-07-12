@@ -30,10 +30,10 @@ export class WorkerScheduleMapper {
       id                  : workerSchedule.id.toString(),
       week_day            : workerSchedule.weekDay.value,
       status              : workerSchedule.status.value,
-      start_date          : workerSchedule.startDate.value,
-      end_date            : workerSchedule.endDate.value,
-      recurrent_start_date: workerSchedule.recurrentStartDate?.value,
-      recurrent_end_date  : workerSchedule.recurrentEndDate?.value
+      start_date          : workerSchedule.startDate.toString(),
+      end_date            : workerSchedule.endDate.toString(),
+      recurrent_start_date: workerSchedule.recurrentStartDate?.toString(),
+      recurrent_end_date  : workerSchedule.recurrentEndDate?.toString()
     }
   }
 
@@ -117,16 +117,12 @@ export class WorkerScheduleMapper {
       ).value,
       start_date          : (
         startDate as ValidDate
-      ).value,
+      ).toString(),
       end_date            : (
         endDate as ValidDate
-      ).value,
-      recurrent_start_date: (
-        recurrentStartDate as ValidDate | undefined
-      )?.value,
-      recurrent_end_date  : (
-        recurrentEndDate as ValidDate | undefined
-      )?.value
+      ).toString(),
+      recurrent_start_date: recurrentStartDate instanceof ValidDate? recurrentStartDate.toString() : undefined,
+      recurrent_end_date  : recurrentEndDate instanceof ValidDate? recurrentEndDate.toString() : undefined
     }
   }
 
