@@ -64,7 +64,7 @@ export class PrismaChatData implements ChatDAO {
     )
 
     if ( workerMapped instanceof Errors ) {
-      return left( workerMapped.values )
+      return workerMapped
     }
 
     const client       = response.client
@@ -79,7 +79,7 @@ export class PrismaChatData implements ChatDAO {
     )
 
     if ( clientMapped instanceof Errors ) {
-      return left( clientMapped.values )
+      return clientMapped
     }
 
     const messages: Message[] = []
@@ -96,14 +96,14 @@ export class PrismaChatData implements ChatDAO {
       )
 
       if ( message instanceof Errors ) {
-        return left( message.values )
+        return message
       }
 
       messages.push( message )
     }
 
 
-    const chat = Chat.fromPrimitives(
+    return Chat.fromPrimitives(
       response.id,
       workerMapped,
       clientMapped,
@@ -114,12 +114,6 @@ export class PrismaChatData implements ChatDAO {
       response.quotationAccepted ? response.quotationAccepted : undefined,
       response.workerArchived ? response.workerArchived : undefined
     )
-
-    if ( chat instanceof Errors ) {
-      return left( chat.values )
-    }
-
-    return chat
   }
 
   async getById( id: UUID ): Promise<Either<BaseException[], Chat>> {
