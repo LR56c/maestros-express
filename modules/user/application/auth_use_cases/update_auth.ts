@@ -41,6 +41,7 @@ export class UpdateAuth {
       exist.right.fullName.value,
       exist.right.createdAt.toString(),
       auth.role ? auth.role : exist.right.role.toString(),
+      auth.status ? auth.status : exist.right.status?.value ?? null,
       auth.avatar ? auth.avatar : exist.right.avatar?.value ?? null
     )
 
