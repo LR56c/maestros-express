@@ -183,7 +183,7 @@ export class PackageMapper {
       documents     : documents,
       created_at    : (
         createdAt as ValidDate
-      ).value
+      ).toString()
     }
   }
 

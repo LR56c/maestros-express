@@ -14,7 +14,7 @@ export const packageResponseSchema = z.object( {
   cover_url     : z.string(),
   value_format  : z.string(),
   documents: z.array( packageDocumentSchema),
-  created_at    : z.date()
+  created_at    : z.string().datetime()
 } )
 
 export type PackageResponse = z.infer<typeof packageResponseSchema>
