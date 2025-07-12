@@ -1,12 +1,18 @@
-import { UserDAO }        from "@/modules/user/domain/user_dao"
-import { GetAuth }        from "@/modules/user/application/auth_use_cases/get_auth"
-import { User, UserAuth } from "@/modules/user/domain/user"
-import { Either, isLeft, left } from "fp-ts/Either"
+import { UserDAO }                     from "@/modules/user/domain/user_dao"
+import {
+  GetAuth
+}                                      from "@/modules/user/application/auth_use_cases/get_auth"
+import { User, UserAuth }              from "@/modules/user/domain/user"
+import { Either, isLeft, left, right } from "fp-ts/Either"
 import {
   BaseException
-}                               from "@/modules/shared/domain/exceptions/base_exception"
-import { UserResponse } from "@/modules/user/application/models/user_response"
-import { Errors } from "@/modules/shared/domain/exceptions/errors"
+}                                      from "@/modules/shared/domain/exceptions/base_exception"
+import {
+  UserResponse
+}                                      from "@/modules/user/application/models/user_response"
+import {
+  Errors
+}                                      from "@/modules/shared/domain/exceptions/errors"
 
 export class UpdateUser {
   constructor(
@@ -16,11 +22,11 @@ export class UpdateUser {
   {
   }
 
-  async execute( dto: UserResponse ): Promise<Either<BaseException[], boolean>>{
-    const exist = await this.getUser.execute( email )
+  async execute( dto: UserResponse ): Promise<Either<BaseException[], User>> {
+    const exist = await this.getUser.execute( dto.email )
 
     if ( isLeft( exist ) ) {
-      return left( [exist.left] )
+      return left( exist.left )
     }
 
     const user = UserAuth.fromPrimitives(
@@ -28,9 +34,9 @@ export class UpdateUser {
       exist.right.email.value,
       exist.right.fullName.value,
       exist.right.createdAt.toString(),
-      dto.role,
-      dto.status,
-      dto.avatar,
+      dto.role ? dto.role : exist.right.role.toString(),
+      dto.status ? dto.status : exist.right.status?.value ?? null,
+      dto.avatar ? dto.avatar : exist.right.avatar?.value ?? null
     )
 
     if ( user instanceof Errors ) {
@@ -43,6 +49,6 @@ export class UpdateUser {
       return left( [result.left] )
     }
 
-    return right( true )
+    return right( user )
   }
 }

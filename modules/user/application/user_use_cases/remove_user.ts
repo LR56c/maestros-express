@@ -4,9 +4,6 @@ import {
   BaseException
 }                                      from "@/modules/shared/domain/exceptions/base_exception"
 import {
-  ensureUserExist
-} from "@/modules/user/utils/ensure_user_exist"
-import {
   GetAuth
 } from "@/modules/user/application/auth_use_cases/get_auth"
 

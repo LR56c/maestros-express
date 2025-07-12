@@ -13,7 +13,6 @@ import {
 import {
   ValidString
 }                                    from "@/modules/shared/domain/value_objects/valid_string"
-import { AuthMethod }                from "@/modules/user/domain/auth_method"
 import { RoleType } from "@/modules/user/domain/role_type"
 
 export class UserMapper {
