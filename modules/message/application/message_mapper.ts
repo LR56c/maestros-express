@@ -1,28 +1,28 @@
 import { MessageResponse } from "@/modules/message/application/message_response"
 import { Message }         from "@/modules/message/domain/message"
-import { ZoneDTO }       from "@/modules/zone/application/zone_dto"
-import { Errors }        from "@/modules/shared/domain/exceptions/errors"
-import { wrapType }      from "@/modules/shared/utils/wrap_type"
-import { UUID }          from "@/modules/shared/domain/value_objects/uuid"
+import { Errors }          from "@/modules/shared/domain/exceptions/errors"
+import { wrapType }        from "@/modules/shared/utils/wrap_type"
+import { UUID }            from "@/modules/shared/domain/value_objects/uuid"
 import {
   BaseException
-}                        from "@/modules/shared/domain/exceptions/base_exception"
-import { Zone }          from "@/modules/zone/domain/zone"
+}                          from "@/modules/shared/domain/exceptions/base_exception"
 import {
   ValidString
-}                        from "@/modules/shared/domain/value_objects/valid_string"
-import { MessageType }   from "@/modules/message/domain/message_type"
-import { MessageStatus } from "@/modules/message/domain/message_status"
-import { ValidDate }     from "@/modules/shared/domain/value_objects/valid_date"
+}                          from "@/modules/shared/domain/value_objects/valid_string"
+import { MessageType }     from "@/modules/message/domain/message_type"
+import { MessageStatus }   from "@/modules/message/domain/message_status"
+import {
+  ValidDate
+}                          from "@/modules/shared/domain/value_objects/valid_date"
 
 export class MessageMapper {
   static toDTO( message: Message ): MessageResponse {
     return {
-      id       : message.id.toString(),
+      id        : message.id.toString(),
       user_id   : message.userId.toString(),
-      content  : message.content.value,
-      type     : message.type.value,
-      status   : message.status.value,
+      content   : message.content.value,
+      type      : message.type.value,
+      status    : message.status.value,
       created_at: message.createdAt.toString()
     }
   }
@@ -30,7 +30,7 @@ export class MessageMapper {
   static toJSON( message: MessageResponse ): Record<string, any> {
     return {
       id       : message.id,
-      user_id   : message.user_id.toString(),
+      user_id  : message.user_id.toString(),
       content  : message.content,
       type     : message.type,
       status   : message.status,
@@ -91,7 +91,7 @@ export class MessageMapper {
       id        : (
         id as UUID
       ).toString(),
-      user_id: (
+      user_id   : (
         userId as ValidString
       ).value,
       content   : (
@@ -105,7 +105,7 @@ export class MessageMapper {
       ).value,
       created_at: (
         createdAt as ValidDate
-      ).value
+      ).toString()
     }
   }
 
