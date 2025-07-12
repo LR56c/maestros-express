@@ -1,8 +1,6 @@
 import { Payment }         from "@/modules/payment/domain/payment"
 import { PaymentResponse } from "@/modules/payment/application/payment_response"
-import { ZoneDTO }         from "@/modules/zone/application/zone_dto"
 import { Errors }        from "@/modules/shared/domain/exceptions/errors"
-import { Zone }          from "@/modules/zone/domain/zone"
 import { wrapType }      from "@/modules/shared/utils/wrap_type"
 import { UUID }          from "@/modules/shared/domain/value_objects/uuid"
 import {
@@ -95,7 +93,7 @@ export class PaymentMapper {
       status      : (status as PaymentStatus).value,
       total       : (total as ValidInteger).value,
       value_format: (valueFormat as ValidString).value,
-      created_at  : (createdAt as ValidDate).value
+      created_at  : (createdAt as ValidDate).toString()
     }
   }
 

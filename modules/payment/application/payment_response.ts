@@ -6,7 +6,7 @@ export const paymentResponseSchema = z.object( {
   status      : z.string(),
   total       : z.number(),
   value_format: z.string(),
-  created_at  : z.date()
+  created_at  : z.string().datetime()
 } )
 
 export type PaymentResponse = z.infer<typeof paymentResponseSchema>

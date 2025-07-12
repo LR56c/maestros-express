@@ -10,7 +10,7 @@ export const quotationResponseSchema = z.object( {
   status        : z.string(),
   value_format  : z.string(),
   details: z.array( quotationDetailSchema),
-  estimated_time: z.date().optional()
+  estimated_time: z.string().datetime().optional()
 } )
 
 export type QuotationResponse = z.infer<typeof quotationResponseSchema>

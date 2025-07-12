@@ -8,7 +8,7 @@ export const quotationUpdateSchema = z.object( {
   title         : z.string().optional(),
   status        : z.string().optional(),
   details       : z.array( quotationDetailSchema ).optional(),
-  estimated_time: z.date().optional()
+  estimated_time: z.string().datetime().optional()
 } )
 
 export type QuotationUpdateDTO = z.infer<typeof quotationUpdateSchema>
