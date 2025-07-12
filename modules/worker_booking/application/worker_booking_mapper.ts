@@ -18,7 +18,7 @@ export class WorkerBookingMapper {
     return {
       id    : book.id.toString(),
       status: book.status.value,
-      date  : book.date.value
+      date  : book.date.toString()
     }
   }
 
@@ -61,7 +61,7 @@ export class WorkerBookingMapper {
       ).value,
       date  : (
         date as ValidDate
-      ).value
+      ).toString()
     }
   }
 
