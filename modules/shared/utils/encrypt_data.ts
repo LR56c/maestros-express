@@ -1,9 +1,9 @@
 import type {
   BaseException
-} from "~~/modules/shared/domain/exceptions/base_exception"
+} from "@/modules/shared/domain/exceptions/base_exception"
 import {
   UnknownException
-} from "~~/modules/shared/domain/exceptions/unknown_exception"
+} from "@/modules/shared/domain/exceptions/unknown_exception"
 
 export async function encryptData(publicKeyPem : string, body : Record<string, any>) : Promise<{ key: string, data: string } | BaseException> {
   try{
