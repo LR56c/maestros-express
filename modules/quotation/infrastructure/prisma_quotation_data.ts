@@ -108,7 +108,7 @@ export class PrismaQuotationData implements QuotationDAO {
             detail.id.toString(),
             detail.quotationId,
             detail.name,
-            detail.value,
+            detail.value.toNumber(),
             detail.valueFormat,
             detail.createdAt,
             detail.description ? detail.description : undefined
@@ -125,7 +125,7 @@ export class PrismaQuotationData implements QuotationDAO {
           e.chatId.toString(),
           e.workerId.toString(),
           e.title,
-          e.total,
+          e.total.toNumber(),
           e.status,
           e.valueFormat,
           e.createdAt,

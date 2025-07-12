@@ -235,7 +235,7 @@ export class PrismaWorkerData implements WorkerDAO {
           w.nationalIdentityValue,
           w.birthDate,
           w.reviewCount,
-          w.reviewAverage,
+          w.reviewAverage.toNumber(),
           w.location,
           w.status,
           relationMapped.right.specialities,

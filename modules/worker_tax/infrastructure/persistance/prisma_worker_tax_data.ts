@@ -34,7 +34,7 @@ export class PrismaWorkerTaxData implements WorkerTaxDAO {
           element.id,
           element.workerId,
           element.name,
-          element.value,
+          element.value.toNumber(),
           element.valueFormat,
           element.createdAt
         )

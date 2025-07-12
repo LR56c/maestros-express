@@ -162,7 +162,7 @@ model QuotationDetail {
   @@map("quotation_detail")
 }
 
-modelReview {
+model Review {
   id          String     @id @default(uuid()) @db.Uuid
   serviceId   String     @map("service_id") @db.Uuid
   serviceType ReviewType @map("service_type")

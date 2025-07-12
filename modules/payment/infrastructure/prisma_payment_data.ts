@@ -100,7 +100,7 @@ export class PrismaPaymentData implements PaymentDAO {
           e.userId.toString(),
           e.token,
           e.status,
-          e.total,
+          e.total.toNumber(),
           e.valueFormat,
           e.createdAt
         )
