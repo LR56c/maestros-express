@@ -26,14 +26,13 @@ import {
   UUID
 }                                      from "@/modules/shared/domain/value_objects/uuid"
 import {
-  WorkerUpdateDTO
-}                                      from "@/modules/worker/application/worker_update_dto"
-import {
   UserResponse
 }                                      from "@/modules/user/application/models/user_response"
 import {
   StoryDocumentDTO
 }                                      from "@/modules/story/modules/story_document/application/story_document_dto"
+import { WorkerExtra }                 from "@/utils/worker_extra"
+
 
 interface WorkerContextType {
   updateWorker: ( workerUser: UserResponse,
@@ -79,7 +78,7 @@ const uploadDocument = async ( repo: UploadFileRepository,
 }
 
 const processData           = async ( workerUser: UserResponse,
-  workerExtra: any ): Promise<Either<string[], WorkerUpdateDTO>> => {
+  workerExtra: any ): Promise<Either<string[], WorkerExtra>> => {
   const namesAdded: string[] = []
 
   const certificates: CertificateDTO[] = []
@@ -115,7 +114,7 @@ const processData           = async ( workerUser: UserResponse,
       for ( const doc of docResult.right ) {
         docs.push( {
           id  : UUID.create().toString(),
-          name : doc.name,
+          name: doc.name,
           url : doc.url,
           type: doc.type
         } )
@@ -159,8 +158,8 @@ export const WorkerProvider = ( { children }: { children: ReactNode } ) => {
       return false
     }
 
-    const updateData: WorkerUpdateDTO = processResult.right
-    const response                    = await fetch( "/api/worker", {
+    const updateData: WorkerExtra = processResult.right
+    const response                = await fetch( "/api/o/worker", {
       method : "PUT",
       headers: {
         "Content-Type": "application/json"
@@ -183,7 +182,7 @@ export const WorkerProvider = ( { children }: { children: ReactNode } ) => {
         () => uploader.remove( failedNames ) )
 
       if ( failedResult instanceof BaseException ) {
-      console.log( "Failed remove")
+        console.log( "Failed remove" )
       }
       return false
     }

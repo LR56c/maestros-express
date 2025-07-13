@@ -28,7 +28,6 @@ export class SupabaseUserData implements AuthAppService {
 
   async revalidate( token?: string ): Promise<UserResponse> {
     const { data, error } = await this.client.auth.refreshSession()
-    console.log("Revalidating user session", data, error)
     if ( error ) {
       throw new InfrastructureException( error.message )
     }

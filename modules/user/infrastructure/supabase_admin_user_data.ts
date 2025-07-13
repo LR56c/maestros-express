@@ -24,26 +24,12 @@ export class SupabaseAdminUserData implements AuthRepository {
   constructor( private readonly client: SupabaseClient ) {
   }
 
-  async anonymous(): Promise<Either<BaseException[], User>> {
-    return left( [new InfrastructureException()] )
-  }
-
-
   async remove( id: ValidString ): Promise<Either<BaseException, boolean>> {
     const { data, error } = await this.client.auth.admin.deleteUser( id.value )
     if ( error ) {
       return left( new InfrastructureException( error.message ) )
     }
     return right( true )
-  }
-
-  async login( email: Email,
-    password: Password ): Promise<Either<BaseException[], User>> {
-    return left( [new InfrastructureException()] )
-  }
-
-  async logout( token: ValidString ): Promise<Either<BaseException, boolean>> {
-    return left( new InfrastructureException() )
   }
 
   async register( auth: User,
@@ -55,7 +41,7 @@ export class SupabaseAdminUserData implements AuthRepository {
       user_metadata: {
         name  : auth.fullName.value,
         role  : auth.role.toString(),
-        status: auth.status.value,
+        status: auth.status.value
       }
     } )
     if ( error ) {
@@ -81,11 +67,15 @@ export class SupabaseAdminUserData implements AuthRepository {
   async update( auth: User ): Promise<Either<BaseException[], boolean>> {
     const { data, error } = await this.client.auth.admin.updateUserById(
       auth.userId.toString(), {
+        role        : auth.role.toString(),
         app_metadata: {
-          // ...auth.metadata
-          "extra": "custom"
+          status: auth.status.value,
+          avatar: auth.avatar?.value,
+          name  : auth.fullName.value,
+          role  : auth.role.toString()
         }
       } )
+    console.log( "Update user", data, error )
     if ( error ) {
       return left( [new InfrastructureException( error.message )] )
     }
@@ -93,6 +83,28 @@ export class SupabaseAdminUserData implements AuthRepository {
   }
 
   async getByEmail( email: Email ): Promise<Either<BaseException[], User>> {
-    return left( [new InfrastructureException()] )
+    const { data, error } = await this.client.rpc('get_user_id_by_email',{
+      p_email: email.value
+    }).single()
+    console.log("Get user by email", data, error )
+    if( error ) {
+    return left( [new InfrastructureException( error.message )] )
+    }
+    const d = data as any
+    const metadata = d.raw_user_meta_data
+
+    const user = UserAuth.fromPrimitives(
+      d.id,
+      d.email,
+      metadata.name,
+      d.created_at,
+      metadata.role,
+      metadata.status,
+      metadata.avatar
+    )
+    if ( user instanceof Errors ) {
+      return left( user.values )
+    }
+    return right( user )
   }
 }

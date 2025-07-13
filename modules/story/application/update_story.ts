@@ -41,6 +41,7 @@ export class UpdateStory {
           newDoc.id,
           storyId,
           newDoc.url,
+          newDoc.name,
           newDoc.type
         )
 

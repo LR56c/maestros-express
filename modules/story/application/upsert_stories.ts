@@ -46,6 +46,7 @@ export class UpsertStories {
           document.id.toString(),
           storyId,
           document.url,
+          document.name,
           document.type,
           documentExist.createdAt.toString()
         )
@@ -61,6 +62,7 @@ export class UpsertStories {
           document.id.toString(),
           storyId,
           document.url,
+          document.name,
           document.type
         )
 

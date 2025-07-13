@@ -356,6 +356,9 @@ import {
 import {
   SupabaseFileUploadData
 } from "@/modules/shared/infrastructure/supabase_file_upload_data"
+import {
+  UpdateAuth
+}                       from "@/modules/user/application/auth_use_cases/update_auth"
 
 export async function ai() {
   return new OpenAI( {
@@ -437,7 +440,7 @@ export async function addWorker() {
 
 export async function updateWorker() {
   return new UpdateWorker( workerData, await searchSpeciality(),
-    await upsertEmbedding(), uploader )
+    await upsertEmbedding() )
 }
 
 export async function searchWorker() {
@@ -463,6 +466,10 @@ export async function addUser() {
 
 export async function registerAuth() {
   return new RegisterAuth( authDao )
+}
+
+export async function updateAuth(){
+  return new UpdateAuth(authDao)
 }
 
 export async function getUser() {

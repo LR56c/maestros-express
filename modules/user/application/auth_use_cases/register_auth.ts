@@ -19,18 +19,12 @@ import {
 import { UserAuth }                    from "@/modules/user/domain/user"
 import { RoleLevelType }               from "@/modules/user/domain/role_type"
 import {
-  AddUser
-}                                      from "@/modules/user/application/user_use_cases/add_user"
-import {
-  UserMapper
-}                                      from "@/modules/user/application/user_mapper"
-import {
   WorkerStatusEnum
 }                                      from "@/modules/worker/domain/worker_status"
 
 export class RegisterAuth {
   constructor(
-    private readonly repo: AuthRepository,
+    private readonly repo: AuthRepository
   )
   {
   }

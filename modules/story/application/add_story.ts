@@ -54,6 +54,7 @@ export class AddStory {
         el.id,
         dto.id,
         el.url,
+        el.name,
         el.type
       )
 

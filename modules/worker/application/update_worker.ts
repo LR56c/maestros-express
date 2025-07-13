@@ -50,16 +50,12 @@ import {
 import {
   WorkerEmbeddingTypeEnum
 }                                      from "@/modules/worker_embedding/domain/worker_embedding_type"
-import {
-  UploadFileRepository
-}                                      from "@/modules/shared/domain/upload_file_repository"
 
 export class UpdateWorker {
   constructor(
     private readonly dao: WorkerDAO,
     private readonly searchSpecialities: SearchSpeciality,
     private readonly embedding: UpsertWorkerEmbedding,
-    private readonly uploader: UploadFileRepository
   )
   {
   }

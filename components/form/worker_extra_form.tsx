@@ -226,7 +226,7 @@ export default function WorkerExtraForm() {
             onChange={ parseFileCertificates }
             helperText="Certificado de Trabajo, Licencia de Conducir, documento que demuestre tu experiencia"
             placeholder="Suelta los archivos aquí o haz click para subir"
-            name="" label="Certificados" dropzone={ dropzone }/>
+            name="certificates" label="Certificados" dropzone={ dropzone }/>
           <ListInput
             name="taxes"
             keyName="name"

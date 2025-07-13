@@ -48,7 +48,7 @@ export class UpsertCertificates {
           cert.name,
           cert.url,
           cert.type,
-          existingCert.createdAt.toString( )
+          existingCert.createdAt.toString()
         )
 
         if ( updatedCert instanceof Errors ) {
