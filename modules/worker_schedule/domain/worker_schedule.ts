@@ -100,7 +100,7 @@ export class WorkerSchedule {
       errors.push( weekDayVO )
     }
 
-    const statusVO = wrapType( () => WorkerScheduleStatus.from( status ) )
+    const statusVO = wrapType( () => WorkerScheduleStatus.from( status.toUpperCase() ) )
     if ( statusVO instanceof BaseException ) {
       errors.push( statusVO )
     }

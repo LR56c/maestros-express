@@ -5,7 +5,6 @@ import { Search, X }       from "lucide-react"
 import { DropzoneOptions } from "react-dropzone"
 import FileUpload          from "@/components/form/file_upload"
 import { Button }          from "@/components/ui/button"
-import { Badge }           from "@/components/ui/badge"
 import { QuickFilter }     from "@/components/quick_filter"
 
 export default function Home() {

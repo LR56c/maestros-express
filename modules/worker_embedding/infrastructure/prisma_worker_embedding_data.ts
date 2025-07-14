@@ -29,9 +29,6 @@ import {
   Errors
 }                                      from "@/modules/shared/domain/exceptions/errors"
 import {
-  DataNotFoundException
-}                                      from "@/modules/shared/domain/exceptions/data_not_found_exception"
-import {
   Position
 }                                      from "@/modules/shared/domain/value_objects/position"
 
@@ -39,38 +36,39 @@ export class PrismaWorkerEmbeddingData
   implements WorkerEmbeddingRepository {
   constructor(
     private readonly db: PrismaClient,
-    private readonly ai: WorkerEmbeddingAI,
+    private readonly ai: WorkerEmbeddingAI
   )
   {
   }
 
-  async getById( embedId: UUID ): Promise<Either<BaseException[], WorkerEmbedding>> {
+  async getById( embedId: UUID ): Promise<Either<BaseException[], WorkerEmbedding[]>> {
     try {
-      const embed = await this.db.workerEmbedding.findUnique( {
+      const embed = await this.db.workerEmbedding.findMany( {
         where  : {
-          id: embedId.toString()
+          workerId: embedId.toString()
         },
         include: {
           worker: true
         }
       } )
-      if ( !embed ) {
-        return left( [new DataNotFoundException()] )
-      }
 
-      const workerEmbed = WorkerEmbedding.fromPrimitives(
-        embed.id,
-        embed.workerId,
-        embed.content,
-        embed.worker.location,
-        embed.type,
-        embed.createdAt
-      )
+      const list: WorkerEmbedding[] = []
+      for ( const element of embed ) {
+        const workerEmbed = WorkerEmbedding.fromPrimitives(
+          element.id,
+          element.workerId,
+          element.content,
+          element.worker.location,
+          element.type,
+          element.createdAt
+        )
 
-      if ( workerEmbed instanceof Errors ) {
-        return left( workerEmbed.values )
+        if ( workerEmbed instanceof Errors ) {
+          return left( workerEmbed.values )
+        }
+        list.push( workerEmbed )
       }
-      return right( workerEmbed )
+      return right( list )
     }
     catch ( e ) {
       return left( [new InfrastructureException()] )
@@ -84,9 +82,24 @@ export class PrismaWorkerEmbeddingData
         return left( embedding.left )
       }
 
+      const exists    = await this.db.workerEmbedding.findUnique( {
+        where: {
+          id: embed.id.toString()
+        }
+      } )
       const longitude = embed.location.value.longitude
       const latitude  = embed.location.value.latitude
-
+      if ( exists ) {
+        await this.db.$executeRaw`UPDATE worker_embedding
+                                  SET content = ${ embed.content.value }::text,
+                                    embedding = ${ embedding.right }::vector
+                                    , location = ST_SetSRID(ST_MakePoint(${ longitude }
+                                    , ${ latitude })
+                                    , 4326)::geography
+                                    ,
+                                  WHERE id = ${ embed.id.toString() }::uuid`
+        return right( true )
+      }
       await this.db.$executeRaw`INSERT INTO worker_embedding (id, type, content, embedding, created_at, worker_id, location)
                                 VALUES (${ embed.id.toString() }::uuid,
                                         ${ embed.type.value.toLowerCase() }

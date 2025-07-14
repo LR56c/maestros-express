@@ -18,7 +18,6 @@ export async function POST( request: NextRequest ) {
     worker_id: z.string(),
     stories  : z.array( storySchema )
   } ), body )
-
   if ( isLeft( data ) ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }

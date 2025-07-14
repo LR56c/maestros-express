@@ -55,7 +55,7 @@ export class UpdateWorker {
   constructor(
     private readonly dao: WorkerDAO,
     private readonly searchSpecialities: SearchSpeciality,
-    private readonly embedding: UpsertWorkerEmbedding,
+    private readonly embedding: UpsertWorkerEmbedding
   )
   {
   }
@@ -187,7 +187,9 @@ export class UpdateWorker {
 
     const workerMapped = WorkerMapper.toDTO( updatedWorker )
 
-    const embeddingResult = await this.embedding.execute( {
+    const embeddingResult = await this.embedding.execute(
+      updatedWorker.user.userId.toString(),
+      {
       id      : UUID.create().toString(),
       location: updatedWorker.location.toString(),
       data    : {

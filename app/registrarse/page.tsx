@@ -1,15 +1,22 @@
 "use client"
-import { useAuthContext }        from "@/app/context/auth_context"
-import { z }                     from "zod"
+import { useAuthContext } from "@/app/context/auth_context"
+import { z }              from "zod"
 import {
   userRegisterRequestSchema
-}                                from "@/modules/user/application/models/user_register_request"
+}                         from "@/modules/user/application/models/user_register_request"
 
-import { FormProvider, useForm } from "react-hook-form"
-import { zodResolver }           from "@hookform/resolvers/zod"
-import InputText                 from "@/components/form/input_text"
-import React                     from "react"
-import { Button }                from "@/components/ui/button"
+import { FormProvider, useForm }          from "react-hook-form"
+import { zodResolver }                    from "@hookform/resolvers/zod"
+import InputText                          from "@/components/form/input_text"
+import React, { useState, useTransition } from "react"
+import { Button }                         from "@/components/ui/button"
+import {
+  wrapTypeAsync
+}                                         from "@/modules/shared/utils/wrap_type"
+import {
+  BaseException
+}                                         from "@/modules/shared/domain/exceptions/base_exception"
+import { Loader2Icon }                    from "lucide-react"
 
 const registerFormSchema = userRegisterRequestSchema.extend( {
   confirm: z.string()
@@ -19,7 +26,8 @@ const registerFormSchema = userRegisterRequestSchema.extend( {
 } )
 
 export default function Registrarse() {
-  const { user, register } = useAuthContext()
+  const { user, register }            = useAuthContext()
+  const [submitting, startTransition] = useTransition()
 
   const methods = useForm( {
     resolver: zodResolver( registerFormSchema )
@@ -29,10 +37,12 @@ export default function Registrarse() {
 
 
   const onSubmit = async ( values: any ) => {
-    await register( {
-      email    : values.email,
-      full_name: values.full_name,
-      password : values.password,
+    startTransition( async () => {
+      await register( {
+        email    : values.email,
+        full_name: values.full_name,
+        password : values.password
+      } )
     } )
   }
   return (
@@ -48,7 +58,14 @@ export default function Registrarse() {
           <InputText name="full_name" label="Nombre" type="text"
                      placeholder="Ingrese su nombre completo"/>
           <Button type="button"
-                  onClick={ handleSubmit( onSubmit ) }>Registrarse</Button>
+                  onClick={ handleSubmit( onSubmit ) }>
+            { submitting ?
+              <>
+                <Loader2Icon className="animate-spin"/>
+                Cargando...
+              </>
+              : "Registrarse" }
+            </Button>
         </form>
       </FormProvider>
     </div>

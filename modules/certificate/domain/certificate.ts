@@ -91,7 +91,7 @@ export class Certificate {
       errors.push( urlVO )
     }
 
-    const typeV0 = wrapType( () => CertificateType.from( type ) )
+    const typeV0 = wrapType( () => CertificateType.from( type.toUpperCase() ) )
 
     if ( typeV0 instanceof BaseException ) {
       errors.push( typeV0 )

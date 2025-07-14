@@ -113,19 +113,20 @@ export const AuthProvider = ( { children }: { children: ReactNode } ) => {
   }, [] )
 
   useEffect( () => {
-    if ( !user ) {
-      const check = async () => {
-        const { data, error } = await supabase.auth.getSession()
-        if ( error || !data?.session ) {
-          await anonymous()
-        }
-        else {
-          setUser( parseResponse( data?.session?.user ) )
-        }
-      }
-      check()
+    if ( user ) {
+      return
     }
-  }, [user] )
+    const check = async () => {
+      const { data, error } = await supabase.auth.getSession()
+      if ( error || !data?.session ) {
+        anonymous()
+      }
+      else {
+        setUser( parseResponse( data?.session?.user ) )
+      }
+    }
+    check()
+  }, [] )
 
   const hasAccess = async ( level: RoleLevelType ): Promise<boolean> => {
     if ( !user ) {

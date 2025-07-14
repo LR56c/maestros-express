@@ -11,15 +11,6 @@ import {
   BaseException
 } from "@/modules/shared/domain/exceptions/base_exception"
 import {
-  containError
-} from "@/modules/shared/utils/contain_error"
-import {
-  DataNotFoundException
-} from "@/modules/shared/domain/exceptions/data_not_found_exception"
-import {
-  ensureWorkerEmbeddingExist
-} from "@/modules/worker_embedding/utils/ensure_worker_embedding_exist"
-import {
   WorkerEmbedding
 } from "@/modules/worker_embedding/domain/worker_embedding"
 import {
@@ -42,6 +33,12 @@ import {
 import {
   WorkerEmbeddingTypeEnum
 } from "@/modules/worker_embedding/domain/worker_embedding_type"
+import {
+  wrapType
+} from "@/modules/shared/utils/wrap_type"
+import {
+  UUID
+} from "@/modules/shared/domain/value_objects/uuid"
 
 type DataType = {
   content: string
@@ -110,7 +107,7 @@ export class UpsertWorkerEmbedding {
       dataResult.right.workerId,
       dataResult.right.content,
       dto.location,
-      dto.data.type,
+      dto.data.type
     )
 
     if ( newEmbed instanceof Errors ) {
@@ -144,14 +141,25 @@ export class UpsertWorkerEmbedding {
     return right( updatedEmbed )
   }
 
-  async execute( dto: WorkerEmbeddingRequest ): Promise<Either<BaseException[], WorkerEmbedding>> {
-    const existResult = await ensureWorkerEmbeddingExist( this.repo, dto.id )
+  async execute( workerId: string,
+    dto: WorkerEmbeddingRequest ): Promise<Either<BaseException[], WorkerEmbedding>> {
+
+    const vId = wrapType( () => UUID.from( workerId ) )
+
+    if ( vId instanceof BaseException ) {
+      return left( [vId] )
+    }
+
+    const existResult = await this.repo.getById( vId )
+    if ( isLeft( existResult ) ) {
+      return left( existResult.left )
+    }
+
+    const workerType = existResult.right.filter(
+      value => value.type.value === "WORKER" )
 
     let embed: WorkerEmbedding
-    if ( isLeft( existResult ) ) {
-      if ( !containError( existResult.left, new DataNotFoundException() ) ) {
-        return left( existResult.left )
-      }
+    if ( workerType.length === 0 ) {
       const createResult = await this.create( dto )
       if ( isLeft( createResult ) ) {
         return left( createResult.left )
@@ -159,8 +167,13 @@ export class UpsertWorkerEmbedding {
 
       embed = createResult.right
     }
+    else if ( workerType.length !== 1 ) {
+      return left( [
+        new InfrastructureException( "Worker embedding multiple entries found" )
+      ] )
+    }
     else {
-      const updateResult = await this.update( dto, existResult.right )
+      const updateResult = await this.update( dto, existResult.right[0] )
 
       if ( isLeft( updateResult ) ) {
         return left( updateResult.left )

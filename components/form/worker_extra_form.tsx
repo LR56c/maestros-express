@@ -1,72 +1,89 @@
 "use client"
-import { z }                          from "zod"
+import { z }                                         from "zod"
 import {
-  SpecialityDTO,
   specialitySchema
-}                                     from "@/modules/speciality/application/speciality_dto"
+}                                                    from "@/modules/speciality/application/speciality_dto"
 import {
   workerTaxSchema
-}                                     from "@/modules/worker_tax/application/worker_tax_dto"
+}                                                    from "@/modules/worker_tax/application/worker_tax_dto"
 import {
   zoneSchema
-}                                     from "@/modules/zone/application/zone_dto"
+}                                                    from "@/modules/zone/application/zone_dto"
 import {
   workerScheduleSchema
-}                                     from "@/modules/worker_schedule/application/worker_schedule_dto"
-import { useQuery }                   from "@tanstack/react-query"
+}                                                    from "@/modules/worker_schedule/application/worker_schedule_dto"
+import {
+  useQuery
+}                                                    from "@tanstack/react-query"
 import {
   useWorkerContext
-}                                     from "@/app/context/worker_context"
+}                                                    from "@/app/context/worker_context"
 import {
   useAuthContext
-}                                     from "@/app/context/auth_context"
-import { FormProvider, useForm }      from "react-hook-form"
+}                                                    from "@/app/context/auth_context"
+import {
+  FormProvider,
+  useForm
+}                                                    from "react-hook-form"
 import {
   zodResolver
-}                                     from "@hookform/resolvers/zod"
-import { Button }                     from "@/components/ui/button"
-import React, { useEffect, useState } from "react"
+}                                                    from "@hookform/resolvers/zod"
+import {
+  Button
+}                                                    from "@/components/ui/button"
+import React, { useEffect, useState, useTransition } from "react"
 import MultiSelectInput, {
   MultiSelectInputValue
-}                                     from "@/components/form/multi_select_input"
-import { DropzoneOptions }            from "react-dropzone"
-import FileUploadInput                from "@/components/form/file_upload_input"
-import ListInput                      from "@/components/form/list_input"
+}                                                    from "@/components/form/multi_select_input"
+import {
+  DropzoneOptions
+}                                                    from "react-dropzone"
+import FileUploadInput
+                                                     from "@/components/form/file_upload_input"
+import ListInput
+                                                     from "@/components/form/list_input"
 import {
   TaxDialog
-}                                     from "@/components/form/tax_dialog"
+}                                                    from "@/components/form/tax_dialog"
 import {
   StoryDialog,
   storyFormSchema
-}                                     from "@/components/form/story_dialog"
+}                                                    from "@/components/form/story_dialog"
 import CalendarScheduleInput
-                                      from "@/components/form/calendar_schedule/calendar_schedule_input"
+                                                     from "@/components/form/calendar_schedule/calendar_schedule_input"
 import {
   parseData
-}                                     from "@/modules/shared/application/parse_handlers"
+}                                                    from "@/modules/shared/application/parse_handlers"
 import {
   CertificateType,
   CertificateTypeEnum
-}                                     from "@/modules/certificate/domain/certificate_type"
+}                                                    from "@/modules/certificate/domain/certificate_type"
 import {
   wrapType
-}                                     from "@/modules/shared/utils/wrap_type"
+}                                                    from "@/modules/shared/utils/wrap_type"
 import {
   BaseException
-}                                     from "@/modules/shared/domain/exceptions/base_exception"
-import { isLeft }                     from "fp-ts/Either"
+}                                                    from "@/modules/shared/domain/exceptions/base_exception"
+import {
+  isLeft
+}                                                    from "fp-ts/Either"
 import {
   parseSpecialities,
-  sectorsOption, specialitiesOption
-} from "@/utils/tanstack_catalog"
+  sectorsOption,
+  specialitiesOption
+}                                                    from "@/utils/tanstack_catalog"
 import {
   parseSectors
-}                                     from "@/utils/multi_select_parser"
+}                                                    from "@/utils/multi_select_parser"
 import {
   UUID
-}                                     from "@/modules/shared/domain/value_objects/uuid"
-import { useRouter }                  from "next/navigation"
-import { Loader2Icon }                from "lucide-react"
+}                                                    from "@/modules/shared/domain/value_objects/uuid"
+import {
+  useRouter
+}                                                    from "next/navigation"
+import {
+  Loader2Icon
+}                                                    from "lucide-react"
 
 const certificateFormSchema = z.instanceof( File ).refine(
   ( file ) => {
@@ -100,8 +117,6 @@ const workerExtraFormSchema = z.object( {
 } )
 
 
-
-
 export default function WorkerExtraForm() {
   const { isPending: specialityPending, data: specialityData } = useQuery(
     specialitiesOption )
@@ -121,19 +136,18 @@ export default function WorkerExtraForm() {
 
   const { handleSubmit, setValue } = methods
 
-  const [submitting, setSubmitting] = useState( false )
-  const onSubmit                    = async ( data: any ) => {
+  const [submitting, startTransition] = useTransition()
+  const onSubmit                      = async ( data: any ) => {
     if ( !user ) return
-    setSubmitting( true )
-    const result = await updateWorker( user, data )
-    if ( !result ) {
-      console.log( "Error updating worker data" )
-      setSubmitting( false )
-      return
-    }
-    await revalidate()
-    await router.replace( "/" )
-    setSubmitting( false )
+    startTransition( async () => {
+      const result = await updateWorker( user, data )
+      if ( !result ) {
+        console.log( "Error updating worker data" )
+        return
+      }
+      await revalidate()
+      await router.replace( "/" )
+    } )
   }
 
   const [sectorValues, setSectorValues] = useState<MultiSelectInputValue[]>(

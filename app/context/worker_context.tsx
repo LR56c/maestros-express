@@ -52,7 +52,7 @@ const uploadDocument = async ( repo: UploadFileRepository,
   try {
     const uploadPromises: Promise<ValidUploadDocumentDTO>[] = documents.map(
       async ( file ) => {
-        const name   = `${ Date.now() }-${ file.name }`
+        const name   = `${ file.name }-${ Date.now() }`
         const format = file.type.split( "/" )[1]
         const type   = file.type.split( "/" )[0]
 
@@ -186,8 +186,6 @@ export const WorkerProvider = ( { children }: { children: ReactNode } ) => {
       }
       return false
     }
-    // const data = await response.json()
-    // console.log( "Worker updated successfully:", data )
     return true
   }
 
@@ -203,7 +201,6 @@ export const WorkerProvider = ( { children }: { children: ReactNode } ) => {
       return false
     }
     const data = await response.json()
-    console.log( "Worker created successfully:", data )
     return true
   }
 

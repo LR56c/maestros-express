@@ -23,7 +23,6 @@ import { addWorker, searchWorker, updateWorker } from "@/app/api/dependencies"
 export async function POST( request: NextRequest ) {
   const body = await request.json()
   const data = parseData( workerRequestSchema, body )
-
   if ( isLeft( data ) ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
@@ -31,7 +30,6 @@ export async function POST( request: NextRequest ) {
   const result = await (
     await addWorker()
   ).execute( data.right )
-
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
   }

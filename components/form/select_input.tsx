@@ -75,7 +75,7 @@ export default function SelectInput( {
       </div>
       <Select value={selectedValue} disabled={ loading } onValueChange={ handleChange }>
         <SelectTrigger className="w-full">
-          <SelectValue placeholder={ loading ? "Cargando" : placeholder }/>
+          <SelectValue className="capitalize" placeholder={ loading ? "Cargando" : placeholder }/>
         </SelectTrigger>
         <SelectContent>
           { values.map( ( { label } ) => (

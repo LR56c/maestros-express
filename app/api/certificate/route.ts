@@ -24,7 +24,6 @@ export async function POST( request: NextRequest ) {
     worker_id   : z.string(),
     certificates: z.array( certificateSchema )
   } ), body )
-
   if ( isLeft( data ) ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }

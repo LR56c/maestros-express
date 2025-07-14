@@ -1,36 +1,51 @@
 "use client"
-import { z }                             from "zod"
-import { zodResolver }                   from "@hookform/resolvers/zod"
-import { FormProvider, useForm }         from "react-hook-form"
-import InputText                         from "@/components/form/input_text"
-import { Button }                        from "@/components/ui/button"
+import { z }                                         from "zod"
+import {
+  zodResolver
+}                                                    from "@hookform/resolvers/zod"
+import { FormProvider, useForm }                     from "react-hook-form"
+import InputText
+                                                     from "@/components/form/input_text"
+import {
+  Button
+}                                                    from "@/components/ui/button"
 import {
   workerRequestSchema
-}                                        from "@/modules/worker/application/worker_request"
-import { DateInput }                     from "@/components/form/date_input"
+}                                                    from "@/modules/worker/application/worker_request"
+import {
+  DateInput
+}                                                    from "@/components/form/date_input"
 import NationalIdentityInput
-                                         from "@/components/form/national_identity_input"
+                                                     from "@/components/form/national_identity_input"
 import InputTextArea
-                                         from "@/components/form/input_text_area"
-import SelectInput, { SelectInputValue } from "@/components/form/select_input"
-import { useQuery }                      from "@tanstack/react-query"
-import React, { useEffect, useState }    from "react"
+                                                     from "@/components/form/input_text_area"
+import SelectInput, {
+  SelectInputValue
+}                                                    from "@/components/form/select_input"
+import {
+  useQuery
+}                                                    from "@tanstack/react-query"
+import React, { useEffect, useState, useTransition } from "react"
 import {
   CountryDTO
-}                                        from "@/modules/country/application/country_dto"
+}                                                    from "@/modules/country/application/country_dto"
 import InputLocationDetector
-                                         from "@/components/form/input_location_detector"
+                                                     from "@/components/form/input_location_detector"
 import {
   NationalIdentityFormatDTO
-}                                        from "@/modules/national_identity_format/application/national_identity_format_dto"
-import { useWorkerContext }              from "@/app/context/worker_context"
-import { useAuthContext }                from "@/app/context/auth_context"
-import { useRouter }                     from "next/navigation"
-import { Loader2Icon }                   from "lucide-react"
+}                                                    from "@/modules/national_identity_format/application/national_identity_format_dto"
+import {
+  useWorkerContext
+}                                                    from "@/app/context/worker_context"
+import {
+  useAuthContext
+}                                                    from "@/app/context/auth_context"
+import { useRouter }                                 from "next/navigation"
+import { Loader2Icon }                               from "lucide-react"
 
 const workerFormSchema = workerRequestSchema.extend( {
-  confirm   : z.string(),
-  country_id: z.string()
+  confirm: z.string(),
+  country: z.string()
 } ).refine( ( data ) => data.user.password === data.confirm, {
   path   : ["confirm"],
   message: "Las contraseñas no coinciden"
@@ -53,10 +68,10 @@ export default function WorkerApplyForm() {
   const { login, user }     = useAuthContext()
   const { createWorker }    = useWorkerContext()
 
-  const router = useRouter()
+  const [submitting, startTransition] = useTransition()
+  const router                        = useRouter()
 
   const [inputCountries, setInputCountries] = useState<SelectInputValue[]>( [] )
-  const [submitting, setSubmitting]         = useState( false )
   useEffect( () => {
     if ( !data ) return
     const countries: CountryDTO[] = data as CountryDTO[]
@@ -75,26 +90,25 @@ export default function WorkerApplyForm() {
   const { handleSubmit, setValue } = methods
 
   const onSubmit = async ( data: any ) => {
-    setSubmitting( true )
-    const result = await createWorker( {
-      user                   : data.user,
-      national_identity_id   : data.national_identity_id,
-      national_identity_value: data.national_identity_value,
-      birth_date             : data.birth_date,
-      description            : data.description,
-      location               : data.location
+    startTransition( async () => {
+      const result = await createWorker( {
+        user                   : data.user,
+        national_identity_id   : data.national_identity_id,
+        national_identity_value: data.national_identity_value,
+        birth_date             : data.birth_date,
+        description            : data.description,
+        location               : data.location
+      } )
+      if ( !result ) {
+        console.error( "Failed to create worker" )
+        return
+      }
+      await login( {
+        email   : data.user.email,
+        password: data.user.password
+      } )
+      await router.replace( "/trabajador/aplicar" )
     } )
-    if ( !result ) {
-      console.error( "Failed to create worker" )
-      setSubmitting( false )
-      return
-    }
-    await login( {
-      email   : data.user.email,
-      password: data.user.password
-    } )
-    await router.replace( "/trabajador/aplicar" )
-    setSubmitting( false )
   }
 
   const [selectedCountry, setSelectedCountry] = useState<CountryDTO | null>(
@@ -137,14 +151,14 @@ export default function WorkerApplyForm() {
         <InputText name="user.full_name" label="Nombre" type="text"
                    placeholder="Ingrese su nombre completo"/>
         <SelectInput
-          placeholder="Seleccione su nacionalidad"
+          placeholder="Seleccione su pais de origen"
           loading={ isPending }
           onChange={ ( value ) => {
             const c = value as CountryDTO
             setSelectedCountry( c )
-            setValue( "country_id", c.id )
+            setValue( "country", c.name )
           } }
-          name="country_id" values={ inputCountries } label="Nacionalidad"/>
+          name="country" values={ inputCountries } label="Pais origen"/>
         <NationalIdentityInput name="national_identity_value"
                                label="Identificador" format={ identityFormat }
                                disabled={ !selectedCountry || isFormatLoading ||
@@ -157,13 +171,13 @@ export default function WorkerApplyForm() {
         <InputTextArea name="description" label="Descripcion"
                        placeholder="Ingrese una breve descripcion"/>
         <InputLocationDetector name="location" label="Ubicacion"/>
-        <Button disabled={submitting} onClick={ handleSubmit( onSubmit ) }>
-          {submitting ?
+        <Button disabled={ submitting } onClick={ handleSubmit( onSubmit ) }>
+          { submitting ?
             <>
-              <Loader2Icon className="animate-spin" />
+              <Loader2Icon className="animate-spin"/>
               Cargando...
             </>
-            : "Continuar"}
+            : "Continuar" }
         </Button>
       </div>
     </FormProvider>

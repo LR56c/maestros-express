@@ -19,7 +19,6 @@ export async function POST( request: NextRequest ) {
       worker_id: z.string(),
       schedules: z.array( workerScheduleSchema )
     } ), body )
-
   if ( isLeft( data ) ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
@@ -29,7 +28,6 @@ export async function POST( request: NextRequest ) {
   const result = await (
     await upsertSchedules()
   ).execute( worker_id, schedules )
-
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
   }

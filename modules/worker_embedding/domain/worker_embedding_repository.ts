@@ -19,7 +19,7 @@ export abstract class WorkerEmbeddingRepository {
 
   abstract remove( id: UUID ): Promise<Either<BaseException, boolean>>
 
-  abstract getById( embedId : UUID): Promise<Either<BaseException[], WorkerEmbedding>>
+  abstract getById( embedId : UUID): Promise<Either<BaseException[], WorkerEmbedding[]>>
 
   abstract search( rawContent : ValidString, targetLocation : Position, radius : ValidInteger, limit?: ValidInteger ): Promise<Either<BaseException[], WorkerEmbedding[]>>
 }

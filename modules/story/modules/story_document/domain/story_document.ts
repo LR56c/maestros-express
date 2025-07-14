@@ -96,7 +96,7 @@ export class StoryDocument {
     }
 
     const typeVO = wrapType(
-      () => StoryDocumentType.from( type ) )
+      () => StoryDocumentType.from( type.toUpperCase() ) )
 
     if ( typeVO instanceof BaseException ) {
       errors.push( typeVO )
