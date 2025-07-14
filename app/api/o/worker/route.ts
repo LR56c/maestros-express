@@ -24,18 +24,15 @@ export async function PUT( request: NextRequest ) {
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
   }
-  console.log( "worker result", result.right )
 
   const dto: UserUpdateDTO = {
     email : result.right.user.email.value,
     status: "VERIFIED"
   }
-  console.log( "update dto", dto )
 
   const user = await (
     await updateAuth()
   ).execute( dto )
-  console.log( "user", user )
 
   if ( isLeft( user ) ) {
     return NextResponse.json( { status: 500 } )

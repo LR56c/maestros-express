@@ -56,14 +56,17 @@ import {
 }                                     from "@/modules/shared/domain/exceptions/base_exception"
 import { isLeft }                     from "fp-ts/Either"
 import {
-  sectorsOption
-}                                     from "@/utils/tanstack_catalog"
+  parseSpecialities,
+  sectorsOption, specialitiesOption
+} from "@/utils/tanstack_catalog"
 import {
   parseSectors
 }                                     from "@/utils/multi_select_parser"
 import {
   UUID
 }                                     from "@/modules/shared/domain/value_objects/uuid"
+import { useRouter }                  from "next/navigation"
+import { Loader2Icon }                from "lucide-react"
 
 const certificateFormSchema = z.instanceof( File ).refine(
   ( file ) => {
@@ -97,24 +100,7 @@ const workerExtraFormSchema = z.object( {
 } )
 
 
-const specialitiesOption = {
-  queryKey: ["specialities"],
-  queryFn : async () => {
-    const response = await fetch( "/api/speciality", { method: "GET" } )
-    if ( !response.ok ) {
-      throw new Error( "Error fetching countries" )
-    }
-    return await response.json() as SpecialityDTO[]
-  }
-}
 
-const parseSpecialities = ( data: SpecialityDTO[] ): MultiSelectInputValue[] => data.map(
-  ( speciality ) => (
-    {
-      label: speciality.name,
-      value: speciality
-    }
-  ) )
 
 export default function WorkerExtraForm() {
   const { isPending: specialityPending, data: specialityData } = useQuery(
@@ -122,35 +108,32 @@ export default function WorkerExtraForm() {
   const { isPending: sectorPending, data: sectorData }         = useQuery(
     sectorsOption )
   const { updateWorker }                                       = useWorkerContext()
-  const { user, revalidate }                                               = useAuthContext()
+  const {
+          user,
+          revalidate
+        }                                                      = useAuthContext()
+
+  const router = useRouter()
 
   const methods = useForm( {
     resolver: zodResolver( workerExtraFormSchema )
   } )
 
-  const {
-          handleSubmit,
-          setValue,
-          watch,
-          formState: { errors },
-          reset
-        } = methods
+  const { handleSubmit, setValue } = methods
 
-
-  useEffect( () => {
-    console.log( "errors", errors )
-  }, [errors] )
-
-  const formValues = watch()
-
-  const onSubmit = async ( data: any ) => {
+  const [submitting, setSubmitting] = useState( false )
+  const onSubmit                    = async ( data: any ) => {
     if ( !user ) return
+    setSubmitting( true )
     const result = await updateWorker( user, data )
     if ( !result ) {
       console.log( "Error updating worker data" )
+      setSubmitting( false )
+      return
     }
-    reset()
     await revalidate()
+    await router.replace( "/" )
+    setSubmitting( false )
   }
 
   const [sectorValues, setSectorValues] = useState<MultiSelectInputValue[]>(
@@ -254,8 +237,14 @@ export default function WorkerExtraForm() {
             tooltip="Indique sus horarios de trabajo"
             visibleDays={ 5 }
           />
-          <Button onClick={ handleSubmit( onSubmit ) }>Finish</Button>
-          <pre>{ JSON.stringify( formValues, null, 2 ) }</pre>
+          <Button onClick={ handleSubmit( onSubmit ) }>
+            { submitting ?
+              <>
+                <Loader2Icon className="animate-spin"/>
+                Cargando...
+              </>
+              : "Completar" }
+          </Button>
         </div>
       </FormProvider>
     </>

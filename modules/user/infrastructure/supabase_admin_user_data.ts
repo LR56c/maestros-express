@@ -67,15 +67,13 @@ export class SupabaseAdminUserData implements AuthRepository {
   async update( auth: User ): Promise<Either<BaseException[], boolean>> {
     const { data, error } = await this.client.auth.admin.updateUserById(
       auth.userId.toString(), {
-        role        : auth.role.toString(),
-        app_metadata: {
+        user_metadata: {
           status: auth.status.value,
           avatar: auth.avatar?.value,
           name  : auth.fullName.value,
           role  : auth.role.toString()
         }
       } )
-    console.log( "Update user", data, error )
     if ( error ) {
       return left( [new InfrastructureException( error.message )] )
     }
@@ -86,7 +84,6 @@ export class SupabaseAdminUserData implements AuthRepository {
     const { data, error } = await this.client.rpc('get_user_id_by_email',{
       p_email: email.value
     }).single()
-    console.log("Get user by email", data, error )
     if( error ) {
     return left( [new InfrastructureException( error.message )] )
     }

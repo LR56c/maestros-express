@@ -493,7 +493,7 @@ enum CertificateType {
 }
 
 model User {
-  id                 String               @unique @db.Uuid
+  id                 String               @id @db.Uuid
   name               String
   email              String
   avatar             String?
@@ -513,7 +513,6 @@ model User {
   FromUserReport     Report[]             @relation("FromUserReports")
   ToUserReport       Report[]             @relation("ToUserReports")
 
-  isAnonymous Boolean?
 
   @@unique([email])
   @@map("user")

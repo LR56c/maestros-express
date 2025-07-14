@@ -192,6 +192,19 @@ export class PrismaWorkerData implements WorkerDAO {
           in: ids
         }
       }
+      if(query.specialities){
+        const arr: string[] = query.specialities.split( "," )
+        const ids           = arr.map( i => UUID.from( i ).toString() )
+        idsCount            = ids.length
+        // @ts-ignore
+        where["WorkerSpeciality"] = {
+          some: {
+            specialityId: {
+              in: ids
+            }
+          }
+        }
+      }
       if ( query.email ) {
         // @ts-ignore
         where["user"] = {

@@ -26,6 +26,7 @@ import {
 import { useWorkerContext }              from "@/app/context/worker_context"
 import { useAuthContext }                from "@/app/context/auth_context"
 import { useRouter }                     from "next/navigation"
+import { Loader2Icon }                   from "lucide-react"
 
 const workerFormSchema = workerRequestSchema.extend( {
   confirm   : z.string(),
@@ -49,11 +50,13 @@ const countriesOption = {
 export default function WorkerApplyForm() {
 
   const { isPending, data } = useQuery( countriesOption )
-  const { login, user }        = useAuthContext()
+  const { login, user }     = useAuthContext()
   const { createWorker }    = useWorkerContext()
 
   const router = useRouter()
+
   const [inputCountries, setInputCountries] = useState<SelectInputValue[]>( [] )
+  const [submitting, setSubmitting]         = useState( false )
   useEffect( () => {
     if ( !data ) return
     const countries: CountryDTO[] = data as CountryDTO[]
@@ -72,23 +75,26 @@ export default function WorkerApplyForm() {
   const { handleSubmit, setValue } = methods
 
   const onSubmit = async ( data: any ) => {
+    setSubmitting( true )
     const result = await createWorker( {
-      user: data.user,
-      national_identity_id: data.national_identity_id,
+      user                   : data.user,
+      national_identity_id   : data.national_identity_id,
       national_identity_value: data.national_identity_value,
-      birth_date: data.birth_date,
-      description: data.description,
-      location: data.location,
+      birth_date             : data.birth_date,
+      description            : data.description,
+      location               : data.location
     } )
-    if( !result ) {
+    if ( !result ) {
       console.error( "Failed to create worker" )
+      setSubmitting( false )
       return
     }
-    await login({
+    await login( {
       email   : data.user.email,
       password: data.user.password
-    })
+    } )
     await router.replace( "/trabajador/aplicar" )
+    setSubmitting( false )
   }
 
   const [selectedCountry, setSelectedCountry] = useState<CountryDTO | null>(
@@ -151,7 +157,14 @@ export default function WorkerApplyForm() {
         <InputTextArea name="description" label="Descripcion"
                        placeholder="Ingrese una breve descripcion"/>
         <InputLocationDetector name="location" label="Ubicacion"/>
-        <Button onClick={ handleSubmit( onSubmit ) }>Send</Button>
+        <Button disabled={submitting} onClick={ handleSubmit( onSubmit ) }>
+          {submitting ?
+            <>
+              <Loader2Icon className="animate-spin" />
+              Cargando...
+            </>
+            : "Continuar"}
+        </Button>
       </div>
     </FormProvider>
   </>

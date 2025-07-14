@@ -1,34 +1,21 @@
 "use client"
-import { useQuery }                   from "@tanstack/react-query"
-import { sectorsOption }              from "@/utils/tanstack_catalog"
-import {
-  MultiSelectInputValue
-}                                     from "@/components/form/multi_select_input"
-import React, { useEffect, useState } from "react"
-import { parseSectors }               from "@/utils/multi_select_parser"
-import { Textarea }                   from "@/components/ui/textarea"
-import { Search }                     from "lucide-react"
-import { DropzoneOptions }            from "react-dropzone"
-import FileUpload                     from "@/components/form/file_upload"
-import { Button }                     from "@/components/ui/button"
+import React               from "react"
+import { Textarea }        from "@/components/ui/textarea"
+import { Search, X }       from "lucide-react"
+import { DropzoneOptions } from "react-dropzone"
+import FileUpload          from "@/components/form/file_upload"
+import { Button }          from "@/components/ui/button"
+import { Badge }           from "@/components/ui/badge"
+import { QuickFilter }     from "@/components/quick_filter"
 
 export default function Home() {
-  const { isPending: sectorPending, data: sectorData } = useQuery(
-    sectorsOption )
-  const [sectorValues, setSectorValues]                = useState<MultiSelectInputValue[]>(
-    [] )
-  useEffect( () => {
-    setSectorValues( parseSectors( sectorData ?? [] ) )
-  }, [sectorData] )
-
 
   const dropzone = {
     accept  : {
-      "image/*": [".jpg", ".jpeg", ".png"],
-      "pdf"    : [".pdf"]
+      "image/*": [".jpg", ".jpeg", ".png"]
     },
     multiple: true,
-    maxFiles: 4,
+    maxFiles: 1,
     maxSize : 1 * 1024 * 1024
   } satisfies DropzoneOptions
 
@@ -54,6 +41,7 @@ export default function Home() {
         </div>
         <Button className="w-full">Buscar servicio</Button>
       </div>
+      <QuickFilter onChange={(values)=>console.log('values',values)}/>
     </div>
   )
 }
