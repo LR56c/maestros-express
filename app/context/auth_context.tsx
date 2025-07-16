@@ -27,7 +27,8 @@ import {
   RoleType
 }                       from "@/modules/user/domain/role_type"
 import {
-  wrapType
+  wrapType,
+  wrapTypeAsync
 }                       from "@/modules/shared/utils/wrap_type"
 import {
   BaseException
@@ -45,13 +46,13 @@ interface AuthContextType {
 
   anonymous(): Promise<void>
 
-  login( request: UserLoginRequest ): Promise<void>
+  login( request: UserLoginRequest ): Promise<boolean>
 
   logout( token?: string ): Promise<void>
 
   revalidate( token?: string ): Promise<void>
 
-  register( request: UserRegisterRequest ): Promise<void>
+  register( request: UserRegisterRequest ): Promise<boolean>
 
   hasAccess( level: RoleLevelType ): Promise<boolean>
 }
@@ -146,8 +147,13 @@ export const AuthProvider = ( { children }: { children: ReactNode } ) => {
   }
 
   const login = async ( request: UserLoginRequest ) => {
-    const userResponse = await service.login( request )
+    const userResponse = await wrapTypeAsync( () => service.login( request ) )
+
+    if ( userResponse instanceof BaseException ) {
+      return false
+    }
     setUser( userResponse )
+    return true
   }
 
   const logout = async ( token?: string ) => {
@@ -156,8 +162,14 @@ export const AuthProvider = ( { children }: { children: ReactNode } ) => {
   }
 
   const register = async ( request: UserRegisterRequest ) => {
-    const userResponse = await service.register( request )
+    const userResponse = await wrapTypeAsync(
+      () => service.register( request ) )
+
+    if ( userResponse instanceof BaseException ) {
+      return false
+    }
     setUser( userResponse )
+    return true
   }
 
   const revalidate = async ( token?: string ): Promise<void> => {

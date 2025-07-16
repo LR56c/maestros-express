@@ -34,14 +34,14 @@ export function QuickFilter( { onFilter }: QuickFilterProps ) {
   return (
     <div className="flex flex-col">
       <p>Filtros rapidos</p>
-      <div className="flex items-center gap-2 h-12">
+      <div className="flex items-center gap-2">
         { specialityPending ? (
-          <div className="flex items-center gap-2">
+          <div className="flex items-start gap-2">
             <Loader2Icon className="animate-spin"/>
             <p>Cargando especialidades</p>
           </div>
         ) : <>
-          <div className="flex items-center gap-2 max-w-md overflow-x-auto">
+          <div className="flex items-center gap-2 max-w-md overflow-x-auto h-16">
             { specialityValues.length > 0 ? specialityValues.map(
               ( speciality ) =>
                 <Button key={ speciality.label } size="sm" variant="secondary"

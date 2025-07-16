@@ -121,7 +121,7 @@ export default function Home() {
 
   return (
     <div
-      className="w-dvh flex flex-col items-center justify-center min-h-screen gap-2">
+      className="flex flex-col items-center justify-center w-full h-full gap-2">
       <div className="w-full max-w-xl flex flex-col gap-2">
         <div className="w-full max-w-xl flex h-16 gap-2">
           <div className="w-full h-full relative">

@@ -31,17 +31,16 @@ export default function RootLayout( {
   return (
     <html lang="en" suppressHydrationWarning>
     <body
-      className={ `${ geistSans.variable } ${ geistMono.variable } antialiased` }
-
-    >
+      className={ `${ geistSans.variable } ${ geistMono.variable } antialiased` }>
     <ReactScan/>
     <Providers>
       <SidebarProvider>
         <MySidebar/>
-        { children }
+        <div className="flex flex-col w-full min-h-svh">
+          <MyNav/>
+          { children }
+        </div>
       </SidebarProvider>
-      <MyNav/>
-      { children }
     </Providers>
     </body>
     </html>

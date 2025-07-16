@@ -4,6 +4,8 @@ import { MultiSelectInputValue } from "@/components/form/multi_select_input"
 import {
   WorkerProfileDTO
 } from "@/modules/worker/application/worker_profile_dto"
+import { UserResponse } from "@/modules/user/application/models/user_response"
+import { getUrl } from "@/utils/get_url"
 
 export const sectorsOption = {
   queryKey: ["sectors"],
@@ -36,6 +38,20 @@ export const parseSpecialities = ( data: SpecialityDTO[] ): MultiSelectInputValu
     }
   ) )
 
+export const getProfile = async (id : string) => {
+  const params = new URLSearchParams();
+  params.append( "id", id );
+  params.append( "limit", "1" );
+  const response = await fetch( `/api/user/?${params.toString()}`, { method: "GET" } )
+  if ( !response.ok ) {
+    throw new Error( "Error fetching users" )
+  }
+  const result = await response.json() as UserResponse[]
+  if ( result.length === 0 ) {
+    throw new Error( "User not found" )
+  }
+  return result[0]
+}
 
 export const getWorker = async (id : string) => {
   const params = new URLSearchParams();
@@ -45,7 +61,7 @@ export const getWorker = async (id : string) => {
 
   } )
   if ( !response.ok ) {
-    throw new Error( "Error fetching countries" )
+    throw new Error( "Error fetching workers" )
   }
   const result = await response.json() as WorkerProfileDTO[]
   if ( result.length === 0 ) {

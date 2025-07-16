@@ -52,9 +52,18 @@ export function MySidebar() {
     await logout()
     router.push( "/" )
   }
+  const isAnonymous      = !user || user.role === "PUBLIC"
 
-  if ( !user ) {
+  if ( isAnonymous ) {
     return null
+  }
+  const handleProfile = () => {
+    if ( user.role === "WORKER" ) {
+      return `/trabajador/${ user.user_id }`
+    }
+    else {
+      return `/perfil/${ user.user_id }`
+    }
   }
 
   return (
@@ -79,19 +88,21 @@ export function MySidebar() {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <SidebarMenuButton>
-                      <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-                      <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+                      <Sun
+                        className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90"/>
+                      <Moon
+                        className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0"/>
                       <span>Cambiar Tema</span>
                     </SidebarMenuButton>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => setTheme("light")}>
+                    <DropdownMenuItem onClick={ () => setTheme( "light" ) }>
                       Light
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setTheme("dark")}>
+                    <DropdownMenuItem onClick={ () => setTheme( "dark" ) }>
                       Dark
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setTheme("system")}>
+                    <DropdownMenuItem onClick={ () => setTheme( "system" ) }>
                       System
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -116,7 +127,7 @@ export function MySidebar() {
                 side="top"
                 className="w-[--radix-popper-anchor-width]"
               >
-                <Link href="/perfil">
+                <Link href={ handleProfile() }>
                   <DropdownMenuItem>
                     <span>Perfil</span>
                   </DropdownMenuItem>

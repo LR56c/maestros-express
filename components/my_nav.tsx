@@ -7,12 +7,9 @@ import Link               from "next/link"
 export function MyNav() {
   const { user } = useAuthContext()
   const isAnonymous      = !user || user.role === "PUBLIC"
-  // const verifiedProfile  = user && user.status !== "PUBLIC"
-
   if ( !isAnonymous ) {
     return null
   }
-
   return (
     <div className="flex justify-between items-center p-4">
       <Link href="/">

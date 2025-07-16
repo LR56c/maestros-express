@@ -11,12 +11,7 @@ import {
   userLoginRequestSchema
 }                                         from "@/modules/user/application/models/user_login_request"
 import { Loader2Icon }                    from "lucide-react"
-import {
-  wrapTypeAsync
-}                                         from "@/modules/shared/utils/wrap_type"
-import {
-  BaseException
-}                                         from "@/modules/shared/domain/exceptions/base_exception"
+import { useRouter }                      from "next/navigation"
 
 export default function Ingresar() {
   const { login }                     = useAuthContext()
@@ -27,22 +22,25 @@ export default function Ingresar() {
 
   const [isError, setIsError] = useState( false )
   const { handleSubmit }      = methods
+  const router                = useRouter()
 
 
   const onSubmit = async ( values: any ) => {
-    setIsError(false)
+    setIsError( false )
     startTransition( async () => {
-      const result = await wrapTypeAsync( () => login( {
+      const result = await login( {
         email   : values.email,
         password: values.password
-      } ) )
-      if ( result instanceof BaseException ) {
+      } )
+      if ( !result ) {
         setIsError( true )
+        return
       }
+      router.push( "/" )
     } )
   }
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
+    <div className="flex flex-col items-center justify-center w-full h-full">
       <FormProvider { ...methods } >
         <form className="w-full max-w-lg flex flex-col gap-4">
           <InputText name="email" label="Email" type="email"
