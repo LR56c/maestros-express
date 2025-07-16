@@ -6,71 +6,64 @@ import React, { useEffect, useState }            from "react"
 import {
   MultiSelectInputValue
 }                                                from "@/components/form/multi_select_input"
-import MultiSelect
-                                                 from "@/components/form/multi_select"
-import { Dialog, DialogContent }                 from "@/components/ui/dialog"
-import { ListFilter, Loader2Icon }               from "lucide-react"
+import { Loader2Icon }                           from "lucide-react"
+import {
+  MoreFilter
+}                                                from "@/components/more_filters"
 
 interface QuickFilterProps {
-  onChange: ( values: string[] ) => void
+  onFilter: ( filters: Map<string, any> ) => void
 }
 
-export function QuickFilter( { onChange }: QuickFilterProps ) {
+export function QuickFilter( { onFilter }: QuickFilterProps ) {
   const { isPending: specialityPending, data: specialityData } = useQuery(
     specialitiesOption )
 
   const [specialityValues, setSpecialityValues] = useState<MultiSelectInputValue[]>(
     [] )
-  const [isOpen, setIsOpen]                     = useState( false )
-  const [filtersSelected, setFiltersSelected]   = useState<string[]>( [] )
+
 
   useEffect( () => {
     setSpecialityValues( parseSpecialities( specialityData ?? [] ) )
   }, [specialityData] )
 
+  const handleFilters = ( value: { key: string, value: any } ) => {
+    onFilter( new Map( [[value.key, value.value]] ) )
+  }
+
   return (
     <div className="flex flex-col">
       <p>Filtros rapidos</p>
-      <div className="flex gap-2 overflow-x-auto">
+      <div className="flex items-center gap-2 h-12">
         { specialityPending ? (
           <div className="flex items-center gap-2">
             <Loader2Icon className="animate-spin"/>
             <p>Cargando especialidades</p>
           </div>
         ) : <>
-          { specialityValues.length > 0 ? specialityValues.map(
-            ( speciality ) =>
-              <Button key={ speciality.label } size="sm" variant="secondary"
-                      className="hover:bg-gray-300 dark:hover:bg-zinc-700 p-2 rounded-full">
-                <span className="text-xs">{ speciality.label }</span>
-              </Button>
-          ) : null
+          <div className="flex items-center gap-2 max-w-md overflow-x-auto">
+            { specialityValues.length > 0 ? specialityValues.map(
+              ( speciality ) =>
+                <Button key={ speciality.label } size="sm" variant="secondary"
+                        onClick={ () => handleFilters( {
+                          key  : "specialities",
+                          value: speciality.value.id
+                        } ) }
+                        className="hover:bg-gray-300 dark:hover:bg-zinc-700 p-2 rounded-full">
+                  <span className="text-xs">{ speciality.label }</span>
+                </Button>
+            ) : null
+            }
+          </div>
+          <MoreFilter onFilter={ ( filters: Map<string, any> ) => {
+            onFilter( filters )
           }
-          { specialityValues.length > 0 ? <Button size="sm" variant="secondary"
-                                                  onClick={ () => setIsOpen(
-                                                    true ) }
-                                                  className="hover:bg-gray-300 dark:hover:bg-zinc-700 p-2 rounded-full">
-            <ListFilter/>
-          </Button> : null }
+          }
+          />
         </>
         }
 
       </div>
-      <Dialog open={ isOpen } onOpenChange={ setIsOpen }>
-        <DialogContent className="sm:max-w-md w-full">
-          <MultiSelect
-            onChange={ ( values ) => setFiltersSelected(
-              values.map( v => v.id ) ) }
-            values={ specialityValues }
-            loading={ specialityPending }
-            placeholder="Seleccione Especialidades"
-            searchPlaceholder="Buscar Especialidad"
-            placeholderLoader="Cargando..."
-          />
-          <Button type="button"
-                  onClick={ () => onChange( filtersSelected ) }>Filtrar</Button>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }

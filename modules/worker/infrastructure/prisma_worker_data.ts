@@ -183,19 +183,25 @@ export class PrismaWorkerData implements WorkerDAO {
           equals: query.id
         }
       }
+      if(query.status){
+        // @ts-ignore
+        where["status"] = {
+          equals: query.status
+        }
+      }
       if ( query.ids ) {
         const arr: string[] = query.ids.split( "," )
         const ids           = arr.map( i => UUID.from( i ).toString() )
-        idsCount            = ids.length
+        idsCount                  = ids.length === 0 ? -1 : ids.length
         // @ts-ignore
         where["id"]         = {
           in: ids
         }
       }
-      if(query.specialities){
-        const arr: string[] = query.specialities.split( "," )
-        const ids           = arr.map( i => UUID.from( i ).toString() )
-        idsCount            = ids.length
+      if ( query.specialities ) {
+        const arr: string[]       = query.specialities.split( "," )
+        const ids                 = arr.map( i => UUID.from( i ).toString() )
+        idsCount                  = ids.length === 0 ? -1 : ids.length
         // @ts-ignore
         where["WorkerSpeciality"] = {
           some: {
@@ -224,7 +230,7 @@ export class PrismaWorkerData implements WorkerDAO {
         skip   : offset,
         take   : limit?.value,
         include: {
-          user: true,
+          user            : true,
           WorkerSpeciality: {
             include: {
               speciality: true

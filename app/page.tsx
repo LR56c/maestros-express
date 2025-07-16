@@ -1,13 +1,67 @@
 "use client"
-import React               from "react"
-import { Textarea }        from "@/components/ui/textarea"
-import { Search, X }       from "lucide-react"
-import { DropzoneOptions } from "react-dropzone"
-import FileUpload          from "@/components/form/file_upload"
-import { Button }          from "@/components/ui/button"
-import { QuickFilter }     from "@/components/quick_filter"
+import React, { useState } from "react"
+import {
+  Textarea
+}                          from "@/components/ui/textarea"
+import {
+  Loader2Icon,
+  Search
+}                          from "lucide-react"
+import {
+  DropzoneOptions
+}                          from "react-dropzone"
+import {
+  Button
+}                          from "@/components/ui/button"
+import {
+  QuickFilter
+}                          from "@/components/quick_filter"
+import {
+  useMutation
+}                          from "@tanstack/react-query"
+import {
+  toast
+}                          from "sonner"
+import FileUploadSingle    from "@/components/form/file_upload_single"
+import {
+  WorkerCard
+}                          from "@/components/worker_card"
+import {
+  Card,
+  CardAction,
+  CardDescription,
+  CardHeader,
+  CardTitle
+}                          from "@/components/ui/card"
+import {
+  MoreFilter
+}                          from "@/components/more_filters"
+import Link                from "next/link"
 
 export default function Home() {
+
+  const { data, mutateAsync, status } = useMutation( {
+    mutationFn: async ( values: any ) => {
+      const response = await fetch( "/api/o/request", {
+        method : "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body   : JSON.stringify( values )
+      } )
+      if ( !response.ok ) {
+        throw new Error( "Error al enviar la solicitud" )
+      }
+      return await response.json()
+    },
+    onError   : ( error, variables, context ) => {
+      toast.error( "Error. Por favor, intenta de nuevo." )
+    }
+  } )
+  const [base64File, setbase64File]   = useState<string | null>(
+    null )
+  const [text, setText]               = useState<string | null>(
+    null )
 
   const dropzone = {
     accept  : {
@@ -18,8 +72,56 @@ export default function Home() {
     maxSize : 1 * 1024 * 1024
   } satisfies DropzoneOptions
 
+  const handleSubmit = async () => {
+    if ( !base64File && !text ) {
+      return
+    }
+    if ( navigator.geolocation ) {
+      navigator.geolocation.getCurrentPosition( async ( position ) => {
+        const result = await mutateAsync( {
+          image   : base64File,
+          input   : text ? text : undefined,
+          location: `(${ position.coords.latitude },${ position.coords.longitude })`,
+          radius  : 100_000
+        } )
+        console.log( "result", result )
+        setHaveResult( true )
+      }, ( error ) => {
+        toast( "Debe permitir el acceso a la ubicación para buscar servicios." )
+      }, {
+        enableHighAccuracy: true,
+        timeout           : 5000,
+        maximumAge        : 0
+      } )
+    }
+    else {
+      toast( "La geolocalización no está disponible en este navegador." )
+    }
+  }
+
+  const handleFile = ( value: File[] | null ) => {
+    if ( !value || value.length !== 1 ) {
+      setbase64File( null )
+      return
+    }
+    const file       = value[0]
+    const reader     = new FileReader()
+    reader.onloadend = () => {
+      const base64String = reader.result as string
+      setbase64File( base64String )
+    }
+    reader.onerror   = ( error ) => {
+      console.error( "Error reading file:", error )
+      setbase64File( null )
+    }
+    reader.readAsDataURL( file )
+  }
+
+  const [haveResult, setHaveResult] = useState( false )
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
+    <div
+      className="w-dvh flex flex-col items-center justify-center min-h-screen gap-2">
       <div className="w-full max-w-xl flex flex-col gap-2">
         <div className="w-full max-w-xl flex h-16 gap-2">
           <div className="w-full h-full relative">
@@ -30,17 +132,71 @@ export default function Home() {
               placeholder="Describe tu problema"
               rows={ 2 }
               className="resize-none pl-10 h-full border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-              onChange={ ( value ) => console.log( "value", value ) }/>
+              onChange={ ( value ) =>
+                setText( value.target.value ) }
+            />
           </div>
-          <FileUpload
+          <FileUploadSingle
+            fileClass="w-48"
             inputClass="h-16 w-full"
             placeholder="o sube una imagen aqui"
-            onChange={ value => console.log( "value", value ) }
+            onChange={ handleFile }
             dropzone={ dropzone }/>
         </div>
-        <Button className="w-full">Buscar servicio</Button>
+        <Button
+          disabled={ status === "pending" || !base64File && !text }
+          type="button" onClick={ handleSubmit } className="w-full">
+          {
+            status === "pending" ?
+              <>
+                <Loader2Icon className="animate-spin"/>
+                Buscando...
+              </>
+              : "Buscar servicio"
+          }
+        </Button>
       </div>
-      <QuickFilter onChange={(values)=>console.log('values',values)}/>
+      { haveResult ?
+        <>
+          <Card className="w-full max-w-xl">
+            <CardHeader>
+              <CardTitle>Como solucionarlo</CardTitle>
+              <CardDescription>{ data.info }</CardDescription>
+              <CardAction>
+                <MoreFilter
+                  onFilter={ ( values ) => console.log( "action values",
+                    values ) }/>
+              </CardAction>
+            </CardHeader>
+          </Card>
+          {
+            data.workers.length === 0 ?
+              <p className="text-center text-gray-500">No se encontraron
+                trabajadores
+                disponibles para tu problema.</p>
+              :
+              <>
+                <p className="text-center text-gray-500">Se
+                  encontraron { data.workers.length } trabajadores
+                  disponibles para tu problema.</p>
+                <div
+                  className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  {
+                    data.workers.map( ( worker: any ) => (
+                      <Link href={ `/trabajador/${ worker.user_id }` }>
+                        <WorkerCard key={ worker.user_id } worker={ worker }/>
+                      </Link>
+                    ) )
+                  }
+                </div>
+              </>
+          }
+        </>
+        : <>
+          <QuickFilter
+            onFilter={ ( values ) => console.log( "values", values ) }/>
+        </>
+      }
     </div>
   )
 }

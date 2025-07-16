@@ -4,6 +4,8 @@ import "./globals.css"
 import Providers             from "@/app/providers"
 import { ReactScan }         from "@/app/react_scan"
 import { MyNav }             from "@/components/my_nav"
+import { SidebarProvider }   from "@/components/ui/sidebar"
+import { MySidebar }         from "@/components/my_sidebar"
 
 const geistSans = Geist( {
   variable: "--font-geist-sans",
@@ -16,7 +18,7 @@ const geistMono = Geist_Mono( {
 } )
 
 export const metadata: Metadata = {
-  title      : "Maestros Express",
+  title: "Maestros Express"
 }
 
 
@@ -34,6 +36,10 @@ export default function RootLayout( {
     >
     <ReactScan/>
     <Providers>
+      <SidebarProvider>
+        <MySidebar/>
+        { children }
+      </SidebarProvider>
       <MyNav/>
       { children }
     </Providers>

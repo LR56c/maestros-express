@@ -90,7 +90,6 @@ export class SearchWorkerEmbedding {
         ).toPoint()
       }, validLimit?.value, validSkip?.value, validSortBy?.value,
       validSortType?.value )
-
     if ( isLeft( workersResult ) ) {
       return left( workersResult.left )
     }

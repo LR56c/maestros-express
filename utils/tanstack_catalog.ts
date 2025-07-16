@@ -1,6 +1,9 @@
 import { SectorDTO } from "@/modules/sector/application/sector_dto"
 import { SpecialityDTO } from "@/modules/speciality/application/speciality_dto"
 import { MultiSelectInputValue } from "@/components/form/multi_select_input"
+import {
+  WorkerProfileDTO
+} from "@/modules/worker/application/worker_profile_dto"
 
 export const sectorsOption = {
   queryKey: ["sectors"],
@@ -32,3 +35,21 @@ export const parseSpecialities = ( data: SpecialityDTO[] ): MultiSelectInputValu
       value: speciality
     }
   ) )
+
+
+export const getWorker = async (id : string) => {
+  const params = new URLSearchParams();
+  params.append( "id", id );
+  params.append( "limit", "1" );
+  const response = await fetch( `/api/worker/?${params.toString()}`, { method: "GET" ,
+
+  } )
+  if ( !response.ok ) {
+    throw new Error( "Error fetching countries" )
+  }
+  const result = await response.json() as WorkerProfileDTO[]
+  if ( result.length === 0 ) {
+    throw new Error( "Worker not found" )
+  }
+  return result[0]
+}

@@ -41,7 +41,7 @@ export class SupabaseWorkerEmbeddingData
   {
   }
 
-  async getById( embedId: UUID ): Promise<Either<BaseException[], WorkerEmbedding>> {
+  async getById( embedId: UUID ): Promise<Either<BaseException[], WorkerEmbedding[]>> {
     return left( [new InfrastructureException()] )
   }
 
@@ -69,7 +69,6 @@ export class SupabaseWorkerEmbeddingData
       target_location     : targetLocation.toPoint(),
       search_radius_meters: radius.value
     } )
-
     if ( error ) {
       return left( [new InfrastructureException()] )
     }

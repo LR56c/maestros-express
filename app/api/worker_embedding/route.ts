@@ -18,18 +18,23 @@ import {
   searchEmbedding,
   upsertEmbedding
 }                                    from "@/app/api/dependencies"
+import { z }                         from "zod"
 
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
-  const data = parseData( workerEmbeddingRequestSchema, body )
+  const data = parseData( workerEmbeddingRequestSchema.extend({
+    worker_id : z.string()
+  }), body )
   if ( isLeft( data ) ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
+  const { worker_id, ...rest } = data.right
+
   const result = await (
     await upsertEmbedding()
-  ).execute( data.right )
+  ).execute( worker_id, rest )
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
   }
