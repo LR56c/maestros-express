@@ -22,7 +22,7 @@ export class RemoveSpeciality {
       return left( existResult.left )
     }
 
-    const result = await this.dao.remove( existResult.right[0]!.id )
+    const result = await this.dao.remove( existResult.right.items[0]!.id )
 
     if ( isLeft( result ) ) {
       return left( [result.left] )

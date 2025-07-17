@@ -26,11 +26,11 @@ export const ensureSpecialityExist = async ( dao: SpecialityDAO,
     return left( existResult.left )
   }
 
-  if ( existResult.right.length > 0 && existResult.right[0]!.name.value !==
+  if ( existResult.right.items.length > 0 && existResult.right.items[0]!.name.value !==
     name )
   {
     return left( [new DataNotFoundException()] )
   }
 
-  return right( existResult.right[0]! )
+  return right( existResult.right.items[0]! )
 }
