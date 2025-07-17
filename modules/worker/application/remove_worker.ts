@@ -27,7 +27,7 @@ export class RemoveWorker {
       return left( exist.left )
     }
 
-    const worker = exist.right[0]
+    const worker = exist.right.items[0]
 
     const removeUser = await this.removeUser.execute(
       worker.user.userId.toString() )

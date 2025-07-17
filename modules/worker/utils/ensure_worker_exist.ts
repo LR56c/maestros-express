@@ -22,9 +22,9 @@ export const ensureWorkerExist = async ( dao: WorkerDAO,
     return left(worker.left)
   }
 
-  if ( worker.right.length > 0 && worker.right[0]!.user.email.value !== email ) {
+  if ( worker.right.items.length > 0 && worker.right.items[0]!.user.email.value !== email ) {
     return left( [new DataNotFoundException()] )
   }
 
-  return right(worker.right[0])
+  return right(worker.right.items[0])
 }
