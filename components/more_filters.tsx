@@ -26,7 +26,7 @@ export function MoreFilter( { onFilter }: MoreFilterProps ) {
     new Map<string, any>() )
 
   useEffect( () => {
-    setSpecialityValues( parseSpecialities( specialityData ?? [] ) )
+    setSpecialityValues( parseSpecialities( specialityData?.items ?? [] ) )
   }, [specialityData] )
 
   const handleFilters = ( value: { key: string, value: any } ) => {

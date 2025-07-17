@@ -14,6 +14,7 @@ import { Zone }           from "@/modules/zone/domain/zone"
 import {
   genericEnsureSearch
 }                         from "@/modules/shared/utils/generic_ensure_search"
+import { PaginatedResult }      from "@/modules/shared/domain/paginated_result"
 
 export class SearchSpeciality {
   constructor( private readonly dao: SpecialityDAO ) {
@@ -21,7 +22,7 @@ export class SearchSpeciality {
 
   async execute( query: Record<string, any>, limit?: number, skip ?: string,
     sortBy ?: string,
-    sortType ?: string ): Promise<Either<BaseException[], Speciality[]>> {
+    sortType ?: string ): Promise<Either<BaseException[], PaginatedResult<Speciality>>> {
     const searchParamsResult = genericEnsureSearch( limit, skip, sortBy,
       sortType )
 

@@ -75,7 +75,10 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { status: 500 } )
   }
 
-  return NextResponse.json( result.right.map( SpecialityMapper.toDTO ),
+  return NextResponse.json( {
+      items: result.right.items.map( SpecialityMapper.toDTO ),
+      total: result.right.total
+    },
     { status: 200 } )
 }
 

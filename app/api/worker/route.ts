@@ -12,9 +12,6 @@ import {
   workerRequestSchema
 }                                                from "@/modules/worker/application/worker_request"
 import {
-  WorkerMapper
-}                                                from "@/modules/worker/application/worker_mapper"
-import {
   workerUpdateSchema
 }                                                from "@/modules/worker/application/worker_update_dto"
 import { addWorker, searchWorker, updateWorker } from "@/app/api/dependencies"
@@ -34,8 +31,7 @@ export async function POST( request: NextRequest ) {
     return NextResponse.json( { status: 500 } )
   }
 
-  return NextResponse.json( WorkerMapper.toDTO( result.right ),
-    { status: 201 } )
+  return NextResponse.json( { status: 201 } )
 }
 
 export async function GET( request: NextRequest ) {
@@ -88,6 +84,5 @@ export async function PUT( request: NextRequest ) {
     return NextResponse.json( { status: 500 } )
   }
 
-  return NextResponse.json( WorkerMapper.toDTO( result.right ),
-    { status: 200 } )
+  return NextResponse.json( { status: 200 } )
 }

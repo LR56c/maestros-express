@@ -22,6 +22,9 @@ import {
 import {
   calculateDistance
 }                                      from "@/modules/shared/utils/calculate_distance"
+import {
+  PaginatedResult
+}                                      from "@/modules/shared/domain/paginated_result"
 
 export class SearchWorker {
   constructor( private readonly dao: WorkerDAO ) {
@@ -29,7 +32,7 @@ export class SearchWorker {
 
   async execute( query: Record<string, any>, limit?: number, skip ?: string,
     sortBy ?: string,
-    sortType ?: string ): Promise<Either<BaseException[], WorkerProfileDTO[]>> {
+    sortType ?: string ): Promise<Either<BaseException[], PaginatedResult<WorkerProfileDTO>>> {
 
     const userLocation = wrapTypeDefault(undefined, (value) => Position.fromJSON( value ) ,query.location)
 
@@ -60,7 +63,7 @@ export class SearchWorker {
     }
 
     const response: WorkerProfileDTO[] = []
-    for ( const w of workersResult.right ) {
+    for ( const w of workersResult.right.items ) {
       const location = wrapType( () => Position.fromJSON( w.location.value ) )
 
       if ( location instanceof BaseException ) {
@@ -75,6 +78,9 @@ export class SearchWorker {
       )
       response.push( mapped )
     }
-    return right( response )
+    return right( {
+      items: response,
+      total: workersResult.right.total,
+    } )
   }
 }

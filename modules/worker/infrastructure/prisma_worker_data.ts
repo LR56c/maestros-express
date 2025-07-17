@@ -31,6 +31,9 @@ import {
 import {
   DataNotFoundException
 }                                      from "@/modules/shared/domain/exceptions/data_not_found_exception"
+import {
+  PaginatedResult
+}                                      from "@/modules/shared/domain/paginated_result"
 
 type WorkerRelations = {
   user: UserAuth,
@@ -171,7 +174,7 @@ export class PrismaWorkerData implements WorkerDAO {
   async search( query: Record<string, any>, limit?: ValidInteger,
     skip?: ValidString,
     sortBy?: ValidString,
-    sortType?: ValidString ): Promise<Either<BaseException[], Worker[]>> {
+    sortType?: ValidString ): Promise<Either<BaseException[], PaginatedResult<Worker>>> {
     try {
       let idsCount: number | undefined = undefined
 
@@ -183,7 +186,7 @@ export class PrismaWorkerData implements WorkerDAO {
           equals: query.id
         }
       }
-      if(query.status){
+      if ( query.status ) {
         // @ts-ignore
         where["status"] = {
           equals: query.status
@@ -192,7 +195,7 @@ export class PrismaWorkerData implements WorkerDAO {
       if ( query.ids ) {
         const arr: string[] = query.ids.split( "," )
         const ids           = arr.map( i => UUID.from( i ).toString() )
-        idsCount                  = ids.length === 0 ? -1 : ids.length
+        idsCount            = ids.length === 0 ? -1 : ids.length
         // @ts-ignore
         where["id"]         = {
           in: ids
@@ -223,23 +226,28 @@ export class PrismaWorkerData implements WorkerDAO {
         // @ts-ignore
         orderBy[key] = sortType ? sortType.value : "desc"
       }
-      const offset   = skip ? parseInt( skip.value ) : 0
-      const response = await this.db.worker.findMany( {
-        where  : where,
-        orderBy: orderBy,
-        skip   : offset,
-        take   : limit?.value,
-        include: {
-          user            : true,
-          WorkerSpeciality: {
-            include: {
-              speciality: true
+      const offset                 = skip ? parseInt( skip.value ) : 0
+      const results                = await this.db.$transaction( [
+        this.db.worker.findMany( {
+          where  : where,
+          orderBy: orderBy,
+          skip   : offset,
+          take   : limit?.value,
+          include: {
+            user            : true,
+            WorkerTax       : true,
+            WorkerSpeciality: {
+              include: {
+                speciality: true
+              }
             }
-          },
-          WorkerTax       : true
-        }
-      } )
-
+          }
+        } ),
+        this.db.worker.count( {
+          where: where
+        } )
+      ] )
+      const [response, totalCount] = results
       if ( !response || response.length === 0 ) {
         return left( [new DataNotFoundException()] )
       }
@@ -275,7 +283,10 @@ export class PrismaWorkerData implements WorkerDAO {
         }
         workers.push( mapped )
       }
-      return right( workers )
+      return right( {
+        items: workers,
+        total: totalCount
+      } )
     }
     catch ( e ) {
       return left( [new InfrastructureException()] )

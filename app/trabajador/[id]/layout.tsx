@@ -27,18 +27,17 @@ export default async function TrabajadorLayout( {
     throw new Error( "Worker not found" )
   }
 
-  const workers = result.right
+  const workers = result.right.items
 
   if ( workers.length === 0 ) {
     throw new Error( "Worker not found" )
   }
 
   const worker = workers[0]
-  console.log("Worker data:", worker)
   return (
     <>
       <div className="flex justify-center p-4 w-full h-full">
-        <div className="flex flex-col max-w-sm gap-2">
+        <div className="flex flex-col max-w-md gap-2">
           <div className="flex gap-4 items-center">
             { worker.avatar ?
               <img

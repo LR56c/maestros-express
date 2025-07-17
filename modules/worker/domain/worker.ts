@@ -41,13 +41,15 @@ export class Worker {
     readonly status: WorkerStatus,
     readonly specialities: Speciality[],
     readonly taxes: WorkerTax[],
+
     // readonly workZones: Zone[],
     // readonly certificates: Certificate[],
     // readonly stories: Story[],
-    // readonly bookings: WorkerBooking[],
     // readonly schedule: WorkerSchedule[],
-    // readonly packages: Package[],
     // readonly reviews: Review[],
+    
+    // readonly bookings: WorkerBooking[],
+    // readonly packages: Package[],
     readonly createdAt: ValidDate,
     readonly verifiedAt?: ValidDate,
     readonly description?: ValidString

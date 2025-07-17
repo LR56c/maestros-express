@@ -23,6 +23,7 @@ import * as changeCase         from "change-case"
 import {
   Errors
 }                              from "@/modules/shared/domain/exceptions/errors"
+import { PaginatedResult }     from "@/modules/shared/domain/paginated_result"
 
 export class PrismaSpecialityData implements SpecialityDAO {
   constructor( private readonly db: PrismaClient ) {
@@ -61,7 +62,7 @@ export class PrismaSpecialityData implements SpecialityDAO {
   async search( query: Record<string, any>, limit?: ValidInteger,
     skip?: ValidString,
     sortBy?: ValidString,
-    sortType?: ValidString ): Promise<Either<BaseException[], Speciality[]>> {
+    sortType?: ValidString ): Promise<Either<BaseException[],PaginatedResult<Speciality>>> {
     try {
       let idsCount : number | undefined = undefined
       const where = {}
@@ -95,13 +96,19 @@ export class PrismaSpecialityData implements SpecialityDAO {
       }
 
       const offset   = skip ? parseInt( skip.value ) : 0
-      const response = await this.db.speciality.findMany( {
-        where  : where,
-        orderBy: orderBy,
-        skip   : offset,
-        take   : limit?.value
-      } )
+      const results = await this.db.$transaction([
+        this.db.speciality.findMany( {
+          where  : where,
+          orderBy: orderBy,
+          skip   : offset,
+          take   : limit?.value
+        } ),
+        this.db.speciality.count( {
+          where: where
+        })
+      ])
 
+      const [ response, total ] = results
       if( idsCount && response.length !== idsCount ) {
         return left( [new InfrastructureException( "Not all specialities found" )] )
       }
@@ -116,7 +123,10 @@ export class PrismaSpecialityData implements SpecialityDAO {
         }
         result.push( mapped )
       }
-      return right( result )
+      return right( {
+        items: result,
+        total: total
+      } )
     }
     catch ( e ) {
       return left( [new InfrastructureException()] )

@@ -26,7 +26,7 @@ export const specialitiesOption = {
     if ( !response.ok ) {
       throw new Error( "Error fetching countries" )
     }
-    return await response.json() as SpecialityDTO[]
+    return await response.json()
   }
 }
 

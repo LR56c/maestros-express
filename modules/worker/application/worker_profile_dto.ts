@@ -15,6 +15,7 @@ export const workerProfileSchema = z.object( {
   review_count  : z.number(),
   review_average: z.number(),
   location      : z.string(),
+  status      : z.string(),
   specialities  : z.array( specialitySchema ),
   taxes         : z.array( workerTaxSchema )
 } )

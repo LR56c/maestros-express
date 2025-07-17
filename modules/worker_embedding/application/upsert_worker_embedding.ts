@@ -74,7 +74,7 @@ export class UpsertWorkerEmbedding {
       if ( isLeft( workerResult ) ) {
         return left( workerResult.left )
       }
-      workerId = workerResult.right[0].user_id
+      workerId = workerResult.right.items[0].user_id
       content  = this.workerPrompt( dto.data )
     }
     else if ( dto.data.type === WorkerEmbeddingTypeEnum.STORY ) {

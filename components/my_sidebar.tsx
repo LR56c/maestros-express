@@ -57,6 +57,9 @@ export function MySidebar() {
   if ( isAnonymous ) {
     return null
   }
+
+  const isAdmin = user && user.role === "ADMIN"
+
   const handleProfile = () => {
     if ( user.role === "WORKER" ) {
       return `/trabajador/${ user.user_id }`
@@ -108,6 +111,78 @@ export function MySidebar() {
                   </DropdownMenuContent>
                 </DropdownMenu>
               </SidebarMenuItem>
+              { isAdmin ? (
+                <SidebarMenuItem className="pt-2">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <SidebarMenuButton>
+                        <p>Admin</p>
+                        <ChevronUp className="ml-auto"/>
+                      </SidebarMenuButton>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      side="bottom"
+                      className="w-[--radix-popper-anchor-width]"
+                    >
+                      <Link href="/admin/paises">
+                        <DropdownMenuItem>
+                          <span>Paises</span>
+                        </DropdownMenuItem>
+                      </Link>
+                      <Link href="/admin/regiones">
+                        <DropdownMenuItem>
+                          <span>Regiones</span>
+                        </DropdownMenuItem>
+                      </Link>
+                      <Link href="/admin/sectores">
+                        <DropdownMenuItem>
+                          <span>Sectores</span>
+                        </DropdownMenuItem>
+                      </Link>
+                      <Link href="/admin/monedas">
+                        <DropdownMenuItem>
+                          <span>Monedas</span>
+                        </DropdownMenuItem>
+                      </Link>
+                      <Link href="/admin/identidad_nacional">
+                        <DropdownMenuItem>
+                          <span>Identidad Nacional</span>
+                        </DropdownMenuItem>
+                      </Link>
+                      <Link href="/admin/formato_telefono">
+                        <DropdownMenuItem>
+                          <span>Formato Telefono</span>
+                        </DropdownMenuItem>
+                      </Link>
+                      <Link href="/admin/especialidades">
+                        <DropdownMenuItem>
+                          <span>Especialidades</span>
+                        </DropdownMenuItem>
+                      </Link>
+                      <Link href="/admin/pagos">
+                        <DropdownMenuItem>
+                          <span>Pagos</span>
+                        </DropdownMenuItem>
+                      </Link>
+                      <Link href="/admin/reportes">
+                        <DropdownMenuItem>
+                          <span>Reportes</span>
+                        </DropdownMenuItem>
+                      </Link>
+                      <Link href="/admin/usuarios">
+                        <DropdownMenuItem>
+                          <span>Usuarios</span>
+                        </DropdownMenuItem>
+                      </Link>
+                      <Link href="/admin/trabajadores">
+                        <DropdownMenuItem>
+                          <span>Trabajadores</span>
+                        </DropdownMenuItem>
+                      </Link>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </SidebarMenuItem>
+              ) : null }
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

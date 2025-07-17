@@ -24,7 +24,7 @@ export function QuickFilter( { onFilter }: QuickFilterProps ) {
 
 
   useEffect( () => {
-    setSpecialityValues( parseSpecialities( specialityData ?? [] ) )
+    setSpecialityValues( parseSpecialities( specialityData?.items ?? [] ) )
   }, [specialityData] )
 
   const handleFilters = ( value: { key: string, value: any } ) => {

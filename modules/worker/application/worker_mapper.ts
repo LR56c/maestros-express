@@ -1,13 +1,10 @@
 import { Worker }                    from "@/modules/worker/domain/worker"
 import {
   WorkerResponse
-} from "@/modules/worker/application/worker_response"
-import {
-  NationalIdentityFormatMapper
-} from "@/modules/national_identity_format/application/national_identity_format_mapper"
+}                                    from "@/modules/worker/application/worker_response"
 import {
   SpecialityMapper
-} from "@/modules/speciality/application/speciality_mapper"
+}                                    from "@/modules/speciality/application/speciality_mapper"
 import {
   WorkerTax
 }                                    from "@/modules/worker_tax/domain/worker_tax"
@@ -34,7 +31,7 @@ import {
 }                                    from "@/modules/shared/domain/value_objects/valid_string"
 import {
   ValidDecimal
-} from "@/modules/shared/domain/value_objects/valid_decimal"
+}                                    from "@/modules/shared/domain/value_objects/valid_decimal"
 import { wrapType, wrapTypeDefault } from "@/modules/shared/utils/wrap_type"
 import {
   WorkerStatus
@@ -45,7 +42,9 @@ import {
 import {
   Position
 }                                    from "@/modules/shared/domain/value_objects/position"
-import { UserMapper } from "@/modules/user/application/user_mapper"
+import {
+  UserMapper
+}                                    from "@/modules/user/application/user_mapper"
 import {
   UserResponse
 }                                    from "@/modules/user/application/models/user_response"
@@ -58,6 +57,7 @@ export class WorkerMapper {
       full_name     : w.user.fullName.value,
       avatar        : w.user.avatar?.value,
       age,
+      status        : w.user.status.value,
       description   : w.description?.value ?? "",
       review_count  : w.reviewCount.value,
       review_average: w.reviewAverage.value,
@@ -69,17 +69,18 @@ export class WorkerMapper {
 
   static toDTO( worker: Worker ): WorkerResponse {
     return {
-      user             : UserMapper.toDTO( worker.user ),
-      national_identity_id: worker.nationalIdentityId.toString(),
+      user                   : UserMapper.toDTO( worker.user ),
+      national_identity_id   : worker.nationalIdentityId.toString(),
       national_identity_value: worker.nationalIdentityValue.value,
-      birth_date       : worker.birthDate.toString(),
-      description      : worker.description?.value,
-      review_count     : worker.reviewCount.value,
-      review_average   : worker.reviewAverage.value,
-      status           : worker.status.value,
-      location         : worker.location.toPoint(),
-      specialities     : worker.specialities.map( SpecialityMapper.toDTO ),
-      taxes            : worker.taxes.map( WorkerTaxMapper.toDTO )
+      birth_date             : worker.birthDate.toString(),
+      description            : worker.description?.value,
+      review_count           : worker.reviewCount.value,
+      review_average         : worker.reviewAverage.value,
+      status                 : worker.status.value,
+      location               : worker.location.toPoint(),
+      specialities           : worker.specialities.map(
+        SpecialityMapper.toDTO ),
+      taxes                  : worker.taxes.map( WorkerTaxMapper.toDTO )
       // work_zones       : worker.workZones.map( ZoneMapper.toDTO ),
       // certificates     : worker.certificates.map( CertificateMapper.toDTO ),
       // stories          : worker.stories.map( StoryMapper.toDTO ),
@@ -92,17 +93,17 @@ export class WorkerMapper {
 
   static toJSON( dto: WorkerResponse ): Record<string, any> {
     return {
-      user             : UserMapper.toJSON( dto.user ),
-      national_identity_id: dto.national_identity_id,
+      user                   : UserMapper.toJSON( dto.user ),
+      national_identity_id   : dto.national_identity_id,
       national_identity_value: dto.national_identity_value,
-      birth_date       : dto.birth_date,
-      description      : dto.description,
-      review_count     : dto.review_count,
-      review_average   : dto.review_average,
-      status           : dto.status,
-      location         : dto.location,
-      specialities     : dto.specialities.map( SpecialityMapper.toJSON ),
-      taxes            : dto.taxes.map( WorkerTaxMapper.toJSON )
+      birth_date             : dto.birth_date,
+      description            : dto.description,
+      review_count           : dto.review_count,
+      review_average         : dto.review_average,
+      status                 : dto.status,
+      location               : dto.location,
+      specialities           : dto.specialities.map( SpecialityMapper.toJSON ),
+      taxes                  : dto.taxes.map( WorkerTaxMapper.toJSON )
       // certificates     : dto.certificates.map( CertificateMapper.toJSON ),
       // work_zones       : dto.work_zones.map( ZoneMapper.toJSON ),
       // stories          : dto.stories.map( StoryMapper.toJSON ),
@@ -283,32 +284,32 @@ export class WorkerMapper {
     }
 
     return {
-      user             : user as UserResponse,
-      national_identity_id: (
+      user                   : user as UserResponse,
+      national_identity_id   : (
         nationalIdentityId as ValidString
       ).value,
       national_identity_value: (
         nationalIdentityValue as ValidString
       ).value,
-      birth_date       : (
+      birth_date             : (
         birhtDate as ValidString
       ).value,
-      description      : description instanceof ValidString ?
+      description            : description instanceof ValidString ?
         description.value : undefined,
-      review_count     : (
+      review_count           : (
         reviewCount as ValidDecimal
       ).value,
-      review_average   : (
+      review_average         : (
         reviewAverage as ValidDecimal
       ).value,
-      status           : (
+      status                 : (
         status as WorkerStatus
       ).value,
-      location         : (
+      location               : (
         location as Position
       ).toPoint(),
-      specialities     : specialities,
-      taxes            : taxes
+      specialities           : specialities,
+      taxes                  : taxes
       // certificates     : certificates,
       // work_zones       : workZones,
       // stories          : stories,
