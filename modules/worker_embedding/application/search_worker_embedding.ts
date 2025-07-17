@@ -94,6 +94,6 @@ export class SearchWorkerEmbedding {
       return left( workersResult.left )
     }
 
-    return right( workersResult.right )
+    return right( workersResult.right.items )
   }
 }
