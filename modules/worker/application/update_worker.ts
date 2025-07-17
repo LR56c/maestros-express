@@ -70,7 +70,7 @@ export class UpdateWorker {
       return left( specialitiesResult.left )
     }
 
-    return right( specialitiesResult.right )
+    return right( specialitiesResult.right.items )
   }
 
   async execute( worker: WorkerUpdateDTO ): Promise<Either<BaseException[], Worker>> {
