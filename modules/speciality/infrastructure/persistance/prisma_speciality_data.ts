@@ -75,7 +75,8 @@ export class PrismaSpecialityData implements SpecialityDAO {
       if ( query.name ) {
         // @ts-ignore
         where["name"] = {
-          contains: query.name
+          contains: query.name,
+          mode    : "insensitive"
         }
       }
       if ( query.ids ) {

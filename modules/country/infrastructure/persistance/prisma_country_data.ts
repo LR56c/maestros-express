@@ -21,6 +21,9 @@ import { PrismaClient }             from "@/lib/generated/prisma"
 import {
   UUID
 }                                   from "@/modules/shared/domain/value_objects/uuid"
+import {
+  PaginatedResult
+}                                   from "@/modules/shared/domain/paginated_result"
 
 
 export class PrismaCountryData implements CountryDAO {
@@ -79,7 +82,7 @@ export class PrismaCountryData implements CountryDAO {
   async search( query: Record<string, any>, limit?: ValidInteger,
     skip?: ValidString,
     sortBy?: ValidString,
-    sortType?: ValidString ): Promise<Either<BaseException[], Country[]>> {
+    sortType?: ValidString ): Promise<Either<BaseException[], PaginatedResult<Country>>> {
     try {
       const where = {}
       if ( query.id ) {
@@ -106,14 +109,20 @@ export class PrismaCountryData implements CountryDAO {
         // @ts-ignore
         orderBy[key] = sortType ? sortType.value : "desc"
       }
-      const offset               = skip ? parseInt( skip.value ) : 0
-      const response             = await this.db.country.findMany( {
-        where  : where,
-        orderBy: orderBy,
-        skip   : offset,
-        take   : limit?.value
-      } )
-      const countries: Country[] = []
+      const offset                 = skip ? parseInt( skip.value ) : 0
+      const results                = await this.db.$transaction( [
+        this.db.country.findMany( {
+          where  : where,
+          orderBy: orderBy,
+          skip   : offset,
+          take   : limit?.value
+        } ),
+        this.db.country.count( {
+          where: where
+        } )
+      ] )
+      const [response, totalCount] = results
+      const countries: Country[]   = []
       for ( const country of response ) {
         const mapped = Country.fromPrimitives(
           country.id.toString(),
@@ -126,7 +135,10 @@ export class PrismaCountryData implements CountryDAO {
         }
         countries.push( mapped )
       }
-      return right( countries )
+      return right( {
+        items: countries,
+        total: totalCount
+      } )
     }
     catch ( e ) {
       return left( [new InfrastructureException()] )

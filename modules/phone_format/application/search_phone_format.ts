@@ -11,6 +11,9 @@ import {
 import {
   PhoneFormat
 }                                    from "@/modules/phone_format/domain/phone_format"
+import {
+  PaginatedResult
+}                                    from "@/modules/shared/domain/paginated_result"
 
 export class SearchPhoneFormat {
   constructor( private readonly dao: PhoneFormatDAO ) {
@@ -18,7 +21,7 @@ export class SearchPhoneFormat {
 
   async execute( query: Record<string, any>, limit ?: number,
     skip ?: string, sortBy ?: string,
-    sortType ?: string ): Promise<Either<BaseException[], PhoneFormat[]>> {
+    sortType ?: string ): Promise<Either<BaseException[], PaginatedResult<PhoneFormat>>> {
     const searchParamsResult = genericEnsureSearch( limit, skip, sortBy,
       sortType )
 

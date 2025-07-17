@@ -25,11 +25,11 @@ export const ensureCurrencyExist = async ( dao: CurrencyDAO,
     return left( currency.left )
   }
 
-  if ( currency.right.length > 0 && currency.right[0].codeId.value !==
+  if ( currency.right.items.length > 0 && currency.right.items[0].codeId.value !==
     code )
   {
     return left( [new DataNotFoundException()] )
   }
 
-  return right( currency.right[0] )
+  return right( currency.right.items[0] )
 }

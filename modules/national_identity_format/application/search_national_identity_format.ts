@@ -11,6 +11,9 @@ import {
 import {
   NationalIdentityFormat
 } from "@/modules/national_identity_format/domain/national_identity_format"
+import {
+  PaginatedResult
+}                                    from "@/modules/shared/domain/paginated_result"
 
 export class SearchNationalIdentityFormat {
   constructor( private readonly dao: NationalIdentityFormatDAO ) {
@@ -18,7 +21,7 @@ export class SearchNationalIdentityFormat {
 
   async execute( query: Record<string, any>, limit ?: number,
     skip ?: string, sortBy ?: string,
-    sortType ?: string ): Promise<Either<BaseException[], NationalIdentityFormat[]>> {
+    sortType ?: string ): Promise<Either<BaseException[], PaginatedResult<NationalIdentityFormat>>> {
     const searchParamsResult = genericEnsureSearch( limit, skip, sortBy,
       sortType )
 

@@ -1,40 +1,30 @@
 "use server"
 
 import { NextRequest, NextResponse } from "next/server"
-import prisma                        from "@/lib/prisma"
 import {
   querySchema
 }                                    from "@/modules/shared/application/query_dto"
 import {
   parseData
 }                                    from "@/modules/shared/application/parse_handlers"
-import { isLeft }                    from "fp-ts/Either"
 import {
-  PrismaCurrencyData
-}                                    from "@/modules/currency/infrastructure/prisma_currency_data"
-import {
-  AddCurrency
-}                                    from "@/modules/currency/application/add_currency"
-import {
-  RemoveCurrency
-}                                    from "@/modules/currency/application/remove_currency"
-import {
-  UpdateCurrency
-}                                    from "@/modules/currency/application/update_currency"
-import {
-  SearchCurrency
-}                                    from "@/modules/currency/application/search_currency"
+  isLeft
+}                                    from "fp-ts/Either"
 import {
   currencySchema
 }                                    from "@/modules/currency/application/currency_dto"
 import {
   CurrencyMapper
-}                                      from "@/modules/currency/application/currency_mapper"
+}                                    from "@/modules/currency/application/currency_mapper"
 import {
-  addCurrency, removeCurrency,
+  addCurrency,
+  removeCurrency,
   searchCurrency,
   updateCurrency
-} from "@/app/api/dependencies"
+}                                    from "@/app/api/dependencies"
+import {
+  SpecialityMapper
+}                                    from "@/modules/speciality/application/speciality_mapper"
 
 
 export async function POST( request: NextRequest ) {
@@ -45,7 +35,9 @@ export async function POST( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await (await addCurrency()).execute( data.right )
+  const result = await (
+    await addCurrency()
+  ).execute( data.right )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
@@ -73,7 +65,9 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await (await searchCurrency()).execute(
+  const result = await (
+    await searchCurrency()
+  ).execute(
     data.right.query,
     data.right.limit,
     data.right.skip,
@@ -85,7 +79,10 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { status: 500 } )
   }
 
-  return NextResponse.json( result.right.map( CurrencyMapper.toDTO ),
+  return NextResponse.json( {
+      items: result.right.items.map( CurrencyMapper.toDTO ),
+      total: result.right.total
+    },
     { status: 200 } )
 }
 
@@ -97,7 +94,9 @@ export async function PUT( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await (await updateCurrency()).execute( data.right )
+  const result = await (
+    await updateCurrency()
+  ).execute( data.right )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
@@ -111,7 +110,9 @@ export async function DELETE( request: NextRequest ) {
   const { searchParams } = new URL( request.url )
   const code             = searchParams.get( "code" )
 
-  const result = await (await removeCurrency()).execute( code ?? "" )
+  const result = await (
+    await removeCurrency()
+  ).execute( code ?? "" )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )

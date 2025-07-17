@@ -15,6 +15,9 @@ import {
   reportSchema
 }                                    from "@/modules/report/application/report_dto"
 import { addReport, searchReport }   from "@/app/api/dependencies"
+import {
+  SpecialityMapper
+}                                    from "@/modules/speciality/application/speciality_mapper"
 
 
 export async function POST( request: NextRequest ) {
@@ -69,6 +72,9 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { status: 500 } )
   }
 
-  return NextResponse.json( result.right.map( ReportMapper.toDTO ),
+  return NextResponse.json( {
+      items: result.right.items.map( ReportMapper.toDTO ),
+      total: result.right.total
+    },
     { status: 200 } )
 }

@@ -7,6 +7,9 @@ import type { Sector }               from "@/modules/sector/domain/sector"
 import {
   genericEnsureSearch
 }                                    from "@/modules/shared/utils/generic_ensure_search"
+import {
+  PaginatedResult
+}                                    from "@/modules/shared/domain/paginated_result"
 
 export class SearchSector {
   constructor( private readonly dao: SectorDAO ) {
@@ -14,7 +17,7 @@ export class SearchSector {
 
   async execute( query: Record<string, any>, limit?: number, skip ?: string,
     sortBy ?: string,
-    sortType ?: string ): Promise<Either<BaseException[], Sector[]>> {
+    sortType ?: string ): Promise<Either<BaseException[], PaginatedResult<Sector>>> {
     const searchParamsResult = genericEnsureSearch( limit, skip, sortBy,
       sortType )
 

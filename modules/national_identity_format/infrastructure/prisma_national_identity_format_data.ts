@@ -23,7 +23,12 @@ import {
 }                              from "@/modules/shared/domain/exceptions/infrastructure_exception"
 import * as changeCase         from "change-case"
 import { Country }             from "@/modules/country/domain/country"
-import { Errors }              from "@/modules/shared/domain/exceptions/errors"
+import {
+  Errors
+}                              from "@/modules/shared/domain/exceptions/errors"
+import {
+  PaginatedResult
+}                              from "@/modules/shared/domain/paginated_result"
 
 export class PrismaNationalIdentityFormatData
   implements NationalIdentityFormatDAO {
@@ -63,7 +68,7 @@ export class PrismaNationalIdentityFormatData
   async search( query: Record<string, any>, limit?: ValidInteger,
     skip?: ValidString,
     sortBy?: ValidString,
-    sortType?: ValidString ): Promise<Either<BaseException[], NationalIdentityFormat[]>> {
+    sortType?: ValidString ): Promise<Either<BaseException[], PaginatedResult<NationalIdentityFormat>>> {
     try {
       const where = {}
       if ( query.id ) {
@@ -90,19 +95,26 @@ export class PrismaNationalIdentityFormatData
         // @ts-ignore
         orderBy[key] = sortType ? sortType.value : "desc"
       }
-      const offset               = skip ? parseInt( skip.value ) : 0
-      const response             = await this.db.nationalIdentityFormat.findMany( {
-        where  : where,
-        orderBy: orderBy,
-        skip   : offset,
-        take   : limit?.value,
-        include:{
-          country: true
-        }
-      } )
+      const offset = skip ? parseInt( skip.value ) : 0
+
+      const results                           = await this.db.$transaction( [
+        this.db.nationalIdentityFormat.findMany( {
+          where  : where,
+          orderBy: orderBy,
+          skip   : offset,
+          take   : limit?.value,
+          include: {
+            country: true
+          }
+        } ),
+        this.db.nationalIdentityFormat.count( {
+          where: where
+        } )
+      ] )
+      const [response, totalCount]            = results
       const formats: NationalIdentityFormat[] = []
       for ( const f of response ) {
-        const country = f.country
+        const country       = f.country
         const countryMapped = Country.fromPrimitives(
           country.id.toString(),
           country.name,
@@ -126,7 +138,10 @@ export class PrismaNationalIdentityFormatData
         }
         formats.push( mapped )
       }
-      return right( formats )
+      return right( {
+        items: formats,
+        total: totalCount
+      } )
     }
     catch ( e ) {
       return left( [new InfrastructureException()] )
@@ -140,7 +155,7 @@ export class PrismaNationalIdentityFormatData
         data : {
           name     : format.name.value,
           regex    : format.regex.value,
-          countryId: format.country.id.toString(),
+          countryId: format.country.id.toString()
         }
       } )
       return right( true )

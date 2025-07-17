@@ -7,6 +7,7 @@ import {
 }                               from "@/modules/shared/utils/generic_ensure_search"
 import { CurrencyDAO }          from "@/modules/currency/domain/currency_dao"
 import { Currency }             from "@/modules/currency/domain/currency"
+import { PaginatedResult }      from "@/modules/shared/domain/paginated_result"
 
 export class SearchCurrency {
 
@@ -18,7 +19,7 @@ export class SearchCurrency {
 
   async execute( query: Record<string, any>, limit?: number,
     skip ?: string, sortBy ?: string,
-    sortType ?: string ): Promise<Either<BaseException[], Currency[]>> {
+    sortType ?: string ): Promise<Either<BaseException[], PaginatedResult<Currency>>> {
     const searchParamsResult = genericEnsureSearch( limit, skip, sortBy,
       sortType )
 

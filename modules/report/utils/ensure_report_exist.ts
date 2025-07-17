@@ -21,9 +21,9 @@ export const ensureReportExist = async ( dao: ReportDAO,
     return left( region.left )
   }
 
-  if ( region.right.length > 0 && region.right[0]!.id.value !== reportId ) {
+  if ( region.right.items.length > 0 && region.right.items[0]!.id.value !== reportId ) {
     return left( [new DataNotFoundException()] )
   }
 
-  return right( region.right[0] )
+  return right( region.right.items[0] )
 }

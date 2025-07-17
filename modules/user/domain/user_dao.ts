@@ -10,6 +10,7 @@ import {
   ValidString
 }                 from "@/modules/shared/domain/value_objects/valid_string"
 import { UUID } from "@/modules/shared/domain/value_objects/uuid"
+import { PaginatedResult } from "@/modules/shared/domain/paginated_result"
 
 export abstract class UserDAO {
 
@@ -17,9 +18,7 @@ export abstract class UserDAO {
   abstract update( user: User ): Promise<Either<BaseException, boolean>>
   abstract remove( id: UUID ): Promise<Either<BaseException, boolean>>
 
-  abstract count( query: Record<string, any> ): Promise<Either<BaseException[], ValidInteger>>
-
   abstract search( query: Record<string, any>, limit?: ValidInteger,
     skip ?: ValidString, sortBy ?: ValidString,
-    sortType ?: ValidString ): Promise<Either<BaseException[], User[]>>
+    sortType ?: ValidString ): Promise<Either<BaseException[], PaginatedResult<User>>>
 }

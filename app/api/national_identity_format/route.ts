@@ -20,6 +20,9 @@ import {
   searchNationalIdentityFormat,
   updateNationalIdentity
 }                                    from "@/app/api/dependencies"
+import {
+  SpecialityMapper
+}                                    from "@/modules/speciality/application/speciality_mapper"
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
@@ -74,7 +77,10 @@ export async function GET( request: NextRequest ) {
   }
 
   return NextResponse.json(
-    result.right.map( NationalIdentityFormatMapper.toDTO ),
+    {
+      items: result.right.items.map( NationalIdentityFormatMapper.toDTO ),
+      total: result.right.total
+    },
     { status: 200 } )
 }
 

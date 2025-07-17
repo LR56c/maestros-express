@@ -22,6 +22,9 @@ import { PrismaClient }             from "@/lib/generated/prisma"
 import {
   UUID
 }                                   from "@/modules/shared/domain/value_objects/uuid"
+import {
+  PaginatedResult
+}                                   from "@/modules/shared/domain/paginated_result"
 
 export class PrismaRegionData implements RegionDAO {
   constructor( private readonly db: PrismaClient ) {
@@ -79,7 +82,7 @@ export class PrismaRegionData implements RegionDAO {
     skip ?: ValidString,
     sortBy ?: ValidString,
     sortType ?: ValidString
-  ): Promise<Either<BaseException[], Region[]>> {
+  ): Promise<Either<BaseException[], PaginatedResult<Region>>> {
     try {
       const where = {}
       if ( query.id
@@ -116,16 +119,21 @@ export class PrismaRegionData implements RegionDAO {
       }
 
       const offset   = skip ? parseInt( skip.value ) : 0
-      const response = await this.db.region.findMany( {
-        where  : where,
-        orderBy: orderBy,
-        skip   : offset,
-        take   : limit?.value,
-        include: {
-          country: true
-        }
-      } )
-
+      const results = await this.db.$transaction( [
+        this.db.region.findMany( {
+          where  : where,
+          orderBy: orderBy,
+          skip   : offset,
+          take   : limit?.value,
+          include: {
+            country: true
+          }
+        } ),
+        this.db.region.count( {
+          where: where
+        } )
+      ])
+      const [response, count] = results
       const result: Region[] = []
       for ( const e of response ) {
         const c      = Country.fromPrimitivesThrow( e.country.id.toString(),
@@ -138,7 +146,10 @@ export class PrismaRegionData implements RegionDAO {
         }
         result.push( mapped )
       }
-      return right( result )
+      return right( {
+        items: result,
+        total: count
+      } )
     }
     catch ( e ) {
       return left( [new InfrastructureException()] )

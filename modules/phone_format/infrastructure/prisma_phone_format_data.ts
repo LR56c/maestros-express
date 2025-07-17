@@ -22,6 +22,7 @@ import { PhoneFormat }         from "@/modules/phone_format/domain/phone_format"
 import {
   PhoneFormatDAO
 }                              from "@/modules/phone_format/domain/phone_format_dao"
+import { PaginatedResult }     from "@/modules/shared/domain/paginated_result"
 
 export class PrismaPhoneFormatData
   implements PhoneFormatDAO {
@@ -62,7 +63,7 @@ export class PrismaPhoneFormatData
   async search( query: Record<string, any>, limit?: ValidInteger,
     skip?: ValidString,
     sortBy?: ValidString,
-    sortType?: ValidString ): Promise<Either<BaseException[], PhoneFormat[]>> {
+    sortType?: ValidString ): Promise<Either<BaseException[], PaginatedResult<PhoneFormat>>> {
     try {
       const where = {}
       if ( query.id ) {
@@ -90,15 +91,21 @@ export class PrismaPhoneFormatData
         orderBy[key] = sortType ? sortType.value : "desc"
       }
       const offset               = skip ? parseInt( skip.value ) : 0
-      const response             = await this.db.phoneFormat.findMany( {
-        where  : where,
-        orderBy: orderBy,
-        skip   : offset,
-        take   : limit?.value,
-        include:{
-          country: true
-        }
-      } )
+      const results = await this.db.$transaction([
+        this.db.phoneFormat.findMany( {
+          where  : where,
+          orderBy: orderBy,
+          skip   : offset,
+          take   : limit?.value,
+          include:{
+            country: true
+          }
+        } ),
+        this.db.phoneFormat.count( {
+          where: where
+        } )
+      ])
+      const [response, count] = results
       const formats: PhoneFormat[] = []
       for ( const f of response ) {
         const country = f.country
@@ -126,7 +133,10 @@ export class PrismaPhoneFormatData
         }
         formats.push( mapped )
       }
-      return right( formats )
+      return right( {
+        items: formats,
+        total: count
+      } )
     }
     catch ( e ) {
       return left( [new InfrastructureException()] )

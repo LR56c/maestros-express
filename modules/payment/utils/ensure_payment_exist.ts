@@ -24,9 +24,9 @@ export const ensurePaymentExist = async ( dao: PaymentDAO,
     return left(payment.left)
   }
 
-  if ( payment.right.length > 0 && payment.right[0]!.id.value !== paymentId ) {
+  if ( payment.right.items.length > 0 && payment.right.items[0]!.id.value !== paymentId ) {
     return left( [new DataNotFoundException()] )
   }
 
-  return right(payment.right[0])
+  return right(payment.right.items[0])
 }

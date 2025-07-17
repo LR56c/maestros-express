@@ -12,6 +12,9 @@ import { searchUser }                from "@/app/api/dependencies"
 import {
   UserMapper
 }                                    from "@/modules/user/application/user_mapper"
+import {
+  SpecialityMapper
+}                                    from "@/modules/speciality/application/speciality_mapper"
 
 export async function GET( request: NextRequest ) {
   const { searchParams }                             = new URL( request.url )
@@ -43,6 +46,9 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { status: 500 } )
   }
 
-  return NextResponse.json( result.right.map( UserMapper.toDTO ),
+  return NextResponse.json( {
+      items: result.right.items.map( UserMapper.toDTO ),
+      total: result.right.total
+    },
     { status: 200 } )
 }

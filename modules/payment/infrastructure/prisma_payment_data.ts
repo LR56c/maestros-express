@@ -16,6 +16,7 @@ import {
 }                              from "@/modules/shared/domain/exceptions/infrastructure_exception"
 import * as changeCase         from "change-case"
 import { Errors }              from "@/modules/shared/domain/exceptions/errors"
+import { PaginatedResult }     from "@/modules/shared/domain/paginated_result"
 
 export class PrismaPaymentData implements PaymentDAO {
   constructor( private readonly db: PrismaClient ) {
@@ -65,7 +66,7 @@ export class PrismaPaymentData implements PaymentDAO {
   async search( query: Record<string, any>, limit?: ValidInteger,
     skip?: ValidString,
     sortBy?: ValidString,
-    sortType?: ValidString ): Promise<Either<BaseException[], Payment[]>> {
+    sortType?: ValidString ): Promise<Either<BaseException[], PaginatedResult<Payment>>> {
     try {
       const where = {}
       if ( query.id
@@ -84,13 +85,18 @@ export class PrismaPaymentData implements PaymentDAO {
       }
 
       const offset   = skip ? parseInt( skip.value ) : 0
-      const response = await this.db.payment.findMany( {
-        where  : where,
-        orderBy: orderBy,
-        skip   : offset,
-        take   : limit?.value
-      } )
-
+      const results = await this.db.$transaction([
+        this.db.payment.findMany( {
+          where  : where,
+          orderBy: orderBy,
+          skip   : offset,
+          take   : limit?.value
+        } ),
+        this.db.payment.count( {
+          where: where
+        } )
+      ])
+      const [ response, total ] = results
       const result: Payment[] = []
       for ( const e of response ) {
         const mapped = Payment.fromPrimitives(
@@ -109,7 +115,10 @@ export class PrismaPaymentData implements PaymentDAO {
         }
         result.push( mapped )
       }
-      return right( result )
+      return right( {
+        items: result,
+        total: total
+      } )
     }
     catch ( e ) {
       return left( [new InfrastructureException()] )

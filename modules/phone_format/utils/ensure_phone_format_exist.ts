@@ -30,9 +30,9 @@ export const ensurePhoneFormatExist = async ( dao: PhoneFormatDAO,
     return left(format.left)
   }
 
-  if ( format.right.length > 0 && format.right[0]!.id.value !== formatId ) {
+  if ( format.right.items.length > 0 && format.right.items[0]!.id.value !== formatId ) {
     return left( [new DataNotFoundException()] )
   }
 
-  return right(format.right[0])
+  return right(format.right.items[0])
 }

@@ -18,6 +18,9 @@ import {
 import {
   ValidInteger
 }                              from "@/modules/shared/domain/value_objects/valid_integer"
+import {
+  PaginatedResult
+}                              from "@/modules/shared/domain/paginated_result"
 
 export class PrismaCurrencyData implements CurrencyDAO {
   constructor( private readonly db: PrismaClient ) {
@@ -59,7 +62,7 @@ export class PrismaCurrencyData implements CurrencyDAO {
   async search( query: Record<string, any>, limit?: ValidInteger,
     skip?: ValidString,
     sortBy?: ValidString,
-    sortType?: ValidString ): Promise<Either<BaseException[], Currency[]>> {
+    sortType?: ValidString ): Promise<Either<BaseException[], PaginatedResult<Currency>>> {
     try {
       let where = {}
       if ( query.code ) {
@@ -87,15 +90,20 @@ export class PrismaCurrencyData implements CurrencyDAO {
         orderBy[key] = sortType ? sortType.value : "desc"
       }
 
-      const offset   = skip ? parseInt( skip.value ) : 0
-      const response = await this.db.currency.findMany( {
-        where  : where,
-        orderBy: orderBy,
-        skip   : offset,
-        take   : limit?.value
-      } )
-
-      const result: Currency[] = []
+      const offset                 = skip ? parseInt( skip.value ) : 0
+      const results                = await this.db.$transaction( [
+        this.db.currency.findMany( {
+          where  : where,
+          orderBy: orderBy,
+          skip   : offset,
+          take   : limit?.value
+        } ),
+        this.db.currency.count( {
+          where: where
+        } )
+      ] )
+      const [response, totalCount] = results
+      const result: Currency[]     = []
       for ( const e of response ) {
         const mapped = Currency.fromPrimitives(
           e.code,
@@ -110,7 +118,10 @@ export class PrismaCurrencyData implements CurrencyDAO {
         }
         result.push( mapped )
       }
-      return right( result )
+      return right( {
+        items: result,
+        total: totalCount
+      } )
     }
     catch ( e ) {
       return left( [new InfrastructureException()] )

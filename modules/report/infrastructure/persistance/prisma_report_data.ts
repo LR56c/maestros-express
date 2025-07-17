@@ -16,6 +16,7 @@ import {
 }                              from "@/modules/shared/domain/exceptions/infrastructure_exception"
 import * as changeCase         from "change-case"
 import { Errors }              from "@/modules/shared/domain/exceptions/errors"
+import { PaginatedResult }     from "@/modules/shared/domain/paginated_result"
 
 export class PrismaReportData implements ReportDAO {
   constructor( private readonly db: PrismaClient ) {
@@ -42,7 +43,7 @@ export class PrismaReportData implements ReportDAO {
   async search( query: Record<string, any>, limit?: ValidInteger,
     skip?: ValidString,
     sortBy?: ValidString,
-    sortType?: ValidString ): Promise<Either<BaseException[], Report[]>> {
+    sortType?: ValidString ): Promise<Either<BaseException[], PaginatedResult<Report>>> {
     try {
       const where = {}
       if ( query.id ) {
@@ -59,17 +60,22 @@ export class PrismaReportData implements ReportDAO {
       }
 
       const offset   = skip ? parseInt( skip.value ) : 0
-      const response = await this.db.report.findMany( {
-        where  : where,
-        orderBy: orderBy,
-        skip   : offset,
-        take   : limit?.value,
-        include: {
-          fromUser: true,
-          toUser  : true
-        }
-      } )
-
+      const results = await this.db.$transaction([
+        this.db.report.findMany( {
+          where  : where,
+          orderBy: orderBy,
+          skip   : offset,
+          take   : limit?.value,
+          include: {
+            fromUser: true,
+            toUser  : true
+          }
+        } ),
+        this.db.report.count( {
+          where: where
+        } )
+      ])
+      const [ response, totalCount ] = results
       const result: Report[] = []
       for ( const e of response ) {
         const mapped = Report.fromPrimitives(
@@ -84,7 +90,10 @@ export class PrismaReportData implements ReportDAO {
         }
         result.push( mapped )
       }
-      return right( result )
+      return right( {
+        items: result,
+        total: totalCount
+      } )
     }
     catch ( e ) {
       return left( [new InfrastructureException()] )

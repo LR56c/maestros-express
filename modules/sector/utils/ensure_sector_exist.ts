@@ -23,9 +23,9 @@ export const ensureSectorExist = async ( dao: SectorDAO,
     return left( sector.left )
   }
 
-  if ( sector.right.length > 0 && sector.right[0]!.id.value !== sectorId ) {
+  if ( sector.right.items.length > 0 && sector.right.items[0]!.id.value !== sectorId ) {
     return left( [new DataNotFoundException()] )
   }
 
-  return right( sector.right[0] )
+  return right( sector.right.items[0] )
 }

@@ -23,7 +23,10 @@ import {
 }                              from "@/modules/shared/domain/value_objects/uuid"
 import {
   DataNotFoundException
-} from "@/modules/shared/domain/exceptions/data_not_found_exception"
+}                              from "@/modules/shared/domain/exceptions/data_not_found_exception"
+import {
+  PaginatedResult
+}                              from "@/modules/shared/domain/paginated_result"
 
 export class PrismaUserData implements UserDAO {
   constructor( private readonly db: PrismaClient ) {
@@ -138,23 +141,10 @@ export class PrismaUserData implements UserDAO {
     return where
   }
 
-  async count( query: Record<string, any> ): Promise<Either<BaseException[], ValidInteger>> {
-    try {
-      let where = this.queryWhere( query )
-      const num = await this.db.user.count( {
-        where: where
-      } )
-      return right( ValidInteger.from( num ) )
-    }
-    catch ( e ) {
-      return left( [new InfrastructureException()] )
-    }
-  }
-
   async search( query: Record<string, any>, limit?: ValidInteger,
     skip?: ValidString,
     sortBy?: ValidString,
-    sortType?: ValidString ): Promise<Either<BaseException[], User[]>> {
+    sortType?: ValidString ): Promise<Either<BaseException[], PaginatedResult<User>>> {
     try {
       let where     = this.queryWhere( query )
       const orderBy = {}
@@ -163,13 +153,20 @@ export class PrismaUserData implements UserDAO {
         // @ts-ignore
         orderBy[key] = sortType ? sortType.value : "desc"
       }
-      const offset   = skip ? parseInt( skip.value ) : 0
-      const response = await this.db.user.findMany( {
-        where  : where,
-        orderBy: orderBy,
-        skip   : offset,
-        take   : limit?.value
-      } )
+      const offset = skip ? parseInt( skip.value ) : 0
+
+      const results                = await this.db.$transaction( [
+        this.db.user.findMany( {
+          where  : where,
+          orderBy: orderBy,
+          skip   : offset,
+          take   : limit?.value
+        } ),
+        this.db.user.count( {
+          where: where
+        } )
+      ] )
+      const [response, totalCount] = results
       if ( !response || response.length === 0 ) {
         return left( [new DataNotFoundException()] )
       }
@@ -189,7 +186,10 @@ export class PrismaUserData implements UserDAO {
         }
         users.push( user )
       }
-      return right( users )
+      return right( {
+        items: users,
+        total  : totalCount
+      } )
     }
     catch ( e ) {
       return left( [new InfrastructureException()] )

@@ -12,12 +12,13 @@ import { UUID } from "@/modules/shared/domain/value_objects/uuid"
 import {
   NationalIdentityFormat
 }               from "@/modules/national_identity_format/domain/national_identity_format"
+import { PaginatedResult } from "@/modules/shared/domain/paginated_result"
 
 export abstract class NationalIdentityFormatDAO{
 
   abstract search( query: Record<string, any>, limit ?: ValidInteger,
     skip ?: ValidString, sortBy ?: ValidString,
-    sortType ?: ValidString ): Promise<Either<BaseException[], NationalIdentityFormat[]>>
+    sortType ?: ValidString ): Promise<Either<BaseException[], PaginatedResult<NationalIdentityFormat>>>
   abstract add( format: NationalIdentityFormat ): Promise<Either<BaseException, boolean>>
   abstract update( format: NationalIdentityFormat ): Promise<Either<BaseException, boolean>>
   abstract remove( id: UUID ): Promise<Either<BaseException, boolean>>

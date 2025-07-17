@@ -26,6 +26,9 @@ import {
 import {
   UUID
 }                                   from "@/modules/shared/domain/value_objects/uuid"
+import {
+  PaginatedResult
+}                                   from "@/modules/shared/domain/paginated_result"
 
 export class PrismaSectorData implements SectorDAO {
   constructor( private readonly db: PrismaClient ) {
@@ -82,7 +85,7 @@ export class PrismaSectorData implements SectorDAO {
   async search( query: Record<string, any>, limit?: ValidInteger,
     skip?: ValidString,
     sortBy?: ValidString,
-    sortType?: ValidString ): Promise<Either<BaseException[], Sector[]>> {
+    sortType?: ValidString ): Promise<Either<BaseException[], PaginatedResult<Sector>>> {
     try {
       let where = {}
       if ( query.id ) {
@@ -153,20 +156,25 @@ export class PrismaSectorData implements SectorDAO {
       }
 
       const offset   = skip ? parseInt( skip.value ) : 0
-      const response = await this.db.sector.findMany( {
-        where  : where,
-        orderBy: orderBy,
-        skip   : offset,
-        take   : limit?.value,
-        include: {
-          region: {
-            include: {
-              country: true
+      const results = await this.db.$transaction( [
+        this.db.sector.findMany( {
+          where  : where,
+          orderBy: orderBy,
+          skip   : offset,
+          take   : limit?.value,
+          include: {
+            region: {
+              include: {
+                country: true
+              }
             }
           }
-        }
-      } )
-
+        } ),
+        this.db.sector.count( {
+          where: where
+        } )
+      ])
+      const [ response, totalCount ] = results
       const result: Sector[] = []
       for ( const e of response ) {
         const country_db = e.region.country
@@ -183,7 +191,10 @@ export class PrismaSectorData implements SectorDAO {
         }
         result.push( mapped )
       }
-      return right( result )
+      return right( {
+        items: result,
+        total: totalCount
+      } )
     }
     catch ( e ) {
       return left( [new InfrastructureException()] )

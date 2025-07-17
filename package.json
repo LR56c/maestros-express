@@ -36,6 +36,7 @@
     "command": "^1.1.1",
     "date-fns": "^4.1.0",
     "defu": "^6.1.4",
+    "embla-carousel-react": "^8.6.0",
     "fp-ts": "^2.16.10",
     "geolib": "^3.3.4",
     "jose": "^6.0.11",

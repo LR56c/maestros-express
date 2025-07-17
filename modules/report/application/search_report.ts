@@ -7,6 +7,7 @@ import { Report }               from "@/modules/report/domain/report"
 import {
   genericEnsureSearch
 }                               from "@/modules/shared/utils/generic_ensure_search"
+import { PaginatedResult }      from "@/modules/shared/domain/paginated_result"
 
 export class SearchReport {
   constructor(private readonly dao : ReportDAO) {
@@ -14,7 +15,7 @@ export class SearchReport {
 
   async execute( query: Record<string, any>, limit?: number,
     skip ?: string, sortBy ?: string,
-    sortType ?: string ): Promise<Either<BaseException[], Report[]>>{
+    sortType ?: string ): Promise<Either<BaseException[], PaginatedResult<Report>>>{
     const searchParamsResult = genericEnsureSearch( limit, skip, sortBy,
       sortType )
 

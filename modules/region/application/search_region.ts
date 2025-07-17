@@ -7,6 +7,9 @@ import { Region }                    from "@/modules/region/domain/region"
 import {
   genericEnsureSearch
 }                                    from "@/modules/shared/utils/generic_ensure_search"
+import {
+  PaginatedResult
+}                                    from "@/modules/shared/domain/paginated_result"
 
 export class SearchRegion {
   constructor( private readonly dao: RegionDAO ) {
@@ -14,7 +17,7 @@ export class SearchRegion {
 
   async execute( query: Record<string, any>, limit?: number, skip ?: string,
     sortBy ?: string,
-    sortType ?: string ): Promise<Either<BaseException[], Region[]>> {
+    sortType ?: string ): Promise<Either<BaseException[], PaginatedResult<Region>>> {
     const searchParamsResult = genericEnsureSearch( limit, skip, sortBy,
       sortType )
 

@@ -1,175 +1,294 @@
 "use client"
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useQuery, useQueryClient, QueryKey } from "@tanstack/react-query";
-import {
-  PageParams,
-  PageResult,
-  SortDir
-} from "@/components/data_table/types"
-import {
-  ParamCodec
-}                                                  from "@/components/data_table/codec"
 
-interface UseServerPagedQueryOpts<TItem, TFilters> {
-  /** Base de la cache key React Query, ej: "workers" o ["workers"] */
-  queryKeyBase: string;
-  /** Fetcher server-side. */
-  fetchFn: (params: PageParams<TFilters>) => Promise<PageResult<TItem>>;
-  /** Param codec (spread/json/custom). */
-  codec: ParamCodec<TFilters>;
-  /** Defaults. */
-  defaultPageSize?: number;
-  minPageSize?: number;
-  maxPageSize?: number;
+import {
+  keepPreviousData,
+  QueryKey,
+  useQuery,
+  useQueryClient
+}                                           from "@tanstack/react-query"
+import { useCallback, useEffect, useState } from "react"
+
+export type SortDir = "asc" | "desc";
+
+export interface PageParams<TFilters = Record<string, any>> {
+  page: number;
+  size: number;
+  filters?: TFilters;
+  sortBy?: string;
+  sortType?: SortDir;
 }
 
-interface UseServerPagedQueryReturn<TItem, TFilters> {
+export interface PageResult<TItem> {
   items: TItem[];
   total: number;
+}
+
+export interface UsePagedResourceOptions<TItem, TFilters> {
+  endpoint: string;
+  defaultPageSize?: number;
+}
+
+const RESERVED_SET = new Set( ["page", "size", "sort_by", "sort_type"] )
+
+function readSearchParams(): URLSearchParams {
+  if ( typeof window === "undefined" ) return new URLSearchParams()
+  return new URLSearchParams( window.location.search )
+}
+
+function shallowReplaceSearch( sp: URLSearchParams ) {
+  if ( typeof window === "undefined" ) return
+  const u  = new URL( window.location.href )
+  u.search = sp.toString()
+  window.history.pushState( {}, "", u.toString() )
+}
+
+function parseSortType( v: string | null ): SortDir | undefined {
+  if ( !v ) return
+  const lc = v.toLowerCase()
+  return lc === "asc" || lc === "desc" ? (
+    lc as SortDir
+  ) : undefined
+}
+
+function parseFiltersSpread<TFilters>(
+  sp: URLSearchParams,
+  coerce?: ( k: string, v: string ) => any
+): TFilters | undefined {
+  const obj: Record<string, any> = {}
+  sp.forEach( ( v, k ) => {
+    if ( !RESERVED_SET.has( k ) ) {
+      obj[k] = coerce ? coerce( k, v ) : v
+    }
+  } )
+  return Object.keys( obj ).length ? (
+    obj as TFilters
+  ) : undefined
+}
+
+function applyFiltersSpread<TFilters>(
+  sp: URLSearchParams,
+  filters: TFilters | undefined
+)
+{
+  const toDel: string[] = []
+  sp.forEach( ( _v, k ) => {
+    if ( !RESERVED_SET.has( k ) ) toDel.push( k )
+  } )
+  toDel.forEach( ( k ) => sp.delete( k ) )
+  if ( filters ) {
+    Object.entries( filters as Record<string, any> ).forEach( ( [k, v] ) => {
+      if ( v == null ) return
+      sp.set( k, String( v ) )
+    } )
+  }
+}
+
+function buildFetchURL<TFilters>(
+  endpoint: string,
+  params: PageParams<TFilters>,
+): string {
+  const { page, size, filters, sortBy, sortType } = params
+  const qs                                        = new URLSearchParams()
+  qs.set( "limit", String( size ) )
+  qs.set( "skip", String( page * size ) )
+  if ( sortBy ) qs.set( "sort_by", sortBy )
+  if ( sortType ) qs.set( "sort_type", sortType )
+  if ( filters ) {
+    Object.entries( filters as Record<string, any> ).forEach( ( [k, v] ) => {
+      if ( v == null ) return
+      qs.set( k, String( v ) )
+    } )
+  }
+  return `${ endpoint }?${ qs.toString() }`
+}
+
+async function defaultFetch<TItem, TFilters>(
+  endpoint: string,
+  params: PageParams<TFilters>,
+): Promise<PageResult<TItem>> {
+  const url = buildFetchURL( endpoint, params )
+  const res = await fetch( url )
+  if ( !res.ok ) throw new Error( `Fetch error ${ res.status }` )
+  return res.json()
+}
+
+export interface UsePagedResourceReturn<TItem, TFilters> {
+  items: TItem[];
+  total: number;
+  data?: PageResult<TItem>;
   pageIndex: number;
   pageSize: number;
   filters?: TFilters;
   sortBy?: string;
   sortType?: SortDir;
+  setPageIndex: ( n: number ) => void;
+  setPageSize: ( n: number ) => void;
+  setFilters: ( f?: TFilters ) => void;
+  setSort: ( field?: string, dir?: SortDir ) => void;
+  makeHref: ( page1: number ) => string;
+  prefetchPage: ( pageIndex: number ) => void;
   isPending: boolean;
   isFetching: boolean;
+  isError: boolean;
   error: unknown;
-  /* Mutators */
-  setPageIndex: (n: number) => void;
-  setPageSize: (n: number) => void;
-  setFilters: (f?: TFilters) => void;    // reset page
-  setSort: (field?: string, dir?: SortDir) => void; // reset page
-  /* Helpers for paginator/DataTable */
-  makeHref: (page1: number) => string;
-  prefetchPage: (pageIndex: number) => void;
+  isPlaceholderData?: boolean;
+  loadingInitial: boolean;
 }
 
-export function usePagedQuery<TItem, TFilters = Record<string, any>>(
-  opts: UseServerPagedQueryOpts<TItem, TFilters>
-): UseServerPagedQueryReturn<TItem, TFilters> {
-  const {
-          queryKeyBase,
-          fetchFn,
-          codec,
-          defaultPageSize = 10,
-          minPageSize = 1,
-          maxPageSize = 1000,
-        } = opts;
+export function usePagedResource<TItem, TFilters = Record<string, any>>(
+  opts: UsePagedResourceOptions<TItem, TFilters>
+): UsePagedResourceReturn<TItem, TFilters> {
+  const { endpoint, defaultPageSize = 10 } = opts
 
-  const sp = useSearchParams();
-  const router = useRouter();
-  const pathname = usePathname();
-  const queryClient = useQueryClient();
+  const init = useCallback( () => {
+    const sp      = readSearchParams()
+    let pageIndex = Number( sp.get( "page" ) )
+    if ( !Number.isFinite( pageIndex ) || pageIndex < 0 ) pageIndex = 0
+    let pageSize = Number( sp.get( "size" ) )
+    if ( !Number.isFinite( pageSize ) || pageSize < 1 ) {
+      pageSize =
+        defaultPageSize
+    }
+    const filters  = parseFiltersSpread<TFilters>( sp )
+    const sortBy   = sp.get( "sort_by" ) ?? undefined
+    const sortType = parseSortType( sp.get( "sort_type" ) )
+    return { pageIndex, pageSize, filters, sortBy, sortType }
+  }, [defaultPageSize] )
 
-  // read basics
-  const rawPage = sp.get("page");
-  const rawSize = sp.get("size");
-  let pageIndex = Number(rawPage);
-  if (!Number.isFinite(pageIndex) || pageIndex < 0) pageIndex = 0;
-  let pageSize = Number(rawSize);
-  if (!Number.isFinite(pageSize) || pageSize < minPageSize) pageSize = defaultPageSize;
-  if (pageSize > maxPageSize) pageSize = maxPageSize;
+  const [state, setState] = useState( init )
 
-  // parse filters & sort
-  const { filters, sortBy, sortType } = codec.parse(sp);
+  // sync popstate
+  useEffect( () => {
+    const onPop = () => setState( init() )
+    window.addEventListener( "popstate", onPop )
+    return () => window.removeEventListener( "popstate", onPop )
+  }, [init] )
 
-  // React Query
+  // write URL + state
+  const write = (
+    next: Partial<typeof state> & { resetPage?: boolean }
+  ) => {
+    const sp      = readSearchParams()
+    const newPage = next.resetPage ? 0 : (
+      next.pageIndex ?? state.pageIndex
+    )
+    const newSize = next.pageSize ?? state.pageSize
+    sp.set( "page", String( Math.max( 0, newPage ) ) )
+    sp.set( "size", String( Math.max( 1, newSize ) ) )
+    applyFiltersSpread( sp, next.filters ?? state.filters )
+    const sortBy   = next.sortBy ?? state.sortBy
+    const sortType = next.sortType ?? state.sortType
+    sortBy ? sp.set( "sort_by", sortBy ) : sp.delete( "sort_by" )
+    sortType ? sp.set( "sort_type", sortType ) : sp.delete( "sort_type" )
+    shallowReplaceSearch( sp )
+    setState( ( prev ) => (
+      {
+        ...prev,
+        ...next,
+        pageIndex: Math.max( 0, newPage ),
+        pageSize : Math.max( 1, newSize )
+      }
+    ) )
+  }
+
+  const setPageIndex = ( n: number ) => write( { pageIndex: n } )
+  const setPageSize  = ( n: number ) => write(
+    { pageSize: n, resetPage: true } )
+  const setFilters   = ( f?: TFilters ) => write(
+    { filters: f, resetPage: true } )
+  const setSort      = ( field?: string, dir?: SortDir ) =>
+    write( { sortBy: field, sortType: dir, resetPage: true } )
+
+  const makeHref = ( page1: number ) => {
+    const idx = Math.max( 0, page1 - 1 )
+    const sp  = readSearchParams()
+    sp.set( "page", String( idx ) )
+    sp.set( "size", String( state.pageSize ) )
+    applyFiltersSpread( sp, state.filters )
+    state.sortBy ? sp.set( "sort_by", state.sortBy ) : sp.delete( "sort_by" )
+    state.sortType ? sp.set( "sort_type", state.sortType ) : sp.delete(
+      "sort_type" )
+    return (
+      typeof window === "undefined" ? "" : window.location.pathname
+    ) + "?" + sp.toString()
+  }
+
+  const params: PageParams<TFilters> = {
+    page    : state.pageIndex,
+    size    : state.pageSize,
+    filters : state.filters,
+    sortBy  : state.sortBy,
+    sortType: state.sortType
+  }
+
   const queryKey: QueryKey = [
-    ...Array.isArray(queryKeyBase) ? queryKeyBase : [queryKeyBase],
-    pageIndex,
-    pageSize,
-    filters,
-    sortBy,
-    sortType,
-  ];
+    "paged",
+    endpoint,
+    params.page,
+    params.size,
+    params.filters ?? {},
+    params.sortBy ?? "",
+    params.sortType ?? ""
+  ]
 
-  const query = useQuery<PageResult<TItem>>({
+  const query = useQuery<PageResult<TItem>>( {
     queryKey,
-    queryFn: () =>
-      fetchFn({ page: pageIndex, size: pageSize, filters, sortBy, sortType }),
-  });
+    queryFn        : () => defaultFetch<TItem, TFilters>( endpoint, params ),
+    placeholderData: keepPreviousData
+  } )
 
-  const { data, isPending, isFetching, error } = query;
-  const items = data?.items ?? [];
-  const total = data?.total ?? 0;
+  const {
+          data,
+          isPending,
+          isFetching,
+          isError,
+          error,
+          isPlaceholderData
+        }     = query
+  const items = data?.items ?? []
+  const total = data?.total ?? 0
 
-  // URL write helper
-  const pushUrl = (params: {
-    page?: number;
-    size?: number;
-    filters?: TFilters;
-    sortBy?: string;
-    sortType?: SortDir;
-    resetPage?: boolean;
-  }) => {
-    const next = new URLSearchParams(sp.toString());
-
-    const nextSize = params.size ?? pageSize;
-    const nextPage = params.resetPage ? 0 : (params.page ?? pageIndex);
-
-    next.set("page", String(Math.max(0, nextPage)));
-    next.set(
-      "size",
-      String(Math.min(Math.max(nextSize, minPageSize), maxPageSize))
-    );
-
-    codec.apply(next, params.filters ?? filters, params.sortBy ?? sortBy, params.sortType ?? sortType);
-
-    router.push(`${pathname}?${next.toString()}`, { scroll: false });
-  };
-
-  // mutators
-  const setPageIndex = (n: number) => pushUrl({ page: n });
-  const setPageSize = (n: number) => pushUrl({ size: n, resetPage: true });
-  const setFilters = (f?: TFilters) => pushUrl({ filters: f, resetPage: true });
-  const setSort = (field?: string, dir?: SortDir) =>
-    pushUrl({ sortBy: field, sortType: dir, resetPage: true });
-
-  // makeHref for Paginator
-  const makeHref = (page1: number) => {
-    const next = new URLSearchParams(sp.toString());
-    const idx = Math.max(0, page1 - 1);
-    next.set("page", String(idx));
-    next.set("size", String(pageSize));
-    codec.apply(next, filters, sortBy, sortType);
-    return `${pathname}?${next.toString()}`;
-  };
-
-  // prefetch
-  const prefetchPage = (pIdx: number) => {
-    if (pIdx === pageIndex) return;
-    const key: QueryKey = [
-      queryKeyBase,
+  const queryClient  = useQueryClient()
+  const prefetchPage = ( pIdx: number ) => {
+    const nextParams: PageParams<TFilters> = { ...params, page: pIdx }
+    const nextKey: QueryKey                = [
+      "paged",
+      endpoint,
       pIdx,
-      pageSize,
-      filters,
-      sortBy,
-      sortType,
-    ];
-    queryClient.prefetchQuery({
-      queryKey: key,
-      queryFn: () =>
-        fetchFn({ page: pIdx, size: pageSize, filters, sortBy, sortType }),
-      staleTime: 30_000,
-    });
-  };
+      params.size,
+      params.filters ?? {},
+      params.sortBy ?? "",
+      params.sortType ?? ""
+    ]
+    queryClient.prefetchQuery( {
+      queryKey : nextKey,
+      queryFn  : () => defaultFetch<TItem, TFilters>( endpoint, nextParams ),
+      staleTime: 30_000
+    } )
+  }
+
+  const loadingInitial = isPending && !data
 
   return {
     items,
     total,
-    pageIndex,
-    pageSize,
-    filters,
-    sortBy,
-    sortType,
-    isPending,
-    isFetching,
-    error,
+    data,
+    pageIndex: state.pageIndex,
+    pageSize : state.pageSize,
+    filters  : state.filters,
+    sortBy   : state.sortBy,
+    sortType : state.sortType,
     setPageIndex,
     setPageSize,
     setFilters,
     setSort,
     makeHref,
     prefetchPage,
+    isPending,
+    isFetching,
+    isError,
+    error,
+    isPlaceholderData,
+    loadingInitial,
   };
 }

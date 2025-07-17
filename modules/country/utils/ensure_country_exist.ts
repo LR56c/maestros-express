@@ -22,9 +22,9 @@ export const ensureCountryExist = async ( dao: CountryDAO,
     return left(country.left)
   }
 
-  if ( country.right.length > 0 && country.right[0]!.id.value !== countryId ) {
+  if ( country.right.items.length > 0 && country.right.items[0]!.id.value !== countryId ) {
     return left( [new DataNotFoundException()] )
   }
 
-  return right(country.right[0])
+  return right(country.right.items[0])
 }

@@ -1,173 +1,189 @@
-"use client";
+"use client"
+import * as React                from "react"
+import { useCallback, useState } from "react"
+import { ColumnDef }             from "@tanstack/react-table"
 
-import * as React from "react";
 import {
-  keepPreviousData,
-  useQuery,
-  useQueryClient
-} from "@tanstack/react-query"
+  DataTablePaginated
+} from "@/components/data_table/data_table_paginated"
+import {
+  usePagedResource
+} from "@/components/data_table/usePagedQuery"
+import {
+  WorkerProfileDTO
+} from "@/modules/worker/application/worker_profile_dto"
+import {
+  Eye
+} from "lucide-react"
+import {
+  Checkbox
+} from "@/components/ui/checkbox"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from "@/components/ui/dialog"
+import {
+  Button
+} from "@/components/ui/button"
+import { WorkerAdminDialog } from "@/components/admin/worker_admin_dialog"
 
-import { DataTablePaginated } from "@/components/data_table/data_table_paginated";
-import { ColumnDef }          from "@tanstack/react-table"
-import {
-  SpecialityDTO
-}                             from "@/modules/speciality/application/speciality_dto"
-import {
-  readSearchParams,
-  updateSearchParamsShallow
-} from "@/components/data_table/codec"
-const columns: ColumnDef<SpecialityDTO>[] = [
+interface WorkerFilters {
+}
+
+
+const columns: ColumnDef<WorkerProfileDTO>[] = [
   {
-    accessorKey: "name",
+    id           : "select",
+    header       : ( { table } ) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (
+            table.getIsSomePageRowsSelected() && "indeterminate"
+          )
+        }
+        onCheckedChange={ ( value ) => table.toggleAllPageRowsSelected(
+          !!value ) }
+        aria-label="Select all"
+      />
+    ),
+    cell         : ( { row } ) => (
+      <Checkbox
+        checked={ row.getIsSelected() }
+        onCheckedChange={ ( value ) => row.toggleSelected( !!value ) }
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding : false
+  },
+  {
+    accessorKey: "full_name",
     header     : "Nombre"
+  },
+  {
+    accessorKey: "status",
+    header     : "Estado"
+  },
+  {
+    id: "actions",
+    // header: () => {
+    //   return (
+    //     <DropdownMenu>
+    //       <DropdownMenuTrigger asChild>
+    //         <Button variant="ghost">
+    //           <MoreHorizontal/>
+    //         </Button>
+    //       </DropdownMenuTrigger>
+    //       <DropdownMenuContent align="end">
+    //         <DropdownMenuItem>Eliminar seleccionados</DropdownMenuItem>
+    //       </DropdownMenuContent>
+    //     </DropdownMenu>
+    //   )
+    // },
+    cell: ( { row } ) => {
+      const worker = row.original
+      return (
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <Eye/>
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Perfil trabajador
+                '{ worker.full_name }'</DialogTitle>
+              <WorkerAdminDialog worker={ worker }/>
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
+        // <DropdownMenu>
+        //   <DropdownMenuTrigger asChild>
+        //     <Button variant="ghost">
+        //       <MoreHorizontal/>
+        //     </Button>
+        //   </DropdownMenuTrigger>
+        //   <DropdownMenuContent align="end">
+        //     <DropdownMenuItem>Editar</DropdownMenuItem>
+        //     <DropdownMenuItem>Eliminar</DropdownMenuItem>
+        //   </DropdownMenuContent>
+        // </DropdownMenu>
+      )
+    }
   }
 ]
 
-
-interface WorkerApiResponse { items: SpecialityDTO[]; total: number; }
-
-const DEFAULT_PAGE_SIZE = 10;
-const MIN_PAGE_SIZE = 1;
-const MAX_PAGE_SIZE = 1000;
-
-function parseNum(v: string | null, fallback: number): number {
-  const n = Number(v);
-  return Number.isFinite(n) && n >= 0 ? n : fallback;
-}
-function clampSize(n: number) {
-  if (n < MIN_PAGE_SIZE) return DEFAULT_PAGE_SIZE;
-  if (n > MAX_PAGE_SIZE) return MAX_PAGE_SIZE;
-  return Math.floor(n);
-}
-
-/* server fetch */
-async function fetchWorkersAPI(page: number, size: number): Promise<WorkerApiResponse> {
-  const params = new URLSearchParams();
-  params.set("limit", String(size));
-  params.set("skip", String(page * size));
-  const res = await fetch(`/api/speciality?${params.toString()}`);
-  if (!res.ok) throw new Error(`Error: ${res.status}`);
-  return res.json();
-}
-
 export default function WorkersPage() {
-  // init from URL
-  const [pageIndex, setPageIndex] = React.useState(() => {
-    const sp = readSearchParams();
-    return parseNum(sp.get("page"), 0);
-  });
-  const [pageSize, setPageSize] = React.useState(() => {
-    const sp = readSearchParams();
-    return clampSize(parseNum(sp.get("size"), DEFAULT_PAGE_SIZE));
-  });
-
-  // sync back/forward
-  React.useEffect(() => {
-    const onPop = () => {
-      const sp = readSearchParams();
-      setPageIndex(parseNum(sp.get("page"), 0));
-      setPageSize(clampSize(parseNum(sp.get("size"), DEFAULT_PAGE_SIZE)));
-    };
-    window.addEventListener("popstate", onPop);
-    return () => window.removeEventListener("popstate", onPop);
-  }, []);
-
-  const queryClient = useQueryClient();
-
   const {
-          data,
-          isPending,
+          items,
+          total,
+          pageIndex,
+          pageSize,
+          setPageIndex,
+          setPageSize,
+          makeHref,
+          prefetchPage,
+          loadingInitial,
           isFetching,
           isError,
-          error,
-        } = useQuery<WorkerApiResponse>({
-    queryKey: ["workers", pageIndex, pageSize],
-    queryFn: () => fetchWorkersAPI(pageIndex, pageSize),
-    placeholderData: keepPreviousData
-  });
+          error
+        } = usePagedResource<WorkerProfileDTO, WorkerFilters>( {
+    endpoint       : "/api/worker",
+    defaultPageSize: 10
+  } )
 
-  const items = data?.items ?? [];
-  const total = data?.total ?? 0;
+  const [selecteds, setSelecteds] = useState<WorkerProfileDTO[]>( [] )
 
-  // push to URL shallow + update state
-  const pushUrl = (newPage: number, newSize: number = pageSize) => {
-    updateSearchParamsShallow((sp) => {
-      sp.set("page", String(newPage));
-      sp.set("size", String(newSize));
-    });
-    setPageIndex(newPage);
-    setPageSize(newSize);
-  };
+  const handleSelectionChange = useCallback(
+    ( rows: WorkerProfileDTO[] ) => {
+      setSelecteds( rows )
+    },
+    []
+  )
 
-  const handlePageSizeChange = (s: number) => {
-    const safe = clampSize(s);
-    if (safe === pageSize) return;
-    pushUrl(0, safe);
-  };
-
-  const handlePageChange = (pIdx: number) => {
-    if (pIdx === pageIndex) return;
-    pushUrl(pIdx);
-  };
-
-  const makeHref = (page1: number) => {
-    const u = new URL(window.location.href);
-    const pIdx = page1 - 1;
-    u.searchParams.set("page", String(pIdx));
-    u.searchParams.set("size", String(pageSize));
-    return u.pathname + "?" + u.searchParams.toString();
-  };
-
-  const handlePageHover = (page1: number) => {
-    const pIdx = page1 - 1;
-    if (pIdx === pageIndex) return;
-    queryClient.prefetchQuery({
-      queryKey: ["workers", pIdx, pageSize],
-      queryFn: () => fetchWorkersAPI(pIdx, pageSize),
-      staleTime: 30_000,
-    });
-  };
-
-  // estado de error
-  if (isError) {
+  if ( isError ) {
     return (
       <div className="p-4 text-sm text-destructive">
-        Error: {(error as Error)?.message ?? "desconocido"}
+        Error: { (
+        error as Error
+      )?.message ?? "desconocido" }
       </div>
-    );
+    )
   }
 
-  // skeleton sólo en primer render (sin data aún)
-  if (isPending && !data) {
+  if ( loadingInitial ) {
     return (
       <div className="p-4">
-        <div className="h-8 w-full animate-pulse bg-muted/50 mb-2" />
-        <div className="h-8 w-full animate-pulse bg-muted/50 mb-2" />
-        <div className="h-8 w-full animate-pulse bg-muted/50" />
+        <div className="h-8 w-full animate-pulse bg-muted/50 mb-2"/>
+        <div className="h-8 w-full animate-pulse bg-muted/50 mb-2"/>
+        <div className="h-8 w-full animate-pulse bg-muted/50"/>
       </div>
-    );
+    )
   }
 
-  // loading inline (no cortar render)
-  const loading = isFetching && !isPending;
-
   return (
-    <div className="p-4">
+    <div className="p-4 space-y-4">
       <DataTablePaginated
-        columns={columns}
-        data={items}
-        total={total}
-        pageIndex={pageIndex}
-        pageSize={pageSize}
-        makeHref={makeHref}
-        onPageChange={handlePageChange}
-        onPageHover={handlePageHover}
-        onPageSizeChange={handlePageSizeChange}
-        boundaries={1}
-        siblings={1}
+        columns={ columns }
+        data={ items }
+        total={ total }
+        pageIndex={ pageIndex }
+        pageSize={ pageSize }
+        onSelectionChange={ handleSelectionChange }
+        getRowId={ ( row ) => row.user_id }
+        makeHref={ makeHref }
+        onPageChange={ setPageIndex }
+        onPageHover={ ( p1 ) => prefetchPage( p1 - 1 ) }
+        onPageSizeChange={ setPageSize }
+        boundaries={ 1 }
+        siblings={ 1 }
         emptyMessage="Sin resultados."
-        loading={loading}
+        loading={ isFetching }
       />
     </div>
-  );
+  )
 }

@@ -38,7 +38,7 @@ export const parseSpecialities = ( data: SpecialityDTO[] ): MultiSelectInputValu
     }
   ) )
 
-export const getProfile = async (id : string) => {
+export const getUser = async (id : string) => {
   const params = new URLSearchParams();
   params.append( "id", id );
   params.append( "limit", "1" );
