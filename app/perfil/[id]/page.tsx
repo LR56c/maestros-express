@@ -19,7 +19,7 @@ export default async function DetallePerfil( { params }: PageProps ) {
   if ( isLeft( result ) ) {
     throw new Error()
   }
-  const users = result.right.map( UserMapper.toDTO )
+  const users = result.right.items.map( UserMapper.toDTO )
   if ( users.length === 0 ) {
     throw new Error( "User not found" )
   }
