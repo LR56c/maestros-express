@@ -15,9 +15,6 @@ import {
   reportSchema
 }                                    from "@/modules/report/application/report_dto"
 import { addReport, searchReport }   from "@/app/api/dependencies"
-import {
-  SpecialityMapper
-}                                    from "@/modules/speciality/application/speciality_mapper"
 
 
 export async function POST( request: NextRequest ) {
