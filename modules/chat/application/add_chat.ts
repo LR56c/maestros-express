@@ -67,8 +67,8 @@ export class AddChat {
 
     const newChat = Chat.create(
       dto.id,
-      workerExist.right[0],
-      clientExist.right[0],
+      workerExist.right.items[0],
+      clientExist.right.items[0],
       dto.subject,
       []
     )
