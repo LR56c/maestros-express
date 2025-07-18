@@ -48,7 +48,7 @@ export class UpsertZones
     }
 
     const verifiedNewZones = new Map<string, Zone>()
-    for ( const sector of sectorsResult.right ) {
+    for ( const sector of sectorsResult.right.items ) {
       const newZone = savedNewZones.get( sector.id.value )
       if ( newZone ) {
         const zone = Zone.create(
