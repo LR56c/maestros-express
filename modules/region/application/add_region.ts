@@ -49,7 +49,7 @@ export class AddRegion {
     const region = Region.create(
       dto.id,
       dto.name,
-      country.right[0]!
+      country.right.items[0]!
     )
 
     if ( region instanceof Errors ) {

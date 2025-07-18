@@ -42,7 +42,7 @@ export class AddSector {
     const sector = Sector.create(
       dto.id,
       dto.name,
-      region.right[0]!
+      region.right.items[0]!
     )
 
     if ( sector instanceof Errors ) {

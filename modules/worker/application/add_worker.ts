@@ -56,7 +56,7 @@ export class AddWorker {
       return left( nationalIdentityResult.left )
     }
 
-    const nationalIdentity = nationalIdentityResult.right[0]
+    const nationalIdentity = nationalIdentityResult.right.items[0]
 
     const status = WorkerStatusEnum.INCOMPLETE
 

@@ -51,7 +51,7 @@ export class AddPhoneFormat {
       return left( countryResult.left )
     }
 
-    const country = countryResult.right[0]
+    const country = countryResult.right.items[0]
 
     const newFormat = PhoneFormat.create(
       format.id,
