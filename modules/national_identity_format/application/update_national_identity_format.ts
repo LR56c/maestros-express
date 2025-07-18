@@ -47,7 +47,7 @@ export class UpdateNationalIdentityFormat {
       return left( countryResult.left )
     }
 
-    const country = countryResult.right[0]
+    const country = countryResult.right.items[0]
 
     const updatedFormat = NationalIdentityFormat.fromPrimitives(
       format.id,
