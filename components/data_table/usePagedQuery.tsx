@@ -4,8 +4,8 @@ import {
   keepPreviousData,
   QueryKey,
   useQuery,
-  useQueryClient
-}                                           from "@tanstack/react-query"
+  useQueryClient, UseQueryResult
+} from "@tanstack/react-query"
 import { useCallback, useEffect, useState } from "react"
 
 export type SortDir = "asc" | "desc";
@@ -85,7 +85,7 @@ function applyFiltersSpread<TFilters>(
 
 function buildFetchURL<TFilters>(
   endpoint: string,
-  params: PageParams<TFilters>,
+  params: PageParams<TFilters>
 ): string {
   const { page, size, filters, sortBy, sortType } = params
   const qs                                        = new URLSearchParams()
@@ -104,7 +104,7 @@ function buildFetchURL<TFilters>(
 
 async function defaultFetch<TItem, TFilters>(
   endpoint: string,
-  params: PageParams<TFilters>,
+  params: PageParams<TFilters>
 ): Promise<PageResult<TItem>> {
   const url = buildFetchURL( endpoint, params )
   const res = await fetch( url )
@@ -121,6 +121,7 @@ export interface UsePagedResourceReturn<TItem, TFilters> {
   filters?: TFilters;
   sortBy?: string;
   sortType?: SortDir;
+  refetch: UseQueryResult<PageResult<TItem>, unknown>["refetch"];
   setPageIndex: ( n: number ) => void;
   setPageSize: ( n: number ) => void;
   setFilters: ( f?: TFilters ) => void;
@@ -131,7 +132,6 @@ export interface UsePagedResourceReturn<TItem, TFilters> {
   isFetching: boolean;
   isError: boolean;
   error: unknown;
-  isPlaceholderData?: boolean;
   loadingInitial: boolean;
 }
 
@@ -157,14 +157,12 @@ export function usePagedResource<TItem, TFilters = Record<string, any>>(
 
   const [state, setState] = useState( init )
 
-  // sync popstate
   useEffect( () => {
     const onPop = () => setState( init() )
     window.addEventListener( "popstate", onPop )
     return () => window.removeEventListener( "popstate", onPop )
   }, [init] )
 
-  // write URL + state
   const write = (
     next: Partial<typeof state> & { resetPage?: boolean }
   ) => {
@@ -241,13 +239,12 @@ export function usePagedResource<TItem, TFilters = Record<string, any>>(
           data,
           isPending,
           isFetching,
+          refetch,
           isError,
-          error,
-          isPlaceholderData
-        }     = query
-  const items = data?.items ?? []
-  const total = data?.total ?? 0
-
+          error
+        }            = query
+  const items        = data?.items ?? []
+  const total        = data?.total ?? 0
   const queryClient  = useQueryClient()
   const prefetchPage = ( pIdx: number ) => {
     const nextParams: PageParams<TFilters> = { ...params, page: pIdx }
@@ -273,6 +270,7 @@ export function usePagedResource<TItem, TFilters = Record<string, any>>(
     items,
     total,
     data,
+    refetch,
     pageIndex: state.pageIndex,
     pageSize : state.pageSize,
     filters  : state.filters,
@@ -288,7 +286,6 @@ export function usePagedResource<TItem, TFilters = Record<string, any>>(
     isFetching,
     isError,
     error,
-    isPlaceholderData,
-    loadingInitial,
-  };
+    loadingInitial
+  }
 }

@@ -29,10 +29,11 @@ export async function PUT( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const updatedStatus = "PENDING"
+  const updatedStatus            = "PENDING"
   const workDto: WorkerUpdateDTO = {
     user        : data.right.user,
     status      : updatedStatus,
+    embedding   : false,
     specialities: data.right.specialities
   }
   const result                   = await (

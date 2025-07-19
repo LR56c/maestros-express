@@ -14,6 +14,7 @@ export const workerUpdateSchema = z.object( {
   status        : z.string().optional(),
   location      : z.string().optional(),
   verified      : z.boolean().optional(),
+  embedding     : z.boolean().default(true),
   specialities  : z.union( [z.array( specialitySchema ).optional(), z.null()] )
 } )
 export type WorkerUpdateDTO = z.infer<typeof workerUpdateSchema>

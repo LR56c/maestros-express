@@ -82,7 +82,7 @@ export class PrismaWorkerEmbeddingData
         return left( embedding.left )
       }
 
-      const exists    = await this.db.workerEmbedding.findUnique( {
+      const exists = await this.db.workerEmbedding.findUnique( {
         where: {
           id: embed.id.toString()
         }
@@ -96,7 +96,6 @@ export class PrismaWorkerEmbeddingData
                                     , location = ST_SetSRID(ST_MakePoint(${ longitude }
                                     , ${ latitude })
                                     , 4326)::geography
-                                    ,
                                   WHERE id = ${ embed.id.toString() }::uuid`
         return right( true )
       }

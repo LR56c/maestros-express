@@ -5,113 +5,104 @@ import { ColumnDef }             from "@tanstack/react-table"
 
 import {
   DataTablePaginated
-} from "@/components/data_table/data_table_paginated"
+}                                               from "@/components/data_table/data_table_paginated"
 import {
   usePagedResource
-} from "@/components/data_table/usePagedQuery"
+}                                               from "@/components/data_table/usePagedQuery"
+import { Eye }                                  from "lucide-react"
+import { Checkbox }                             from "@/components/ui/checkbox"
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+import { Button }                               from "@/components/ui/button"
 import {
-  WorkerProfileDTO
-} from "@/modules/worker/application/worker_profile_dto"
+  WorkerAdminDialog
+}                                               from "@/components/admin/worker_admin_dialog"
 import {
-  Eye
-} from "lucide-react"
-import {
-  Checkbox
-} from "@/components/ui/checkbox"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from "@/components/ui/dialog"
-import {
-  Button
-} from "@/components/ui/button"
-import { WorkerAdminDialog } from "@/components/admin/worker_admin_dialog"
-import { WorkerResponse } from "@/modules/worker/application/worker_response"
+  WorkerResponse
+}                                               from "@/modules/worker/application/worker_response"
 
 interface WorkerFilters {
 }
 
-const columns: ColumnDef<WorkerResponse>[] = [
-  {
-    id           : "select",
-    header       : ( { table } ) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (
-            table.getIsSomePageRowsSelected() && "indeterminate"
-          )
-        }
-        onCheckedChange={ ( value ) => table.toggleAllPageRowsSelected(
-          !!value ) }
-        aria-label="Select all"
-      />
-    ),
-    cell         : ( { row } ) => (
-      <Checkbox
-        checked={ row.getIsSelected() }
-        onCheckedChange={ ( value ) => row.toggleSelected( !!value ) }
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding : false
-  },
-  {
-    accessorKey: "user.full_name",
-    header     : "Nombre"
-  },
-  {
-    accessorKey: "user.status",
-    header     : "Estado"
-  },
-  {
-    id: "actions",
-    // header: () => {
-    //   return (
-    //     <DropdownMenu>
-    //       <DropdownMenuTrigger asChild>
-    //         <Button variant="ghost">
-    //           <MoreHorizontal/>
-    //         </Button>
-    //       </DropdownMenuTrigger>
-    //       <DropdownMenuContent align="end">
-    //         <DropdownMenuItem>Eliminar seleccionados</DropdownMenuItem>
-    //       </DropdownMenuContent>
-    //     </DropdownMenu>
-    //   )
-    // },
-    cell: ( { row } ) => {
-      const worker = row.original
-      return (
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <Eye/>
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-h-3/4 overflow-y-auto">
-              <WorkerAdminDialog worker={ worker }/>
-          </DialogContent>
-        </Dialog>
-        // <DropdownMenu>
-        //   <DropdownMenuTrigger asChild>
-        //     <Button variant="ghost">
-        //       <MoreHorizontal/>
-        //     </Button>
-        //   </DropdownMenuTrigger>
-        //   <DropdownMenuContent align="end">
-        //     <DropdownMenuItem>Editar</DropdownMenuItem>
-        //     <DropdownMenuItem>Eliminar</DropdownMenuItem>
-        //   </DropdownMenuContent>
-        // </DropdownMenu>
-      )
+function getColumns( invalidateTable: () => void ): ColumnDef<WorkerResponse>[] {
+  return [
+    {
+      id           : "select",
+      header       : ( { table } ) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (
+              table.getIsSomePageRowsSelected() && "indeterminate"
+            )
+          }
+          onCheckedChange={ ( value ) => table.toggleAllPageRowsSelected(
+            !!value ) }
+          aria-label="Select all"
+        />
+      ),
+      cell         : ( { row } ) => (
+        <Checkbox
+          checked={ row.getIsSelected() }
+          onCheckedChange={ ( value ) => row.toggleSelected( !!value ) }
+          aria-label="Select row"
+        />
+      ),
+      enableSorting: false,
+      enableHiding : false
+    },
+    {
+      accessorKey: "user.full_name",
+      header     : "Nombre"
+    },
+    {
+      accessorKey: "user.status",
+      header     : "Estado"
+    },
+    {
+      id: "actions",
+      // header: () => {
+      //   return (
+      //     <DropdownMenu>
+      //       <DropdownMenuTrigger asChild>
+      //         <Button variant="ghost">
+      //           <MoreHorizontal/>
+      //         </Button>
+      //       </DropdownMenuTrigger>
+      //       <DropdownMenuContent align="end">
+      //         <DropdownMenuItem>Eliminar seleccionados</DropdownMenuItem>
+      //       </DropdownMenuContent>
+      //     </DropdownMenu>
+      //   )
+      // },
+      cell: ( { row } ) => {
+        const worker = row.original
+        return (
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Eye/>
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-h-3/4 overflow-y-auto">
+              <WorkerAdminDialog worker={ worker } onUpdate={ invalidateTable }/>
+            </DialogContent>
+          </Dialog>
+          // <DropdownMenu>
+          //   <DropdownMenuTrigger asChild>
+          //     <Button variant="ghost">
+          //       <MoreHorizontal/>
+          //     </Button>
+          //   </DropdownMenuTrigger>
+          //   <DropdownMenuContent align="end">
+          //     <DropdownMenuItem>Editar</DropdownMenuItem>
+          //     <DropdownMenuItem>Eliminar</DropdownMenuItem>
+          //   </DropdownMenuContent>
+          // </DropdownMenu>
+        )
+      }
     }
-  }
-]
+  ]
+}
 
 export default function WorkersPage() {
   const {
@@ -121,6 +112,7 @@ export default function WorkersPage() {
           pageSize,
           setPageIndex,
           setPageSize,
+          refetch,
           makeHref,
           prefetchPage,
           loadingInitial,
@@ -164,7 +156,10 @@ export default function WorkersPage() {
   return (
     <div className="p-4 space-y-4">
       <DataTablePaginated
-        columns={ columns }
+        columns={ getColumns( async () => {
+          console.log( "invalidate table" )
+          await refetch()
+        } ) }
         data={ items }
         total={ total }
         pageIndex={ pageIndex }

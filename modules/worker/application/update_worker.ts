@@ -185,23 +185,24 @@ export class UpdateWorker {
       return left( [updated.left] )
     }
 
-    const workerMapped = WorkerMapper.toDTO( updatedWorker )
+    if ( worker.embedding ) {
+      const workerMapped = WorkerMapper.toDTO( updatedWorker )
 
-    const embeddingResult = await this.embedding.execute(
-      updatedWorker.user.userId.toString(),
-      {
-      id      : UUID.create().toString(),
-      location: updatedWorker.location.toString(),
-      data    : {
-        type: WorkerEmbeddingTypeEnum.WORKER,
-        ...workerMapped
+      const embeddingResult = await this.embedding.execute(
+        updatedWorker.user.userId.toString(),
+        {
+          id      : UUID.create().toString(),
+          location: updatedWorker.location.toString(),
+          data    : {
+            type: WorkerEmbeddingTypeEnum.WORKER,
+            ...workerMapped
+          }
+        } )
+
+      if ( isLeft( embeddingResult ) ) {
+        return left( embeddingResult.left )
       }
-    } )
-
-    if ( isLeft( embeddingResult ) ) {
-      return left( embeddingResult.left )
     }
-
     return right( updatedWorker )
   }
 

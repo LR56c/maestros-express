@@ -5,54 +5,53 @@ import {
   CardDescription,
   CardHeader,
   CardTitle
-}                                 from "@/components/ui/card"
+}                                              from "@/components/ui/card"
 import {
   Carousel,
   CarouselContent,
   CarouselItem
-}                                from "@/components/ui/carousel"
-import { useMutation, useQuery } from "@tanstack/react-query"
+}                                                from "@/components/ui/carousel"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
   Skeleton
-}                                from "@/components/ui/skeleton"
+}                                                from "@/components/ui/skeleton"
 import {
   ZoneDTO
-}                                 from "@/modules/zone/application/zone_dto"
-import { Badge }                  from "@/components/ui/badge"
-import { Label }                  from "@/components/ui/label"
-import { ExternalLink, FileText } from "lucide-react"
-import { Button }                 from "@/components/ui/button"
+}                                              from "@/modules/zone/application/zone_dto"
+import { Badge }                               from "@/components/ui/badge"
+import { Label }                               from "@/components/ui/label"
+import { ExternalLink, FileText, Loader2Icon } from "lucide-react"
+import { Button }                              from "@/components/ui/button"
 import {
   CertificateDTO
-}                                 from "@/modules/certificate/application/certificate_dto"
+}                                              from "@/modules/certificate/application/certificate_dto"
 import {
   NationalIdentityFormatDTO
-}                                 from "@/modules/national_identity_format/application/national_identity_format_dto"
+}                                              from "@/modules/national_identity_format/application/national_identity_format_dto"
 import {
   WorkerResponse
-}                                 from "@/modules/worker/application/worker_response"
+}                                              from "@/modules/worker/application/worker_response"
 import {
   SpecialityDTO
-}                                 from "@/modules/speciality/application/speciality_dto"
-import React                      from "react"
+}                                              from "@/modules/speciality/application/speciality_dto"
+import React                                   from "react"
 import {
   WorkerTaxDTO
-}                                 from "@/modules/worker_tax/application/worker_tax_dto"
+}                                              from "@/modules/worker_tax/application/worker_tax_dto"
 import {
   calculateAge
-}                                 from "@/modules/shared/utils/calculate_age"
-import { Map, Marker }            from "pigeon-maps"
+}                                              from "@/modules/shared/utils/calculate_age"
+import { Map, Marker }                         from "pigeon-maps"
 import {
   StoryDTO
-}                                 from "@/modules/story/application/story_dto"
-import CalendarScheduleInput
-                                  from "@/components/form/calendar_schedule/calendar_schedule_input"
+}                                              from "@/modules/story/application/story_dto"
 import CalendarSchedule
-                                  from "@/components/form/calendar_schedule/calendar_schedule"
-import { toast }                  from "sonner"
+                                               from "@/components/form/calendar_schedule/calendar_schedule"
+import { toast }                               from "sonner"
 
 interface WorkerAdminDialogProps {
   worker: WorkerResponse
+  onUpdate: () => void
 }
 
 const nationalIdentityOptions = ( id: string ) => (
@@ -139,33 +138,41 @@ const schedulesOptions = ( id: string ) => (
   }
 )
 
-export function WorkerAdminDialog( { worker }: WorkerAdminDialogProps ) {
+export function WorkerAdminDialog( { worker, onUpdate }: WorkerAdminDialogProps ) {
   const { isPending, data } = useQuery(
     schedulesOptions( worker.user.user_id ) )
 
   const location              = worker.location.slice( 1, -1 )
   const [latitude, longitude] = location.split( "," ).map( parseFloat )
+  const { mutateAsync, status } = useMutation( {
+    mutationFn: async () => {
+      const response = await fetch( "/api/o/worker/verify", {
+        method : "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        // body   : JSON.stringify( values )
+        body: JSON.stringify( { user: worker.user } )
+      } )
+      if ( !response.ok ) {
+        return undefined
+      }
+      return await response.json()
+    },
+    onError   : ( error, variables, context ) => {
+      toast.error( "Error al actualizar" )
+    },
+    onSuccess : ( data, variables, context ) => {
+      onUpdate()
+      toast.success( "Trabajador aceptado correctamente" )
+    }
+  } )
 
-  // const { mutateAsync, status } = useMutation( {
-  //   mutationFn: async ( values: any ) => {
-  //     const response = await fetch( "/api/o/request", {
-  //       method : "POST",
-  //       headers: {
-  //         "Content-Type": "application/json"
-  //       },
-  //       body   : JSON.stringify( values )
-  //     } )
-  //     if ( !response.ok ) {
-  //       return undefined
-  //     }
-  //     return await response.json()
-  //   },
-  //   onError   : ( error, variables, context ) => {
-  //     toast.error( "Error. Por favor, intenta de nuevo." )
-  //   }
-  // } )
-
-  const handleAccept = () => {
+  const handleAccept = async () => {
+    const result = await mutateAsync()
+    if ( !result ) {
+      toast.error( "Error al aceptar el trabajador" )
+    }
   }
   return (
     <div className="flex flex-col space-y-4 overflow-y-scroll">
@@ -183,20 +190,28 @@ export function WorkerAdminDialog( { worker }: WorkerAdminDialogProps ) {
           <p>Estado { worker.user.status }</p>
         </div>
       </div>
-      <Button onClick={handleAccept}>Aceptar</Button>
-      <div className="flex flex-col space-y-2">
-        <Label>Descripcion</Label>
-        <p>{ worker.description }</p>
-      </div>
+      <Button disabled={ status === "pending" } onClick={ handleAccept }>
+        {
+          status === "pending" ?
+            <>
+              <Loader2Icon className="animate-spin"/>
+              Actualizando...
+            </>
+            : "Aceptar"
+        }</Button>
       { isPending ? <div className="flex flex-col space-y-3">
         <Skeleton className="h-4 w-[250px]"/>
         <Skeleton className="h-4 w-[200px]"/>
-      </div> :  <CalendarSchedule
+      </div> : <CalendarSchedule
         canEdit={ false }
         schedules={ data }
         placeholder="Ver horario"
         visibleDays={ 3 }
       /> }
+      <div className="flex flex-col space-y-2">
+        <Label>Descripcion</Label>
+        <p>{ worker.description }</p>
+      </div>
       <NationalIdenitySection value={ worker.national_identity_value }
                               id={ worker.national_identity_id }/>
       <TaxSection tax={ worker.taxes }/>
@@ -247,24 +262,27 @@ function StoriesSection( { id }: { id: string } ) {
   const stories = data as StoryDTO[]
 
   return stories.map( ( story: StoryDTO ) => (
-    <Card>
-      <CardHeader>
-        <CardTitle>{ story.name }</CardTitle>
-        <CardDescription>{ story.description }</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Carousel>
-          <CarouselContent>
-            { story.documents.map( ( document, index ) => (
-              <CarouselItem key={ document.id }>
-                <img src={ document.url } alt={ document.name }
-                     className="w-full h-48 object-cover rounded-lg"/>
-              </CarouselItem>
-            ) ) }
-          </CarouselContent>
-        </Carousel>
-      </CardContent>
-    </Card>
+    <div key={story.id} className="flex flex-col space-y-2">
+      <Label>Historias</Label>
+      <Card>
+        <CardHeader>
+          <CardTitle>{ story.name }</CardTitle>
+          <CardDescription>{ story.description }</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Carousel>
+            <CarouselContent>
+              { story.documents.map( ( document, index ) => (
+                <CarouselItem key={ document.id }>
+                  <img src={ document.url } alt={ document.name }
+                       className="w-full h-48 object-cover rounded-lg"/>
+                </CarouselItem>
+              ) ) }
+            </CarouselContent>
+          </Carousel>
+        </CardContent>
+      </Card>
+    </div>
   ) )
 }
 
