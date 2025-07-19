@@ -110,6 +110,12 @@ export class PrismaWorkerScheduleData implements WorkerScheduleDAO {
           equals: query.id
         }
       }
+      if ( query.worker_id ) {
+        // @ts-ignore
+        where["workerId"] = {
+          equals: query.worker_id
+        }
+      }
       const orderBy = {}
       if ( sortBy ) {
         const key    = changeCase.camelCase( sortBy.value )

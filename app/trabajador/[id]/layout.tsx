@@ -4,6 +4,9 @@ import Link                 from "next/link"
 import { searchWorker }     from "@/app/api/dependencies"
 import { isLeft }           from "fp-ts/Either"
 import WorkerTabs           from "@/components/worker_tabs"
+import {
+  TransformWorkerProfile
+}                           from "@/modules/worker/application/transform_worker_profile"
 
 export default async function TrabajadorLayout( {
   children,
@@ -27,7 +30,14 @@ export default async function TrabajadorLayout( {
     throw new Error( "Worker not found" )
   }
 
-  const workers = result.right.items
+  const transformProfile = new TransformWorkerProfile()
+  const transformResult  = await transformProfile.execute( result.right.items )
+
+  if ( isLeft( transformResult ) ) {
+    throw new Error( "Worker not found" )
+  }
+
+  const workers = transformResult.right
 
   if ( workers.length === 0 ) {
     throw new Error( "Worker not found" )
@@ -65,7 +75,7 @@ export default async function TrabajadorLayout( {
           <p>historias</p>
           <Link
             href={ `/historia/202fd6db-482f-4aac-b118-957f4ddba7e3` }>historia</Link>
-          <WorkerTabs worker={worker}/>
+          <WorkerTabs worker={ worker }/>
           { children }
         </div>
       </div>

@@ -113,6 +113,9 @@ importers:
       openai:
         specifier: ^5.8.2
         version: 5.8.2(ws@8.18.2)(zod@3.25.64)
+      pigeon-maps:
+        specifier: ^0.22.1
+        version: 0.22.1(react@19.1.0)
       react:
         specifier: ^19.0.0
         version: 19.1.0
@@ -2609,6 +2612,11 @@ packages:
   picomatch@4.0.2:
     resolution: {integrity: sha512-M7BAV6Rlcy5u+m6oPhAPFgJTzAioX/6B0DxyvDlo9l8+T3nLKbrczg2WLUyzd45L8RqfUMyGPzekbMvX2Ldkwg==}
     engines: {node: '>=12'}
+
+  pigeon-maps@0.22.1:
+    resolution: {integrity: sha512-mVWxgpIyhAekITeJvDGlFAo/Ytm6Fg7prpDiAuQ0Z6cJ/LwpnS8F0sF+0TDqyJu7C/DDHupkstFTNoIRqhdP5A==}
+    peerDependencies:
+      react: '*'
 
   playwright-core@1.53.0:
     resolution: {integrity: sha512-mGLg8m0pm4+mmtB7M89Xw/GSqoNC+twivl8ITteqvAndachozYe2ZA7srU6uleV1vEdAHYqjq+SV8SNxRRFYBw==}
@@ -5601,6 +5609,10 @@ snapshots:
   picomatch@2.3.1: {}
 
   picomatch@4.0.2: {}
+
+  pigeon-maps@0.22.1(react@19.1.0):
+    dependencies:
+      react: 19.1.0
 
   playwright-core@1.53.0: {}
 

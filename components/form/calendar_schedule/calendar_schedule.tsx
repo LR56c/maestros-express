@@ -73,7 +73,7 @@ interface Horario {
 interface CalendarScheduleInputProps {
   schedules: Horario[]
   placeholder: string
-  onChange: ( schedules: Horario[] ) => void
+  onChange?: ( schedules: Horario[] ) => void
   visibleDays?: number
   canEdit: boolean
 }
@@ -118,7 +118,6 @@ export default function CalendarSchedule( {
   }
 
   const handleOpenScheduleModal = () => {
-    if ( !canEdit ) return
     setIsScheduleModalOpen( true )
   }
 
@@ -207,7 +206,7 @@ export default function CalendarSchedule( {
       currentSchedules.push( scheduleToValidate )
     }
 
-    onChange( currentSchedules )
+    onChange?.( currentSchedules )
     setIsAddScheduleModalOpen( false )
     setEditingSchedule( null )
     setValidationErrors( [] )
@@ -222,7 +221,7 @@ export default function CalendarSchedule( {
 
     if ( indexToDelete !== undefined ) {
       currentSchedules.splice( indexToDelete, 1 )
-      onChange( currentSchedules )
+      onChange?.( currentSchedules )
     }
 
     if ( index === undefined ) {

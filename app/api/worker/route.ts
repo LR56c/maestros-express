@@ -15,6 +15,9 @@ import {
   workerUpdateSchema
 }                                                from "@/modules/worker/application/worker_update_dto"
 import { addWorker, searchWorker, updateWorker } from "@/app/api/dependencies"
+import {
+  TransformWorkerProfile
+}                                                from "@/modules/worker/application/transform_worker_profile"
 
 
 export async function POST( request: NextRequest ) {
@@ -64,7 +67,19 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { status: 500 } )
   }
 
-  return NextResponse.json( result.right,
+  const { query } = data.right
+  const { items, total } = result.right
+  const transformProfile = new TransformWorkerProfile()
+  const profiles = await transformProfile.execute(items, query.location as string)
+
+  if( isLeft( profiles ) ) {
+    return NextResponse.json( { status: 500 } )
+  }
+
+  return NextResponse.json( {
+      items: profiles.right,
+      total: total
+    },
     { status: 200 } )
 }
 

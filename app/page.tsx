@@ -50,7 +50,7 @@ export default function Home() {
         body   : JSON.stringify( values )
       } )
       if ( !response.ok ) {
-        throw new Error( "Error al enviar la solicitud" )
+        return undefined
       }
       return await response.json()
     },
@@ -84,8 +84,9 @@ export default function Home() {
           location: `(${ position.coords.latitude },${ position.coords.longitude })`,
           radius  : 100_000
         } )
-        console.log( "result", result )
-        setHaveResult( true )
+        if ( result ) {
+          setHaveResult( true )
+        }
       }, ( error ) => {
         toast( "Debe permitir el acceso a la ubicación para buscar servicios." )
       }, {

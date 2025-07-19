@@ -29,12 +29,12 @@ import {
   Button
 } from "@/components/ui/button"
 import { WorkerAdminDialog } from "@/components/admin/worker_admin_dialog"
+import { WorkerResponse } from "@/modules/worker/application/worker_response"
 
 interface WorkerFilters {
 }
 
-
-const columns: ColumnDef<WorkerProfileDTO>[] = [
+const columns: ColumnDef<WorkerResponse>[] = [
   {
     id           : "select",
     header       : ( { table } ) => (
@@ -61,11 +61,11 @@ const columns: ColumnDef<WorkerProfileDTO>[] = [
     enableHiding : false
   },
   {
-    accessorKey: "full_name",
+    accessorKey: "user.full_name",
     header     : "Nombre"
   },
   {
-    accessorKey: "status",
+    accessorKey: "user.status",
     header     : "Estado"
   },
   {
@@ -93,12 +93,8 @@ const columns: ColumnDef<WorkerProfileDTO>[] = [
               <Eye/>
             </Button>
           </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Perfil trabajador
-                '{ worker.full_name }'</DialogTitle>
+          <DialogContent className="max-h-3/4 overflow-y-auto">
               <WorkerAdminDialog worker={ worker }/>
-            </DialogHeader>
           </DialogContent>
         </Dialog>
         // <DropdownMenu>
@@ -131,15 +127,15 @@ export default function WorkersPage() {
           isFetching,
           isError,
           error
-        } = usePagedResource<WorkerProfileDTO, WorkerFilters>( {
-    endpoint       : "/api/worker",
+        } = usePagedResource<WorkerResponse, WorkerFilters>( {
+    endpoint       : "/api/worker/admin",
     defaultPageSize: 10
   } )
 
-  const [selecteds, setSelecteds] = useState<WorkerProfileDTO[]>( [] )
+  const [selecteds, setSelecteds] = useState<WorkerResponse[]>( [] )
 
   const handleSelectionChange = useCallback(
-    ( rows: WorkerProfileDTO[] ) => {
+    ( rows: WorkerResponse[] ) => {
       setSelecteds( rows )
     },
     []
@@ -174,7 +170,7 @@ export default function WorkersPage() {
         pageIndex={ pageIndex }
         pageSize={ pageSize }
         onSelectionChange={ handleSelectionChange }
-        getRowId={ ( row ) => row.user_id }
+        getRowId={ ( row ) => row.user.user_id }
         makeHref={ makeHref }
         onPageChange={ setPageIndex }
         onPageHover={ ( p1 ) => prefetchPage( p1 - 1 ) }

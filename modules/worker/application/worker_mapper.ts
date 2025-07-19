@@ -51,7 +51,7 @@ import {
 
 export class WorkerMapper {
   static toProfile( w: Worker, age: number,
-    location: string ): WorkerProfileDTO {
+    location: string = "" ): WorkerProfileDTO {
     return {
       user_id       : w.user.userId.toString(),
       full_name     : w.user.fullName.value,
