@@ -11,6 +11,9 @@ import { z }                         from "zod"
 import {
   UploadRequestTypeEnum
 }                                    from "@/modules/worker_embedding/domain/upload_request_type"
+import {
+  TransformWorkerProfile
+}                                    from "@/modules/worker/application/transform_worker_profile"
 
 export const config = {
   api: {
@@ -66,9 +69,19 @@ export async function POST( request: NextRequest ) {
     return NextResponse.json( { status: 500 } )
   }
 
+  const transformProfile = new TransformWorkerProfile()
+  const { location }     = data.right
+  const profiles         = await transformProfile.execute(
+    queryResult.right.items, location )
+
+  if ( isLeft( profiles ) ) {
+    return NextResponse.json( { status: 500 } )
+  }
+
   return NextResponse.json( {
       info   : uploadRequest.infoText!.value,
-      workers: queryResult.right
+      workers: profiles.right,
+      total  : queryResult.right.total
     }
     , { status: 200 } )
 }

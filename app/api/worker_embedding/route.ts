@@ -19,6 +19,9 @@ import {
   upsertEmbedding
 }                                    from "@/app/api/dependencies"
 import { z }                         from "zod"
+import {
+  TransformWorkerProfile
+}                                    from "@/modules/worker/application/transform_worker_profile"
 
 
 export async function POST( request: NextRequest ) {
@@ -75,7 +78,17 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { status: 500 } )
   }
 
-  return NextResponse.json( result.right,
+  const transformProfile = new TransformWorkerProfile()
+  const profiles = await transformProfile.execute(result.right.items)
+
+  if( isLeft( profiles ) ) {
+    return NextResponse.json( { status: 500 } )
+  }
+
+  return NextResponse.json( {
+      total: result.right.total,
+      items: profiles.right
+    },
     { status: 200 } )
 }
 

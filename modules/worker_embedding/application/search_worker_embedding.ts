@@ -24,6 +24,10 @@ import {
 import {
   ValidInteger
 }                                      from "@/modules/shared/domain/value_objects/valid_integer"
+import {
+  PaginatedResult
+}                                      from "@/modules/shared/domain/paginated_result"
+import { Worker }                      from "@/modules/worker/domain/worker"
 
 export class SearchWorkerEmbedding {
 
@@ -37,7 +41,7 @@ export class SearchWorkerEmbedding {
   async execute( query: Record<string, any>,
     limit?: number, skip ?: string,
     sortBy ?: string,
-    sortType ?: string ): Promise<Either<BaseException[], WorkerProfileDTO[]>> {
+    sortType ?: string ): Promise<Either<BaseException[], PaginatedResult<Worker>>> {
     const searchParamsResult = genericEnsureSearch( limit, skip, sortBy,
       sortType )
 
@@ -85,15 +89,13 @@ export class SearchWorkerEmbedding {
 
     const workersResult = await this.searchWorkers.execute( {
         ids     : workerIds.join( "," ),
-        location: (
-          location as Position
-        ).toPoint()
       }, validLimit?.value, validSkip?.value, validSortBy?.value,
       validSortType?.value )
+
     if ( isLeft( workersResult ) ) {
       return left( workersResult.left )
     }
 
-    return right( workersResult.right.items )
+    return right( workersResult.right )
   }
 }
