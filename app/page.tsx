@@ -84,8 +84,8 @@ export default function Home() {
           location: `(${ position.coords.latitude },${ position.coords.longitude })`,
           radius  : 100_000
         } )
-        if ( result ) {
-          setHaveResult( true )
+        if ( !result ) {
+          toast.error( "Error al buscar servicios. Por favor, intenta de nuevo." )
         }
       }, ( error ) => {
         toast( "Debe permitir el acceso a la ubicación para buscar servicios." )
@@ -117,8 +117,6 @@ export default function Home() {
     }
     reader.readAsDataURL( file )
   }
-
-  const [haveResult, setHaveResult] = useState( false )
 
   return (
     <div
@@ -157,7 +155,7 @@ export default function Home() {
           }
         </Button>
       </div>
-      { haveResult ?
+      { data ?
         <>
           <Card className="w-full max-w-xl">
             <CardHeader>

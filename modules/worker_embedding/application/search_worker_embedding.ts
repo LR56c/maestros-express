@@ -85,7 +85,7 @@ export class SearchWorkerEmbedding {
       return left( embedResult.left )
     }
 
-    const workerIds = embedResult.right.map( e => e.workerId.toString() )
+    const workerIds = Array.from(new Set(embedResult.right.map( e => e.workerId.toString() )))
 
     const workersResult = await this.searchWorkers.execute( {
         ids     : workerIds.join( "," ),

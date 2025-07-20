@@ -120,7 +120,8 @@ export const AuthProvider = ( { children }: { children: ReactNode } ) => {
     const check = async () => {
       const { data, error } = await supabase.auth.getSession()
       if ( error || !data?.session ) {
-        anonymous()
+        await anonymous()
+        await router.refresh()
       }
       else {
         setUser( parseResponse( data?.session?.user ) )

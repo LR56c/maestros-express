@@ -15,12 +15,6 @@ import {
   TransformWorkerProfile
 }                                    from "@/modules/worker/application/transform_worker_profile"
 
-export const config = {
-  api: {
-    bodyParser: false
-  }
-}
-
 export async function POST( request: NextRequest ) {
   const body = await request.json()
   const data = parseData( z.object( {
@@ -61,10 +55,9 @@ export async function POST( request: NextRequest ) {
       input   : uploadRequest.processInput!.value,
       location: data.right.location,
       radius  : data.right.radius,
-      status  : "PENDING"
+      status  : "VERIFIED"
     }
   )
-
   if ( isLeft( queryResult ) ) {
     return NextResponse.json( { status: 500 } )
   }
