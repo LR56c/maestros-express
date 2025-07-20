@@ -157,7 +157,6 @@ export default function WorkersPage() {
     <div className="p-4 space-y-4">
       <DataTablePaginated
         columns={ getColumns( async () => {
-          console.log( "invalidate table" )
           await refetch()
         } ) }
         data={ items }

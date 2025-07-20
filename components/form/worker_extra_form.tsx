@@ -167,11 +167,13 @@ export default function WorkerExtraForm() {
   } satisfies DropzoneOptions
 
   useEffect( () => {
-    setSectorValues( parseSectors( sectorData ?? [] ) )
+    if ( !sectorData ) return
+    setSectorValues( parseSectors( sectorData.items ?? [] ) )
   }, [sectorData] )
 
   useEffect( () => {
-    setSpecialityValues( parseSpecialities( specialityData ?? [] ) )
+    if ( !specialityData ) return
+    setSpecialityValues( parseSpecialities( specialityData.items ?? [] ) )
   }, [specialityData] )
 
   const parseFileCertificates = ( files: File[] | null ) => {

@@ -49,7 +49,7 @@ export class SupabaseWorkerEmbeddingData
     return left( new InfrastructureException() )
   }
 
-  async remove( id: UUID ): Promise<Either<BaseException, boolean>> {
+  async remove( ids: UUID[] ): Promise<Either<BaseException, boolean>>{
     return left( new InfrastructureException() )
   }
 

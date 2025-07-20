@@ -77,16 +77,17 @@ export class UpsertStories {
   }
 
   private async ensureStories( workerId: string,
-    stories: StoryDTO[] ): Promise<Either<BaseException[], Story[]>> {
+    stories: StoryDTO[] ): Promise<Either<BaseException[], { updated: Story[], created: Story[] }>> {
     const exist = await this.getStories.execute( workerId )
 
     if ( isLeft( exist ) ) {
       return left( exist.left )
     }
 
-    const existMap        = new Map<string, Story>(
+    const existMap = new Map<string, Story>(
       exist.right.map( s => [s.id.toString(), s] ) )
-    const result: Story[] = []
+    const updated: Story[] = []
+    const created: Story[] = []
 
     for ( const story of stories ) {
       const storyExist = existMap.get( story.id.toString() )
@@ -113,7 +114,7 @@ export class UpsertStories {
         if ( updatedStory instanceof Errors ) {
           return left( updatedStory.values )
         }
-        result.push( updatedStory )
+        updated.push( updatedStory )
       }
       else {
         const newStory = Story.create(
@@ -126,14 +127,14 @@ export class UpsertStories {
         if ( newStory instanceof Errors ) {
           return left( newStory.values )
         }
-        result.push( newStory )
+        created.push( newStory )
       }
     }
-    return right( result )
+    return right( { updated: [...updated, ...created], created } )
   }
 
   async execute( workerId: string,
-    stories: StoryDTO[] ): Promise<Either<BaseException[], Story[]>> {
+    stories: StoryDTO[] ): Promise<Either<BaseException[], { updated: Story[], created: Story[] }>> {
 
     const wId = wrapType( () => UUID.from( workerId ) )
 
@@ -141,17 +142,17 @@ export class UpsertStories {
       return left( [wId] )
     }
 
-    const updatedStories = await this.ensureStories( wId.toString(), stories )
-    if ( isLeft( updatedStories ) ) {
-      return left( updatedStories.left )
+    const storiesResult = await this.ensureStories( wId.toString(), stories )
+    if ( isLeft( storiesResult ) ) {
+      return left( storiesResult.left )
     }
 
-    const result = await this.dao.upsert( wId, updatedStories.right )
+    const result = await this.dao.upsert( wId, storiesResult.right.updated )
 
     if ( isLeft( result ) ) {
       return left( [result.left] )
     }
 
-    return right( updatedStories.right )
+    return right( storiesResult.right )
   }
 }

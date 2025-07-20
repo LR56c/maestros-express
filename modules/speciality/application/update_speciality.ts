@@ -12,14 +12,17 @@ import {
 import {
   Errors
 }                                      from "@/modules/shared/domain/exceptions/errors"
+import {
+  SpecialityDTO
+}                                      from "@/modules/speciality/application/speciality_dto"
 
 export class UpdateSpeciality {
   constructor( private readonly dao: SpecialityDAO ) {
   }
 
 
-  async execute( prevName: string, newName :string ): Promise<Either<BaseException[], Speciality>>{
-    const existResult = await ensureSpecialityExist(this.dao, prevName )
+  async execute(dto : SpecialityDTO): Promise<Either<BaseException[], Speciality>>{
+    const existResult = await ensureSpecialityExist(this.dao, dto.id )
 
     if ( isLeft(existResult) ) {
       return left( existResult.left )
@@ -27,7 +30,7 @@ export class UpdateSpeciality {
 
     const newSpeciality = Speciality.fromPrimitives(
       existResult.right.id.toString(),
-      newName,
+      dto.name,
       existResult.right.createdAt.toString()
     )
 

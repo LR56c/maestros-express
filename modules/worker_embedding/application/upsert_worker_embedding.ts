@@ -154,30 +154,38 @@ export class UpsertWorkerEmbedding {
       return left( existResult.left )
     }
 
-    const workerType = existResult.right.filter(
-      value => value.type.value === "WORKER" )
+    const typeToCheck = dto.data.type === WorkerEmbeddingTypeEnum.WORKER ? "WORKER" : dto.data.type === WorkerEmbeddingTypeEnum.STORY ? "STORY" : undefined;
+    if (!typeToCheck) {
+      return left([
+        new InfrastructureException("Invalid embedding type")
+      ])
+    }
+
+    let typeEmbeds = existResult.right.filter(
+      value => value.type.value === typeToCheck )
+
+    if (dto.data.type === WorkerEmbeddingTypeEnum.STORY) {
+      typeEmbeds = typeEmbeds.filter(e => e.id.toString() === dto.id)
+    }
 
     let embed: WorkerEmbedding
-    if ( workerType.length === 0 ) {
+    if ( typeEmbeds.length === 0 ) {
       const createResult = await this.create( dto )
       if ( isLeft( createResult ) ) {
         return left( createResult.left )
       }
-
       embed = createResult.right
     }
-    else if ( workerType.length !== 1 ) {
+    else if ( typeEmbeds.length !== 1 ) {
       return left( [
-        new InfrastructureException( "Worker embedding multiple entries found" )
+        new InfrastructureException( `${typeToCheck} embedding multiple entries found` )
       ] )
     }
     else {
-      const updateResult = await this.update( dto, existResult.right[0] )
-
+      const updateResult = await this.update( dto, typeEmbeds[0] )
       if ( isLeft( updateResult ) ) {
         return left( updateResult.left )
       }
-
       embed = updateResult.right
     }
     const result = await this.repo.upsert( embed )

@@ -31,7 +31,7 @@ const currencyOption = {
     if ( !response.ok ) {
       throw new Error( "Error fetching countries" )
     }
-    return await response.json() as CurrencyDTO[]
+    return await response.json()
   }
 }
 
@@ -50,7 +50,7 @@ export const TaxDialog: React.FC<ListInputModalProps> = ( {
   const [selectValues, setSelectValues] = useState<SelectInputValue[]>( [] )
   useEffect( () => {
     if ( !data ) return
-    const currencies: CurrencyDTO[] = data as CurrencyDTO[]
+    const currencies: CurrencyDTO[] = data.items as CurrencyDTO[]
     setSelectValues( currencies.map( value => (
       {
         label: value.code,

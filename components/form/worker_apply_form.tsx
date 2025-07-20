@@ -74,7 +74,7 @@ export default function WorkerApplyForm() {
   const [inputCountries, setInputCountries] = useState<SelectInputValue[]>( [] )
   useEffect( () => {
     if ( !data ) return
-    const countries: CountryDTO[] = data as CountryDTO[]
+    const countries: CountryDTO[] = data.items as CountryDTO[]
     setInputCountries( countries.map( c => (
       {
         label: c.name,
@@ -130,7 +130,7 @@ export default function WorkerApplyForm() {
 
   useEffect( () => {
     if ( formatData ) {
-      const format = formatData[0] as NationalIdentityFormatDTO
+      const format = formatData.items[0] as NationalIdentityFormatDTO
       setIdentityFormat( format )
       setValue( "national_identity_id", format.id )
     }

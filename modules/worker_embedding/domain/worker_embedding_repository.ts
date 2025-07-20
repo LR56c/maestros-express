@@ -17,7 +17,7 @@ import { Position } from "@/modules/shared/domain/value_objects/position"
 export abstract class WorkerEmbeddingRepository {
   abstract upsert( embed : WorkerEmbedding ): Promise<Either<BaseException, boolean>>
 
-  abstract remove( id: UUID ): Promise<Either<BaseException, boolean>>
+  abstract remove( ids: UUID[] ): Promise<Either<BaseException, boolean>>
 
   abstract getById( embedId : UUID): Promise<Either<BaseException[], WorkerEmbedding[]>>
 

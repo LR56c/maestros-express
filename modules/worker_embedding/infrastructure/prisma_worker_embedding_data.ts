@@ -116,11 +116,13 @@ export class PrismaWorkerEmbeddingData
     }
   }
 
-  async remove( id: UUID ): Promise<Either<BaseException, boolean>> {
+  async remove( ids: UUID[] ): Promise<Either<BaseException, boolean>>{
     try {
-      await this.db.workerEmbedding.delete( {
+      await this.db.workerEmbedding.deleteMany( {
         where: {
-          id: id.toString()
+          id: {
+            in: ids.map( id => id.toString() )
+          }
         }
       } )
       return right( true )

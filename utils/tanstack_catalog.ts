@@ -14,7 +14,7 @@ export const sectorsOption = {
     if ( !response.ok ) {
       throw new Error( "Error fetching countries" )
     }
-    return await response.json() as SectorDTO[]
+    return await response.json()
   }
 }
 
@@ -37,21 +37,6 @@ export const parseSpecialities = ( data: SpecialityDTO[] ): MultiSelectInputValu
       value: speciality
     }
   ) )
-
-export const getUser = async (id : string) => {
-  const params = new URLSearchParams();
-  params.append( "id", id );
-  params.append( "limit", "1" );
-  const response = await fetch( `/api/user/?${params.toString()}`, { method: "GET" } )
-  if ( !response.ok ) {
-    throw new Error( "Error fetching users" )
-  }
-  const result = await response.json() as UserResponse[]
-  if ( result.length === 0 ) {
-    throw new Error( "User not found" )
-  }
-  return result[0]
-}
 
 export const getWorker = async (id : string) => {
   const params = new URLSearchParams();

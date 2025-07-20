@@ -19,15 +19,15 @@ import {
 }                                      from "@/modules/shared/domain/exceptions/data_not_found_exception"
 
 export const ensureSpecialityExist = async ( dao: SpecialityDAO,
-  name: string ): Promise<Either<BaseException[], Speciality>> => {
-  const existResult = await dao.search( { name: name }, ValidInteger.from( 1 ) )
+  id: string ): Promise<Either<BaseException[], Speciality>> => {
+  const existResult = await dao.search( { id: id }, ValidInteger.from( 1 ) )
 
   if ( isLeft( existResult ) ) {
     return left( existResult.left )
   }
 
-  if ( existResult.right.items.length > 0 && existResult.right.items[0]!.name.value !==
-    name )
+  if ( existResult.right.items.length > 0 && existResult.right.items[0]!.id.toString() !==
+    id )
   {
     return left( [new DataNotFoundException()] )
   }

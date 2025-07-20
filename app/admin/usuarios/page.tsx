@@ -19,6 +19,14 @@ import {
 import {
   UserResponse
 }                           from "@/modules/user/application/models/user_response"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle
+}                           from "@/components/ui/dialog"
+import { UserAdminDialog }  from "@/components/admin/user_admin_dialog"
 
 interface SpecialityFilters {
 }
@@ -76,18 +84,28 @@ const columns: ColumnDef<UserResponse>[] = [
     // },
     cell: ( { row } ) => {
       const user = row.original
+      const [open, setOpen] = useState(false)
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost">
-              <MoreHorizontal/>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem>Editar</DropdownMenuItem>
-            <DropdownMenuItem>Eliminar</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost">
+                <MoreHorizontal/>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={()=> setOpen(true)}>
+                Ver
+              </DropdownMenuItem>
+              <DropdownMenuItem>Eliminar</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogContent className="max-h-3/4 overflow-y-auto">
+              <UserAdminDialog user={ user }/>
+            </DialogContent>
+          </Dialog>
+        </>
       )
     }
   }

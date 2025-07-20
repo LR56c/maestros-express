@@ -6,6 +6,7 @@ import { ReactScan }         from "@/app/react_scan"
 import { MyNav }             from "@/components/my_nav"
 import { SidebarProvider }   from "@/components/ui/sidebar"
 import { MySidebar }         from "@/components/my_sidebar"
+import { Toaster }           from "@/components/ui/sonner"
 
 const geistSans = Geist( {
   variable: "--font-geist-sans",
@@ -42,6 +43,7 @@ export default function RootLayout( {
         </div>
       </SidebarProvider>
     </Providers>
+    <Toaster/>
     </body>
     </html>
   )

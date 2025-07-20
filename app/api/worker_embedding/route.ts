@@ -96,9 +96,10 @@ export async function DELETE( request: NextRequest ) {
   const { searchParams } = new URL( request.url )
   const id               = searchParams.get( "id" )
 
+  const split = id?.split( "," )
   const result = await (
     await removeEmbedding()
-  ).execute( id ?? "" )
+  ).execute( split ?? [] )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )

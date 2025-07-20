@@ -151,7 +151,6 @@ export function WorkerAdminDialog( { worker, onUpdate }: WorkerAdminDialogProps 
         headers: {
           "Content-Type": "application/json"
         },
-        // body   : JSON.stringify( values )
         body: JSON.stringify( { user: worker.user } )
       } )
       if ( !response.ok ) {
@@ -179,7 +178,10 @@ export function WorkerAdminDialog( { worker, onUpdate }: WorkerAdminDialogProps 
       <div className="flex gap-4">
         <div
           className="size-24 rounded-full bg-muted flex items-center justify-center">
-          avatar
+          <img
+            src={ worker.user.avatar }
+            alt={ worker.user.full_name }
+            className="rounded-full object-cover w-full h-full"/>
         </div>
         <div className="flex flex-col space-y-2">
           <div className="flex space-y-2">

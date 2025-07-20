@@ -84,10 +84,7 @@ export async function GET( request: NextRequest ) {
 
 export async function PUT( request: NextRequest ) {
   const body = await request.json()
-  const data = parseData( z.object( {
-    prev_name: z.string(),
-    new_name : z.string()
-  } ), body )
+  const data = parseData( specialitySchema, body )
 
   if ( isLeft( data ) ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
@@ -95,10 +92,7 @@ export async function PUT( request: NextRequest ) {
 
   const result = await (
     await updateSpeciality()
-  ).execute(
-    data.right.prev_name,
-    data.right.new_name
-  )
+  ).execute( data.right)
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )

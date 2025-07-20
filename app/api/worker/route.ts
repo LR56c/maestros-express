@@ -14,10 +14,22 @@ import {
 import {
   workerUpdateSchema
 }                                                from "@/modules/worker/application/worker_update_dto"
-import { addWorker, searchWorker, updateWorker } from "@/app/api/dependencies"
+import {
+  addWorker,
+  getStories, removeEmbedding,
+  searchWorker,
+  updateWorker, upsertEmbedding
+} from "@/app/api/dependencies"
 import {
   TransformWorkerProfile
 }                                                from "@/modules/worker/application/transform_worker_profile"
+import {
+  StoryMapper
+}                                                from "@/modules/story/application/story_mapper"
+import { UUID } from "@/modules/shared/domain/value_objects/uuid"
+import {
+  WorkerEmbeddingTypeEnum
+} from "@/modules/worker_embedding/domain/worker_embedding_type"
 
 
 export async function POST( request: NextRequest ) {
@@ -83,21 +95,21 @@ export async function GET( request: NextRequest ) {
     { status: 200 } )
 }
 
-export async function PUT( request: NextRequest ) {
-  const body = await request.json()
-  const data = parseData( workerUpdateSchema, body )
-
-  if ( isLeft( data ) ) {
-    return NextResponse.json( { error: data.left.message }, { status: 400 } )
-  }
-
-  const result = await (
-    await updateWorker()
-  ).execute( data.right )
-
-  if ( isLeft( result ) ) {
-    return NextResponse.json( { status: 500 } )
-  }
-
-  return NextResponse.json( { status: 200 } )
-}
+// export async function PUT( request: NextRequest ) {
+//   const body = await request.json()
+//   const data = parseData( workerUpdateSchema, body )
+//
+//   if ( isLeft( data ) ) {
+//     return NextResponse.json( { error: data.left.message }, { status: 400 } )
+//   }
+//
+//   const result = await (
+//     await updateWorker()
+//   ).execute( data.right )
+//
+//   if ( isLeft( result ) ) {
+//     return NextResponse.json( { status: 500 } )
+//   }
+//
+//   return NextResponse.json( { status: 200 } )
+// }

@@ -92,7 +92,6 @@ function PageNumber( {
   )
 }
 
-/* ---------- Prev / Next ---------- */
 function NavLink( {
   icon,
   label,
@@ -200,8 +199,8 @@ export default function PaginatorShallow( {
   showPreviousNext = true,
   boundaries = 1,
   siblings = 1,
-  prevLabel = "Previous",
-  nextLabel = "Next"
+  prevLabel = "Anterior",
+  nextLabel = "Siguiente"
 }: PaginatorShallowProps )
 {
   if ( totalPages < 1 ) return null

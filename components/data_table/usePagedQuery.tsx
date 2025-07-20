@@ -4,28 +4,29 @@ import {
   keepPreviousData,
   QueryKey,
   useQuery,
-  useQueryClient, UseQueryResult
-} from "@tanstack/react-query"
+  useQueryClient,
+  UseQueryResult
+}                                           from "@tanstack/react-query"
 import { useCallback, useEffect, useState } from "react"
 
-export type SortDir = "asc" | "desc";
+export type SortDir = "asc" | "desc"
 
 export interface PageParams<TFilters = Record<string, any>> {
-  page: number;
-  size: number;
-  filters?: TFilters;
-  sortBy?: string;
-  sortType?: SortDir;
+  page: number
+  size: number
+  filters?: TFilters
+  sortBy?: string
+  sortType?: SortDir
 }
 
 export interface PageResult<TItem> {
-  items: TItem[];
-  total: number;
+  items: TItem[]
+  total: number
 }
 
 export interface UsePagedResourceOptions<TItem, TFilters> {
-  endpoint: string;
-  defaultPageSize?: number;
+  endpoint: string
+  defaultPageSize?: number
 }
 
 const RESERVED_SET = new Set( ["page", "size", "sort_by", "sort_type"] )
@@ -50,31 +51,28 @@ function parseSortType( v: string | null ): SortDir | undefined {
   ) : undefined
 }
 
-function parseFiltersSpread<TFilters>(
-  sp: URLSearchParams,
-  coerce?: ( k: string, v: string ) => any
-): TFilters | undefined {
+function parseFiltersSpread<TFilters>( sp: URLSearchParams ): TFilters | undefined {
   const obj: Record<string, any> = {}
   sp.forEach( ( v, k ) => {
-    if ( !RESERVED_SET.has( k ) ) {
-      obj[k] = coerce ? coerce( k, v ) : v
-    }
+    if ( !RESERVED_SET.has( k ) ) obj[k] = v
   } )
   return Object.keys( obj ).length ? (
     obj as TFilters
   ) : undefined
 }
 
-function applyFiltersSpread<TFilters>(
-  sp: URLSearchParams,
-  filters: TFilters | undefined
-)
-{
+function clearNonReserved( sp: URLSearchParams ) {
   const toDel: string[] = []
   sp.forEach( ( _v, k ) => {
     if ( !RESERVED_SET.has( k ) ) toDel.push( k )
   } )
   toDel.forEach( ( k ) => sp.delete( k ) )
+}
+
+function applyFiltersSpread<TFilters>( sp: URLSearchParams,
+  filters: TFilters | undefined )
+{
+  clearNonReserved( sp )
   if ( filters ) {
     Object.entries( filters as Record<string, any> ).forEach( ( [k, v] ) => {
       if ( v == null ) return
@@ -112,28 +110,30 @@ async function defaultFetch<TItem, TFilters>(
   return res.json()
 }
 
+
 export interface UsePagedResourceReturn<TItem, TFilters> {
-  items: TItem[];
-  total: number;
-  data?: PageResult<TItem>;
-  pageIndex: number;
-  pageSize: number;
-  filters?: TFilters;
-  sortBy?: string;
-  sortType?: SortDir;
-  refetch: UseQueryResult<PageResult<TItem>, unknown>["refetch"];
-  setPageIndex: ( n: number ) => void;
-  setPageSize: ( n: number ) => void;
-  setFilters: ( f?: TFilters ) => void;
-  setSort: ( field?: string, dir?: SortDir ) => void;
-  makeHref: ( page1: number ) => string;
-  prefetchPage: ( pageIndex: number ) => void;
-  isPending: boolean;
-  isFetching: boolean;
-  isError: boolean;
-  error: unknown;
-  loadingInitial: boolean;
+  items: TItem[]
+  total: number
+  data?: PageResult<TItem>
+  pageIndex: number
+  pageSize: number
+  filters?: TFilters
+  sortBy?: string
+  sortType?: SortDir
+  refetch: UseQueryResult<PageResult<TItem>, unknown>["refetch"]
+  setPageIndex: ( n: number ) => void
+  setPageSize: ( n: number ) => void
+  setFilters: ( f?: TFilters ) => void
+  setSort: ( field?: string, dir?: SortDir ) => void
+  makeHref: ( page1: number ) => string
+  prefetchPage: ( pageIndex: number ) => void
+  isPending: boolean
+  isFetching: boolean
+  isError: boolean
+  error: unknown
+  loadingInitial: boolean
 }
+
 
 export function usePagedResource<TItem, TFilters = Record<string, any>>(
   opts: UsePagedResourceOptions<TItem, TFilters>
@@ -163,39 +163,67 @@ export function usePagedResource<TItem, TFilters = Record<string, any>>(
     return () => window.removeEventListener( "popstate", onPop )
   }, [init] )
 
-  const write = (
-    next: Partial<typeof state> & { resetPage?: boolean }
-  ) => {
-    const sp      = readSearchParams()
-    const newPage = next.resetPage ? 0 : (
-      next.pageIndex ?? state.pageIndex
-    )
-    const newSize = next.pageSize ?? state.pageSize
-    sp.set( "page", String( Math.max( 0, newPage ) ) )
-    sp.set( "size", String( Math.max( 1, newSize ) ) )
-    applyFiltersSpread( sp, next.filters ?? state.filters )
-    const sortBy   = next.sortBy ?? state.sortBy
-    const sortType = next.sortType ?? state.sortType
-    sortBy ? sp.set( "sort_by", sortBy ) : sp.delete( "sort_by" )
-    sortType ? sp.set( "sort_type", sortType ) : sp.delete( "sort_type" )
+  const updateUrl = ( updater: ( sp: URLSearchParams ) => void ) => {
+    const sp = readSearchParams()
+    updater( sp )
     shallowReplaceSearch( sp )
-    setState( ( prev ) => (
-      {
-        ...prev,
-        ...next,
-        pageIndex: Math.max( 0, newPage ),
-        pageSize : Math.max( 1, newSize )
-      }
+  }
+
+  const setPageIndex = ( n: number ) => {
+    updateUrl( ( sp ) => {
+      sp.set( "page", String( Math.max( 0, n ) ) )
+      sp.set( "size", String( Math.max( 1, state.pageSize ) ) )
+      applyFiltersSpread( sp, state.filters )
+      state.sortBy ? sp.set( "sort_by", state.sortBy ) : sp.delete( "sort_by" )
+      state.sortType ? sp.set( "sort_type", state.sortType ) : sp.delete(
+        "sort_type" )
+    } )
+    setState( ( s ) => (
+      { ...s, pageIndex: Math.max( 0, n ) }
     ) )
   }
 
-  const setPageIndex = ( n: number ) => write( { pageIndex: n } )
-  const setPageSize  = ( n: number ) => write(
-    { pageSize: n, resetPage: true } )
-  const setFilters   = ( f?: TFilters ) => write(
-    { filters: f, resetPage: true } )
-  const setSort      = ( field?: string, dir?: SortDir ) =>
-    write( { sortBy: field, sortType: dir, resetPage: true } )
+  const setPageSize = ( n: number ) => {
+    const size = Math.max( 1, n )
+    updateUrl( ( sp ) => {
+      sp.set( "page", "0" )
+      sp.set( "size", String( size ) )
+      applyFiltersSpread( sp, state.filters )
+      state.sortBy ? sp.set( "sort_by", state.sortBy ) : sp.delete( "sort_by" )
+      state.sortType ? sp.set( "sort_type", state.sortType ) : sp.delete(
+        "sort_type" )
+    } )
+    setState( ( s ) => (
+      { ...s, pageIndex: 0, pageSize: size }
+    ) )
+  }
+
+  const setFilters = ( f?: TFilters ) => {
+    updateUrl( ( sp ) => {
+      sp.set( "page", "0" )
+      sp.set( "size", String( Math.max( 1, state.pageSize ) ) )
+      applyFiltersSpread( sp, f )
+      state.sortBy ? sp.set( "sort_by", state.sortBy ) : sp.delete( "sort_by" )
+      state.sortType ? sp.set( "sort_type", state.sortType ) : sp.delete(
+        "sort_type" )
+    } )
+    setState( ( s ) => (
+      { ...s, pageIndex: 0, filters: f }
+    ) )
+  }
+
+  const setSort = ( field?: string, dir?: SortDir ) => {
+    updateUrl( ( sp ) => {
+      sp.set( "page", "0" )
+      sp.set( "size", String( Math.max( 1, state.pageSize ) ) )
+      applyFiltersSpread( sp, state.filters )
+      field ? sp.set( "sort_by", field ) : sp.delete( "sort_by" )
+      dir ? sp.set( "sort_type", dir ) : sp.delete( "sort_type" )
+    } )
+    setState( ( s ) => (
+      { ...s, pageIndex: 0, sortBy: field, sortType: dir }
+    ) )
+  }
 
   const makeHref = ( page1: number ) => {
     const idx = Math.max( 0, page1 - 1 )
@@ -242,9 +270,11 @@ export function usePagedResource<TItem, TFilters = Record<string, any>>(
           refetch,
           isError,
           error
-        }            = query
-  const items        = data?.items ?? []
-  const total        = data?.total ?? 0
+        } = query
+
+  const items = data?.items ?? []
+  const total = data?.total ?? 0
+
   const queryClient  = useQueryClient()
   const prefetchPage = ( pIdx: number ) => {
     const nextParams: PageParams<TFilters> = { ...params, page: pIdx }
@@ -286,6 +316,12 @@ export function usePagedResource<TItem, TFilters = Record<string, any>>(
     isFetching,
     isError,
     error,
-    loadingInitial
+    loadingInitial,
   }
 }
+
+// function exampleClearStatusOnly() {
+//   if (!filters) return
+//   const { status, ...rest } = filters
+//   setFilters(Object.keys(rest).length ? (rest as TFilters) : undefined)
+// }

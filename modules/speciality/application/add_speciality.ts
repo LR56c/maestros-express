@@ -28,7 +28,7 @@ export class AddSpeciality {
 
 
   async execute( speciality: SpecialityDTO ): Promise<Either<BaseException[], Speciality>> {
-    const existResult = await ensureSpecialityExist( this.dao, speciality.name )
+    const existResult = await ensureSpecialityExist( this.dao, speciality.id )
     if ( isLeft( existResult ) ) {
       if ( !containError( existResult.left, new DataNotFoundException() ) ) {
         return left( existResult.left )
