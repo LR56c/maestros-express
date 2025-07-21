@@ -30,6 +30,30 @@ export const sectorsOption = {
 }
 
 
+export const regionsOption = {
+  queryKey: ["regions"],
+  queryFn : async () => {
+    const response = await fetch( "/api/region", { method: "GET" } )
+    if ( !response.ok ) {
+      throw new Error( "Error fetching regions" )
+    }
+    return await response.json()
+  }
+}
+
+
+export const countriesOption = {
+  queryKey: ["countries"],
+  queryFn : async () => {
+    const response = await fetch( "/api/country", { method: "GET" } )
+    if ( !response.ok ) {
+      throw new Error( "Error fetching countries" )
+    }
+    return await response.json()
+  }
+}
+
+
 export const specialitiesOption = {
   queryKey: ["specialities"],
   queryFn : async () => {

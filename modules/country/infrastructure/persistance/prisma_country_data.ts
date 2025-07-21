@@ -122,7 +122,6 @@ export class PrismaCountryData implements CountryDAO {
         } )
       ] )
       const [response, totalCount] = results
-      console.log( "Country Search Result:", response, totalCount)
       const countries: Country[]   = []
       for ( const country of response ) {
         const mapped = Country.fromPrimitives(

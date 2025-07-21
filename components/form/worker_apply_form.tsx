@@ -42,6 +42,9 @@ import {
 }                                                    from "@/app/context/auth_context"
 import { useRouter }                                 from "next/navigation"
 import { Loader2Icon }                               from "lucide-react"
+import {
+  countriesOption
+}                                                    from "@/utils/tanstack_catalog"
 
 const workerFormSchema = workerRequestSchema.extend( {
   confirm: z.string(),
@@ -50,17 +53,6 @@ const workerFormSchema = workerRequestSchema.extend( {
   path   : ["confirm"],
   message: "Las contraseñas no coinciden"
 } )
-
-const countriesOption = {
-  queryKey: ["countries"],
-  queryFn : async () => {
-    const response = await fetch( "/api/country", { method: "GET" } )
-    if ( !response.ok ) {
-      throw new Error( "Error fetching countries" )
-    }
-    return await response.json()
-  }
-}
 
 export default function WorkerApplyForm() {
 
