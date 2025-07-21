@@ -46,7 +46,7 @@ export function MoreFilter( { onFilter }: MoreFilterProps ) {
           Mas filtros
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md w-full">
+      <DialogContent className="sm:max-w-md w-full pt-12">
         <MultiSelect
           onChange={ ( values ) => handleFilters( {
             key  : "specialities",

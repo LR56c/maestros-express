@@ -53,17 +53,20 @@ export default function Home() {
   const {
           items,
           setFilters,
-          loadingInitial,
-        } = usePagedResource<WorkerProfileDTO, WorkerFilters>( {
+          loadingInitial
+        }            = usePagedResource<WorkerProfileDTO, WorkerFilters>( {
     endpoint       : "/api/worker",
     defaultPageSize: 10
   } )
-  const clearFilters    = () => setFilters( undefined )
+  const clearFilters = () => {
+    setFilters( undefined )
+    reset()
+  }
 
 
   const applyFilterForm = ( values: Record<string, any> ) => {
     const newFilters: WorkerFilters = {}
-    if(values.specialities)  newFilters.specialities = values.specialities
+    if ( values.specialities ) newFilters.specialities = values.specialities
     setFilters( Object.keys( newFilters ).length ? newFilters : undefined )
     reset()
   }
@@ -191,9 +194,13 @@ export default function Home() {
               <CardHeader>
                 <CardTitle>Como solucionarlo</CardTitle>
                 <CardDescription>{ data.info }</CardDescription>
-                <CardAction>
+                <CardAction className="flex flex-col gap-2">
                   <MoreFilter
                     onFilter={ ( values ) => applyFilterForm( values ) }/>
+                  <Button variant="secondary" className="rounded-full"
+                    onClick={ clearFilters }>
+                    Limpiar filtros
+                  </Button>
                 </CardAction>
               </CardHeader>
             </Card>

@@ -18,13 +18,11 @@ import {
 export async function POST( request: NextRequest ) {
   const body = await request.json()
   const data = parseData( z.object( {
-    // image   : z.string().optional(),
-    image   : z.union([z.string(),z.null()]),
-    input   : z.union([z.string(),z.null()]),
+    image   : z.string().optional(),
+    input   : z.string().optional(),
     location: z.string(),
     radius  : z.number().int()
   } ), body )
-
   if ( isLeft( data ) ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
