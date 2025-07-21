@@ -1,20 +1,20 @@
 "use server"
 
-import { NextRequest, NextResponse }       from "next/server"
+import { NextRequest, NextResponse }     from "next/server"
 import {
   parseData
-}                                          from "@/modules/shared/application/parse_handlers"
-import { isLeft }                          from "fp-ts/Either"
+}                                        from "@/modules/shared/application/parse_handlers"
+import { isLeft }                        from "fp-ts/Either"
 import {
   ChatMapper
-}                                          from "@/modules/chat/application/chat_mapper"
+}                                        from "@/modules/chat/application/chat_mapper"
 import {
   chatRequestSchema
-}                                          from "@/modules/chat/application/chat_request"
+}                                        from "@/modules/chat/application/chat_request"
 import {
   chatUpdateSchema
-}                                          from "@/modules/chat/application/chat_update_dto"
-import { addChat, chatByUser, updateChat } from "@/app/api/dependencies"
+}                                        from "@/modules/chat/application/chat_update_dto"
+import { addChat, chatById, updateChat } from "@/app/api/dependencies"
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()
@@ -42,14 +42,13 @@ export async function GET( request: NextRequest ) {
   const id               = searchParams.get( "id" )
 
   const result = await (
-    await chatByUser()
+    await chatById()
   ).execute( id ?? "" )
-
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
   }
 
-  return NextResponse.json( result.right.map( ChatMapper.toDTO ),
+  return NextResponse.json( ChatMapper.toDTO( result.right ),
     { status: 200 } )
 }
 

@@ -34,14 +34,14 @@ const items = [
   },
   {
     title: "Mensajes",
-    url  : "/mensajes",
+    url  : "/chat",
     icon : Inbox
   },
-  {
-    title: "Notificaciones",
-    url  : "/notificaciones",
-    icon : Bell
-  }
+  // {
+  //   title: "Notificaciones",
+  //   url  : "/notificaciones",
+  //   icon : Bell
+  // }
 ]
 
 export function MySidebar() {

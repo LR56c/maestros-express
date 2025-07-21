@@ -359,6 +359,7 @@ import {
 import {
   UpdateAuth
 }                       from "@/modules/user/application/auth_use_cases/update_auth"
+import { GetChatById }  from "@/modules/chat/application/get_chat_by_id"
 
 export async function ai() {
   return new OpenAI( {
@@ -738,6 +739,10 @@ export async function addChat() {
 
 export async function updateChat() {
   return new UpdateChat( chatData )
+}
+
+export async function chatById() {
+  return new GetChatById( chatData )
 }
 
 export async function chatByUser() {

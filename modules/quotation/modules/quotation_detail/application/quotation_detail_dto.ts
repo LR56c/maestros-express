@@ -4,7 +4,7 @@ export const quotationDetailSchema = z.object( {
   id          : z.string(),
   name        : z.string(),
   description : z.string().optional(),
-  value       : z.number().int(),
+  value       : z.coerce.number().int(),
   value_format: z.string()
 } )
 

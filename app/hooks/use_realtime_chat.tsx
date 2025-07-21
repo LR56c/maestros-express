@@ -1,9 +1,11 @@
-'use client'
+"use client"
 
-import { supabaseClient } from '@/lib/supabase'
-import { useCallback, useEffect, useState } from 'react'
-import { MessageResponse } from "@/modules/message/application/message_response"
-import { UUID } from "@/modules/shared/domain/value_objects/uuid"
+import { useCallback, useEffect, useState } from "react"
+import {
+  MessageResponse
+}                                           from "@/modules/message/application/message_response"
+import { createClient }                     from "@/utils/supabase/client"
+import { useQueryClient }                   from "@tanstack/react-query"
 
 interface RealtimeChatProps {
   roomName: string
@@ -13,57 +15,78 @@ interface RealtimeChatProps {
 
 export type ChatMessage = MessageResponse
 
-const EVENT_MESSAGE_TYPE = 'message'
+const EVENT_MESSAGE_TYPE = "messages"
+const EVENT_PAYMENT_TYPE = "payment"
 
-export function useRealtimeChat({ roomName, username,senderId }: RealtimeChatProps) {
-  const supabase = supabaseClient()
-  const [messages, setMessages] = useState<ChatMessage[]>([])
-  const [channel, setChannel] = useState<ReturnType<typeof supabase.channel> | null>(null)
-  const [isConnected, setIsConnected] = useState(false)
+export function useRealtimeChat( {
+  roomName,
+  username,
+  senderId
+}: RealtimeChatProps )
+{
+  const supabase                      = createClient()
+  const [messages, setMessages]       = useState<ChatMessage[]>( [] )
+  const [channel, setChannel]         = useState<ReturnType<typeof supabase.channel> | null>(
+    null )
+  const queryClient  = useQueryClient()
+  const [isConnected, setIsConnected] = useState( false )
 
-  useEffect(() => {
-    const newChannel = supabase.channel(roomName)
+  useEffect( () => {
+    const newChannel = supabase.channel( roomName,{  config: {    broadcast: { self: true },  },})
 
     newChannel
-      .on('broadcast', { event: EVENT_MESSAGE_TYPE }, (payload) => {
-        setMessages((current) => [...current, payload.payload as ChatMessage])
-      })
-      .subscribe(async (status) => {
-        if (status === 'SUBSCRIBED') {
-          setIsConnected(true)
-        }
-      })
 
-    setChannel(newChannel)
+      .on( "broadcast", { event: EVENT_MESSAGE_TYPE }, ( payload ) => {
+        setMessages(
+          ( current ) => [...current, payload.payload as ChatMessage] )
+      } )
+      .subscribe( async ( status ) => {
+        if ( status === "SUBSCRIBED" ) {
+          setIsConnected( true )
+        }
+      } )
+
+    newChannel
+
+      .on( "broadcast", { event: EVENT_PAYMENT_TYPE }, async ( payload ) => {
+        await queryClient.invalidateQueries({ queryKey: ["chat_message", payload] })
+        console.log("Payment event received:", payload)
+      } )
+
+    setChannel( newChannel )
 
     return () => {
-      supabase.removeChannel(newChannel)
+      supabase.removeChannel( newChannel )
     }
-  }, [roomName, username, supabase])
+  }, [roomName, username, supabase] )
 
   const sendMessage = useCallback(
-    async (content: string, type : string) => {
-      if (!channel || !isConnected) return
-
-      const message: ChatMessage = {
-        id: UUID.create().value,
-        content,
-        user_id: senderId,
-        status: "SENT",
-        type,
-        created_at: new Date().toISOString(),
-      }
-
-      setMessages((current) => [...current, message])
-
-      await channel.send({
-        type: 'broadcast',
-        event: EVENT_MESSAGE_TYPE,
-        payload: message,
-      })
+    async ( message: ChatMessage ) => {
+      if ( !channel || !isConnected ) return
+      setMessages( ( current ) => {
+        if ( current.some( ( m ) => m.id === message.id ) ) return current
+        return [...current, message]
+      } )
+      await channel.send( {
+        type   : "broadcast",
+        event  : EVENT_MESSAGE_TYPE,
+        payload: message
+      } )
     },
-    [channel, isConnected, username]
+    [channel, isConnected]
   )
 
-  return { messages, sendMessage, isConnected }
+  const sendPayment = useCallback(
+    async ( chatId : string ) => {
+      if ( !channel || !isConnected ) return
+      await channel.send( {
+        type   : "broadcast",
+        event  : EVENT_PAYMENT_TYPE,
+        payload: chatId
+      } )
+    },
+    [channel, isConnected]
+  )
+
+  return { messages, sendMessage, isConnected, sendPayment }
 }

@@ -46,10 +46,14 @@ export function WorkerCard( {
       {
         tax ? <p>Tarifa desde { tax }</p> : null
       }
-      <p>
-        { worker.review_average.toFixed( 1 ) } estrellas
-        ({ worker.review_count } reseñas)
-      </p>
+      { worker.review_count > 0 ? <p>
+          { worker.review_average.toFixed( 1 ) } estrellas
+          ({ worker.review_count } reseñas)
+        </p>
+        :
+        null
+      }
+
     </div>
   )
 }

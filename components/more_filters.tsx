@@ -1,18 +1,18 @@
 "use client"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
-import { Button }                               from "@/components/ui/button"
-import { ListFilter }                           from "lucide-react"
+import { Dialog, DialogContent, DialogTrigger }  from "@/components/ui/dialog"
+import { Button }                                from "@/components/ui/button"
+import { ListFilter }                            from "lucide-react"
 import MultiSelect
-                                                from "@/components/form/multi_select"
+                                                 from "@/components/form/multi_select"
 import { useQuery }                              from "@tanstack/react-query"
 import { parseSpecialities, specialitiesOption } from "@/utils/tanstack_catalog"
 import { useEffect, useState }                   from "react"
 import {
   MultiSelectInputValue
-}                                               from "@/components/form/multi_select_input"
+}                                                from "@/components/form/multi_select_input"
 
 interface MoreFilterProps {
-  onFilter: ( filters: Map<string, any> ) => void
+  onFilter: ( filters: any ) => void
 }
 
 export function MoreFilter( { onFilter }: MoreFilterProps ) {
@@ -59,8 +59,10 @@ export function MoreFilter( { onFilter }: MoreFilterProps ) {
           placeholderLoader="Cargando..."
         />
         <Button type="button"
-                onClick={ () => onFilter(
-                  filtersSelected ) }>Filtrar</Button>
+                onClick={ () => {
+                  onFilter(Object.fromEntries(filtersSelected))
+                } }
+        >Filtrar</Button>
       </DialogContent>
     </Dialog>
   )

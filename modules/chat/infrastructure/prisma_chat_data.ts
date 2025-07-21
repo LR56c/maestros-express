@@ -82,25 +82,25 @@ export class PrismaChatData implements ChatDAO {
       return clientMapped
     }
 
-    const messages: Message[] = []
-
-    for ( const m of response.messages ) {
-      const message = Message.fromPrimitives(
-        m.id,
-        m.chatId,
-        m.userId,
-        m.content,
-        m.type,
-        m.status,
-        m.createdAt
-      )
-
-      if ( message instanceof Errors ) {
-        return message
-      }
-
-      messages.push( message )
-    }
+    // const messages: Message[] = []
+    //
+    // for ( const m of response.messages ) {
+    //   const message = Message.fromPrimitives(
+    //     m.id,
+    //     m.chatId,
+    //     m.userId,
+    //     m.content,
+    //     m.type,
+    //     m.status,
+    //     m.createdAt
+    //   )
+    //
+    //   if ( message instanceof Errors ) {
+    //     return message
+    //   }
+    //
+    //   messages.push( message )
+    // }
 
 
     return Chat.fromPrimitives(
@@ -109,7 +109,8 @@ export class PrismaChatData implements ChatDAO {
       clientMapped,
       response.createdAt,
       response.subject,
-      messages,
+      // messages,
+      [],
       response.acceptedDate ? response.acceptedDate : undefined,
       response.quotationAccepted ? response.quotationAccepted : undefined,
       response.workerArchived ? response.workerArchived : undefined
@@ -150,12 +151,15 @@ export class PrismaChatData implements ChatDAO {
     try {
       const result = await this.db.chat.findMany( {
         where  : {
-          clientId: userId.toString()
+          OR: [
+            { clientId: userId.toString() },
+            { workerId: userId.toString() }
+          ]
         },
         include: {
           worker  : true,
           client  : true,
-          messages: true
+          // messages: true
         }
       } )
 

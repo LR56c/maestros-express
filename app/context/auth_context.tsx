@@ -39,7 +39,8 @@ import {
 import {
   usePathname,
   useRouter
-}                       from "next/navigation"
+}                            from "next/navigation"
+import { parseAuthResponse } from "@/utils/auth_parser"
 
 interface AuthContextType {
   user?: UserResponse
@@ -62,19 +63,6 @@ const AuthContext             = createContext<AuthContextType | undefined>(
   undefined )
 const service: AuthAppService = new SupabaseUserData( createClient() )
 
-const parseResponse = ( user: any ): UserResponse | undefined => {
-  if ( !user ) {
-    return undefined
-  }
-  return {
-    user_id  : user.id,
-    email    : user.email || "",
-    full_name: user.user_metadata?.name || "",
-    role     : user.user_metadata?.role || "",
-    status   : user.user_metadata?.status || "",
-    avatar   : user.user_metadata.avatar
-  } as UserResponse
-}
 
 export const AuthProvider = ( { children }: { children: ReactNode } ) => {
   const [user, setUser] = useState<UserResponse | undefined>( undefined )
@@ -97,7 +85,7 @@ export const AuthProvider = ( { children }: { children: ReactNode } ) => {
   useEffect( () => {
     const { data: listener } = supabase.auth.onAuthStateChange(
       async ( event, session ) => {
-        const parsed = parseResponse( session?.user )
+        const parsed = parseAuthResponse( session?.user )
         if ( !user || (
           session?.user?.id && user.user_id !== session.user.id
         ) )
@@ -124,7 +112,7 @@ export const AuthProvider = ( { children }: { children: ReactNode } ) => {
         await router.refresh()
       }
       else {
-        setUser( parseResponse( data?.session?.user ) )
+        setUser( parseAuthResponse( data?.session?.user ) )
       }
     }
     check()

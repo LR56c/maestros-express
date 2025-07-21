@@ -23,6 +23,7 @@ export class UpdateAuth {
 
   async execute( auth: UserUpdateDTO
   ): Promise<Either<BaseException[], UserAuth>> {
+    console.log("UpdateAuth.execute", auth)
     const email = wrapType( () => Email.from( auth.email ) )
 
     if ( email instanceof BaseException ) {

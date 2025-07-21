@@ -7,6 +7,17 @@ import {
 import { UserResponse } from "@/modules/user/application/models/user_response"
 import { getUrl } from "@/utils/get_url"
 
+export const currencyOption = {
+  queryKey: ["currency"],
+  queryFn : async () => {
+    const response = await fetch( "/api/currency", { method: "GET" } )
+    if ( !response.ok ) {
+      throw new Error( "Error fetching countries" )
+    }
+    return await response.json()
+  }
+}
+
 export const sectorsOption = {
   queryKey: ["sectors"],
   queryFn : async () => {

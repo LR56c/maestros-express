@@ -7,14 +7,22 @@ import {
 import {
   parseData
 }                                    from "@/modules/shared/application/parse_handlers"
-import { isLeft }                    from "fp-ts/Either"
-import { searchUser }                from "@/app/api/dependencies"
+import { isLeft }                                from "fp-ts/Either"
+import { searchUser, updateAuth, updateMessage } from "@/app/api/dependencies"
 import {
   UserMapper
-}                                    from "@/modules/user/application/user_mapper"
+}                                                from "@/modules/user/application/user_mapper"
 import {
-  SpecialityMapper
-}                                    from "@/modules/speciality/application/speciality_mapper"
+  messageUpdateSchema
+}                                    from "@/modules/message/application/message_update_dto"
+import {
+  MessageMapper
+}                                    from "@/modules/message/application/message_mapper"
+import {
+  UserUpdateDTO,
+  userUpdateSchema
+} from "@/modules/user/application/models/user_update_dto"
+import { createClientServer }                    from "@/utils/supabase/server"
 
 export async function GET( request: NextRequest ) {
   const { searchParams }                             = new URL( request.url )
@@ -51,4 +59,33 @@ export async function GET( request: NextRequest ) {
       total: result.right.total
     },
     { status: 200 } )
+}
+
+
+export async function PUT( request: NextRequest ) {
+  const sup                = await createClientServer()
+  const { data: { user } } = await sup.auth.getUser()
+  if ( !user ) {
+    return NextResponse.json( { status: 401 } )
+  }
+
+  const body = {
+    ...await request.json(),
+    email: user.email,
+  }
+  const data = parseData( userUpdateSchema, body )
+
+  if ( isLeft( data ) ) {
+    return NextResponse.json( { error: data.left.message }, { status: 400 } )
+  }
+
+  const result = await (
+    await updateAuth()
+  ).execute( data.right )
+
+  if ( isLeft( result ) ) {
+    return NextResponse.json( { status: 500 } )
+  }
+
+  return NextResponse.json( { status: 200 } )
 }

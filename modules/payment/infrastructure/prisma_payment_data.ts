@@ -69,12 +69,16 @@ export class PrismaPaymentData implements PaymentDAO {
     sortType?: ValidString ): Promise<Either<BaseException[], PaginatedResult<Payment>>> {
     try {
       const where = {}
-      if ( query.id
-      )
-      {
+      if ( query.id ) {
         // @ts-ignore
         where["id"] = {
           equals: query.id
+        }
+      }
+      if ( query.service_id ) {
+        // @ts-ignore
+        where["serviceId"] = {
+          equals: query.service_id
         }
       }
       const orderBy = {}

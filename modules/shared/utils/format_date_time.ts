@@ -12,3 +12,13 @@ export function formatUTCDateTime(date: Date) {
   const pad = (n: number) => n.toString().padStart(2, '0')
   return `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())}T${pad(date.getUTCHours())}:${pad(date.getUTCMinutes())}Z`
 }
+
+export const myFormatDate = (dateString: string, locale: string = "en-US") => {
+  return new Date(dateString).toLocaleDateString(locale, {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  })
+}

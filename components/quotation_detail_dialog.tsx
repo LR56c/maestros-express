@@ -3,9 +3,6 @@ import { Button }                              from "@/components/ui/button"
 import { Dialog, DialogContent, DialogTitle }  from "@/components/ui/dialog"
 import { FormProvider, useForm }               from "react-hook-form"
 import { zodResolver }                         from "@hookform/resolvers/zod"
-import {
-  workerTaxSchema
-}                                              from "@/modules/worker_tax/application/worker_tax_dto"
 import InputText
                                                from "@/components/form/input_text"
 import React, { useEffect, useMemo, useState } from "react"
@@ -22,11 +19,17 @@ import { useQuery }                            from "@tanstack/react-query"
 import {
   CurrencyDTO
 }                                              from "@/modules/currency/application/currency_dto"
+import {
+  quotationDetailSchema
+}                                              from "@/modules/quotation/modules/quotation_detail/application/quotation_detail_dto"
 import { currencyOption }                      from "@/utils/tanstack_catalog"
+import InputTextArea
+                                               from "@/components/form/input_text_area"
 
 
 
-export const TaxDialog: React.FC<ListInputModalProps> = ( {
+
+export const QuotationDetailDialog: React.FC<ListInputModalProps> = ( {
   isOpen,
   onOpenChange,
   title,
@@ -56,7 +59,7 @@ export const TaxDialog: React.FC<ListInputModalProps> = ( {
   }, [formData] )
 
   const methods = useForm( {
-    resolver: zodResolver( workerTaxSchema ),
+    resolver: zodResolver( quotationDetailSchema ),
     values  : initialValues
   } )
 
@@ -71,10 +74,12 @@ export const TaxDialog: React.FC<ListInputModalProps> = ( {
       <Dialog open={ isOpen } onOpenChange={ onOpenChange }>
         <DialogContent className="sm:max-w-md w-full">
           <DialogTitle>{ title }</DialogTitle>
-          <InputText name="name" label="Nombre de tarifa" type="text"
-                     placeholder="Ingrese nombre de tarifa"/>
-          <InputText name="value" label="Valor de tarifa" type="number"
-                     placeholder="Ingrese valor de tarifa"/>
+          <InputText name="name" label="Nombre del detalle" type="text"
+                     placeholder="Ingrese nombre del detalle"/>
+          <InputTextArea name="description" label="Descripcion"
+                         placeholder="Ingrese una breve descripcion"/>
+          <InputText name="value" label="Valor del detalle" type="number"
+                     placeholder="Ingrese valor del detalle"/>
           <SelectInput
             placeholder="Seleccione una moneda"
             onChange={ ( value ) => setValue( "value_format", value.code ) }

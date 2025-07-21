@@ -28,6 +28,7 @@ export default async function DetallePerfil( { params }: PageProps ) {
     return redirect( "/trabajador/" + id )
   }
 
+  console.log("profile", profile )
   return (
     <ProfileDetail profile={ profile }/>
   )

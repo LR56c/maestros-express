@@ -37,10 +37,38 @@ import {
   MoreFilter
 }                          from "@/components/more_filters"
 import Link                from "next/link"
+import {
+  usePagedResource
+}                          from "@/components/data_table/usePagedQuery"
+import {
+  WorkerProfileDTO
+}                          from "@/modules/worker/application/worker_profile_dto"
+
+interface WorkerFilters {
+  specialities?: string
+}
 
 export default function Home() {
 
-  const { data, mutateAsync, status } = useMutation( {
+  const {
+          items,
+          setFilters,
+          loadingInitial,
+        } = usePagedResource<WorkerProfileDTO, WorkerFilters>( {
+    endpoint       : "/api/worker",
+    defaultPageSize: 10
+  } )
+  const clearFilters    = () => setFilters( undefined )
+
+
+  const applyFilterForm = ( values: Record<string, any> ) => {
+    const newFilters: WorkerFilters = {}
+    if(values.specialities)  newFilters.specialities = values.specialities
+    setFilters( Object.keys( newFilters ).length ? newFilters : undefined )
+    reset()
+  }
+
+  const { data, mutateAsync, status, reset } = useMutation( {
     mutationFn: async ( values: any ) => {
       const response = await fetch( "/api/o/request", {
         method : "POST",
@@ -58,9 +86,9 @@ export default function Home() {
       toast.error( "Error. Por favor, intenta de nuevo." )
     }
   } )
-  const [base64File, setbase64File]   = useState<string | null>(
+  const [base64File, setbase64File]          = useState<string | null>(
     null )
-  const [text, setText]               = useState<string | null>(
+  const [text, setText]                      = useState<string | null>(
     null )
 
   const dropzone = {
@@ -85,7 +113,8 @@ export default function Home() {
           radius  : 100_000
         } )
         if ( !result ) {
-          toast.error( "Error al buscar servicios. Por favor, intenta de nuevo." )
+          toast.error(
+            "Error al buscar servicios. Por favor, intenta de nuevo." )
         }
       }, ( error ) => {
         toast( "Debe permitir el acceso a la ubicación para buscar servicios." )
@@ -155,47 +184,67 @@ export default function Home() {
           }
         </Button>
       </div>
-      { data ?
-        <>
-          <Card className="w-full max-w-xl">
-            <CardHeader>
-              <CardTitle>Como solucionarlo</CardTitle>
-              <CardDescription>{ data.info }</CardDescription>
-              <CardAction>
-                <MoreFilter
-                  onFilter={ ( values ) => console.log( "action values",
-                    values ) }/>
-              </CardAction>
-            </CardHeader>
-          </Card>
-          {
-            data.workers.length === 0 ?
-              <p className="text-center text-gray-500">No se encontraron
-                trabajadores
-                disponibles para tu problema.</p>
-              :
-              <>
-                <p className="text-center text-gray-500">Se
-                  encontraron { data.workers.length } trabajadores
+      {
+        data ?
+          <>
+            <Card className="w-full max-w-xl">
+              <CardHeader>
+                <CardTitle>Como solucionarlo</CardTitle>
+                <CardDescription>{ data.info }</CardDescription>
+                <CardAction>
+                  <MoreFilter
+                    onFilter={ ( values ) => applyFilterForm( values ) }/>
+                </CardAction>
+              </CardHeader>
+            </Card>
+            {
+              data.workers.length === 0 ?
+                <p className="text-center text-gray-500">No se encontraron
+                  trabajadores
                   disponibles para tu problema.</p>
+                :
+                <>
+                  <p className="text-center text-gray-500">Se
+                    encontraron { data.workers.length } trabajadores
+                    disponibles para tu problema.</p>
+                  <div
+                    className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    {
+                      data.workers.map( ( worker: any ) => (
+                        <Link href={ `/trabajador/${ worker.user_id }` }>
+                          <WorkerCard key={ worker.user_id } worker={ worker }/>
+                        </Link>
+                      ) )
+                    }
+                  </div>
+                </>
+            }
+          </>
+          :
+          <>
+            <QuickFilter
+              onClear={ clearFilters }
+              onFilter={
+                ( values ) => applyFilterForm( values ) }/>
+            {
+              loadingInitial ?
+                <div className="p-4">
+                  <div className="h-8 w-full animate-pulse bg-muted/50 mb-2"/>
+                  <div className="h-8 w-full animate-pulse bg-muted/50 mb-2"/>
+                  <div className="h-8 w-full animate-pulse bg-muted/50"/>
+                </div> :
                 <div
                   className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                   {
-                    data.workers.map( ( worker: any ) => (
+                    items.map( ( worker: any ) => (
                       <Link href={ `/trabajador/${ worker.user_id }` }>
                         <WorkerCard key={ worker.user_id } worker={ worker }/>
                       </Link>
                     ) )
                   }
                 </div>
-              </>
-          }
-        </>
-        : <>
-          <QuickFilter
-            onFilter={ ( values ) => console.log( "values", values ) }/>
-        </>
-      }
+            }
+          </> }
     </div>
   )
 }

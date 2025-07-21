@@ -24,7 +24,7 @@ import {
 export async function POST( request: NextRequest ) {
   const body = await request.json()
   const data = parseData( messageRequestSchema, body )
-
+  console.log("Message Request Data:", data)
   if ( isLeft( data ) ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
@@ -32,6 +32,7 @@ export async function POST( request: NextRequest ) {
   const result = await (
     await addMessage()
   ).execute( data.right )
+  console.log("Message Result:", result)
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
