@@ -17,6 +17,10 @@ import {
 }                                             from "@/components/request_chat_dialog"
 import { createClientServer }                 from "@/utils/supabase/server"
 import { redirect }                           from "next/navigation"
+import WorkerHistories
+                                              from "@/components/worker_histories"
+import { getQueryClient }                     from "@/lib/query_client"
+import WorkerTax                              from "@/components/worker_tax"
 
 export default async function TrabajadorLayout( {
   children,
@@ -34,10 +38,6 @@ export default async function TrabajadorLayout( {
 
   const sup                = await createClientServer()
   const { data: { user } } = await sup.auth.getUser()
-
-  if ( !user ) {
-    return redirect( "/" )
-  }
 
   const workerResult = await (
     await searchWorker()
@@ -95,6 +95,11 @@ export default async function TrabajadorLayout( {
               }
             </div>
           </div>
+          { user && user.id === worker.user_id ?
+            <Link className="w-full" href={ `/trabajador/${ worker.user_id }/editar` }>
+              <Button className="w-full" variant="outline">Editar perfil</Button>
+            </Link>
+            : null }
           {
             worker.review_count === 0 ? null : <p>
               { worker.review_average.toFixed( 1 ) } estrellas
@@ -108,14 +113,22 @@ export default async function TrabajadorLayout( {
             placeholder="Ver horario"
             visibleDays={ 3 }
           />
-          <RequestChatDialog
+          { user ? <RequestChatDialog
             workerId={ worker.user_id }
             clientId={ user.id }
-          />
-          <p>historias</p>
-          <Link
-            href={ `/historia/202fd6db-482f-4aac-b118-957f4ddba7e3` }>historia</Link>
+          /> : null }
+          <WorkerHistories workerId={worker.user_id}/>
           <WorkerTabs worker={ worker }/>
+          { !Array.isArray(children) && children && (
+            <div
+              className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              { worker.taxes.map(
+                ( tax ) => (
+                  <WorkerTax key={ tax.id } tax={tax}></WorkerTax>
+                )
+              )}
+            </div>
+          ) }
           { children }
         </div>
       </div>

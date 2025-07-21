@@ -18,17 +18,12 @@ import {
 export async function POST( request: NextRequest ) {
   const body = await request.json()
   const data = parseData( z.object( {
-    image   : z.string().optional(),
-    input   : z.string().optional(),
+    // image   : z.string().optional(),
+    image   : z.union([z.string(),z.null()]),
+    input   : z.union([z.string(),z.null()]),
     location: z.string(),
     radius  : z.number().int()
-  } )
-                           .refine( data =>
-                               data.image || data.input,
-                             {
-                               message: "Debe proporcionar al menos una imagen o un texto de entrada"
-                             }
-                           ), body )
+  } ), body )
 
   if ( isLeft( data ) ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
@@ -36,8 +31,8 @@ export async function POST( request: NextRequest ) {
   const resultRequest = await (
     await uploadRequestWorkerEmbedding()
   ).execute(
-    data.right.image,
-    data.right.input
+    data.right.image ? data.right.image : undefined,
+    data.right.input ? data.right.input : undefined
   )
   if ( isLeft( resultRequest ) ) {
     return NextResponse.json( { status: 500 } )
@@ -58,6 +53,7 @@ export async function POST( request: NextRequest ) {
       status  : "VERIFIED"
     }
   )
+  console.log("queryResult", queryResult)
   if ( isLeft( queryResult ) ) {
     return NextResponse.json( { status: 500 } )
   }

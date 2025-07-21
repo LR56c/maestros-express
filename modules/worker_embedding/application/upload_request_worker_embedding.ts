@@ -126,7 +126,6 @@ Your response MUST be a JSON object with the following keys. All string values M
 
     const vImage = await wrapTypeDefault( undefined,
       async ( value ) => await ValidImage.from( value ), base64Image )
-
     if ( vImage instanceof BaseException ) {
       errors.push( vImage )
     }

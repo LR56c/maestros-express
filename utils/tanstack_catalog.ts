@@ -30,6 +30,40 @@ export const sectorsOption = {
 }
 
 
+export const storyOptions = ( id: string ) => (
+  {
+    queryKey: ["story", id],
+    queryFn : async () => {
+      const params = new URLSearchParams()
+      params.append( "id", id )
+      const response = await fetch( `/api/story?${ params.toString() }`,
+        { method: "GET" } )
+      if ( !response.ok ) {
+        throw new Error( "Error fetching story" )
+      }
+      return await response.json()
+    }
+  }
+)
+
+
+export const storiesOptions = ( id: string ) => (
+  {
+    queryKey: ["stories_worker", id],
+    queryFn : async () => {
+      const params = new URLSearchParams()
+      params.append( "id", id )
+      const response = await fetch( `/api/stories?${ params.toString() }`,
+        { method: "GET" } )
+      if ( !response.ok ) {
+        throw new Error( "Error fetching stories" )
+      }
+      return await response.json()
+    }
+  }
+)
+
+
 export const regionsOption = {
   queryKey: ["regions"],
   queryFn : async () => {
@@ -59,7 +93,7 @@ export const specialitiesOption = {
   queryFn : async () => {
     const response = await fetch( "/api/speciality", { method: "GET" } )
     if ( !response.ok ) {
-      throw new Error( "Error fetching countries" )
+      throw new Error( "Error fetching specialities" )
     }
     return await response.json()
   }
@@ -77,9 +111,7 @@ export const getWorker = async (id : string) => {
   const params = new URLSearchParams();
   params.append( "id", id );
   params.append( "limit", "1" );
-  const response = await fetch( `/api/worker/?${params.toString()}`, { method: "GET" ,
-
-  } )
+  const response = await fetch( `/api/worker/?${params.toString()}`, { method: "GET" , } )
   if ( !response.ok ) {
     throw new Error( "Error fetching workers" )
   }

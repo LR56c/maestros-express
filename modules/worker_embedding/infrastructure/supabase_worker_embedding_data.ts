@@ -64,7 +64,7 @@ export class SupabaseWorkerEmbeddingData
 
     const { data, error } = await this.client.rpc( "match_worker_vector", {
       query_embedding     : vector.right,
-      match_threshold     : 0.55,
+      match_threshold     : 0.65,
       match_count         : limit?.value ?? 5,
       target_location     : targetLocation.toPoint(),
       search_radius_meters: radius.value

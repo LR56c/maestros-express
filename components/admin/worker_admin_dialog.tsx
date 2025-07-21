@@ -48,6 +48,7 @@ import {
 import CalendarSchedule
                                                from "@/components/form/calendar_schedule/calendar_schedule"
 import { toast }                               from "sonner"
+import { storiesOptions }                      from "@/utils/tanstack_catalog"
 
 interface WorkerAdminDialogProps {
   worker: WorkerResponse
@@ -87,21 +88,6 @@ const certificatesOptions = ( id: string ) => (
   }
 )
 
-const storiesOptions = ( id: string ) => (
-  {
-    queryKey: ["stories_worker", id],
-    queryFn : async () => {
-      const params = new URLSearchParams()
-      params.append( "id", id )
-      const response = await fetch( `/api/story?${ params.toString() }`,
-        { method: "GET" } )
-      if ( !response.ok ) {
-        throw new Error( "Error fetching story" )
-      }
-      return await response.json()
-    }
-  }
-)
 
 
 const zonesOptions = ( id: string ) => (

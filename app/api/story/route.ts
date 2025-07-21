@@ -14,10 +14,10 @@ import {
 }                                    from "@/modules/story/application/story_mapper"
 import {
   addStory,
-  getStories,
+  getStories, getStory,
   removeStory,
   updateStory
-}                                    from "@/app/api/dependencies"
+} from "@/app/api/dependencies"
 
 
 export async function POST( request: NextRequest ) {
@@ -49,14 +49,14 @@ export async function GET( request: NextRequest ) {
   const id               = searchParams.get( "id" )
 
   const result = await (
-    await getStories()
+    await getStory()
   ).execute( id ?? "" )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
   }
 
-  return NextResponse.json( result.right.map( StoryMapper.toDTO ),
+  return NextResponse.json( StoryMapper.toDTO(result.right),
     { status: 200 } )
 }
 

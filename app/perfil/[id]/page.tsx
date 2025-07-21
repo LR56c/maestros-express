@@ -1,8 +1,8 @@
 "use server"
-import { searchUser } from "@/app/api/dependencies"
-import { isLeft }     from "fp-ts/Either"
-import { UserMapper } from "@/modules/user/application/user_mapper"
-import { redirect }   from "next/navigation"
+import { searchUser }    from "@/app/api/dependencies"
+import { isLeft }        from "fp-ts/Either"
+import { UserMapper }    from "@/modules/user/application/user_mapper"
+import { redirect }      from "next/navigation"
 import { ProfileDetail } from "@/components/profile_detail"
 
 interface PageProps {
@@ -17,18 +17,17 @@ export default async function DetallePerfil( { params }: PageProps ) {
     id
   } )
   if ( isLeft( result ) ) {
-    throw new Error()
+    return redirect( "/404" )
   }
   const users = result.right.items.map( UserMapper.toDTO )
   if ( users.length === 0 ) {
-    throw new Error( "User not found" )
+    return redirect( "/404" )
   }
   const profile = users[0]
   if ( profile.role === "WORKER" ) {
     return redirect( "/trabajador/" + id )
   }
 
-  console.log("profile", profile )
   return (
     <ProfileDetail profile={ profile }/>
   )
