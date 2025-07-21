@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { updateSession }                  from "@/utils/supabase/middleware"
 
-const PUBLIC_PATHS = ['/', '/ingresar', '/registrar', 'trabajador/aplicar']
+const PUBLIC_PATHS = ['/', '/ingresar', '/registrar', '/trabajador/aplicar']
 function isPublicPath(pathname: string) {
   return PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p + '/'))
 }

@@ -105,7 +105,6 @@ async function defaultFetch<TItem, TFilters>(
   params: PageParams<TFilters>
 ): Promise<PageResult<TItem>> {
   const url = buildFetchURL( endpoint, params )
-  console.log( `Fetching paged resource from: ${ url }` )
   const res = await fetch( url )
   if ( !res.ok ) throw new Error( `Fetch error ${ res.status }` )
   return res.json()
