@@ -53,7 +53,7 @@ export default function MessagePage( {}: MessagePageProps )
 
   return (
     <RealtimeChat
-      roomName={ id! }
+      roomName={ id as string }
       ownerUser={ user! }
       otherUser={ otherUser }
       messages={ messages }/>
