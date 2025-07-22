@@ -45,6 +45,10 @@ import { Loader2Icon }                               from "lucide-react"
 import {
   countriesOption
 }                                                    from "@/utils/tanstack_catalog"
+import ProfilePhotoModal
+                                                     from "@/components/profile_photo_modal"
+import ProfilePhotoHover
+                                                     from "@/components/profile_photo_hover"
 
 const workerFormSchema = workerRequestSchema.extend( {
   confirm: z.string(),
@@ -85,6 +89,7 @@ export default function WorkerApplyForm() {
     startTransition( async () => {
       const result = await createWorker( {
         user                   : data.user,
+        avatar                 : data.avatar,
         national_identity_id   : data.national_identity_id,
         national_identity_value: data.national_identity_value,
         birth_date             : data.birth_date,
@@ -134,6 +139,9 @@ export default function WorkerApplyForm() {
   return <>
     <FormProvider { ...methods } >
       <div className="w-full max-w-lg flex flex-col gap-4">
+        <div className="flex justify-center">
+        <ProfilePhotoHover onChange={(file, imageString) => setValue('avatar', imageString)}/>
+        </div>
         <InputText name="user.email" label="Email" type="email"
                    placeholder="Ingrese su email"/>
         <InputText name="user.password" label="Contraseña" type="password"

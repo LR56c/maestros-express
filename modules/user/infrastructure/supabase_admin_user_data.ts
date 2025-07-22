@@ -40,6 +40,7 @@ export class SupabaseAdminUserData implements AuthRepository {
       email_confirm: true,
       user_metadata: {
         name  : auth.fullName.value,
+        avatar: auth.avatar?.value,
         role  : auth.role.toString(),
         status: auth.status.value
       }
