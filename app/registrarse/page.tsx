@@ -36,6 +36,7 @@ export default function Registrarse() {
       const result = await register( {
         email    : values.email,
         full_name: values.full_name,
+        username: values.username,
         password : values.password
       } )
       if ( !result ) {
@@ -54,6 +55,8 @@ export default function Registrarse() {
                      placeholder="Ingrese su contraseña"/>
           <InputText name="confirm" label="Confirmar Contraseña" type="password"
                      placeholder="Confirme su contraseña"/>
+          <InputText name="full_name" label="Nombre de usuario" type="text"
+                     placeholder="Ingrese su nombre de usuario"/>
           <InputText name="full_name" label="Nombre" type="text"
                      placeholder="Ingrese su nombre completo"/>
           <Button type="button"

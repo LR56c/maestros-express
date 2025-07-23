@@ -56,6 +56,7 @@ export class PrismaChatData implements ChatDAO {
     const workerMapped = UserAuth.fromPrimitives(
       worker.id,
       worker.email,
+      worker.username,
       worker.name,
       worker.createdAt,
       worker.role,
@@ -71,6 +72,7 @@ export class PrismaChatData implements ChatDAO {
     const clientMapped = UserAuth.fromPrimitives(
       client.id,
       client.email,
+      client.username,
       client.name,
       client.createdAt,
       client.role,

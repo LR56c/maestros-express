@@ -5,15 +5,15 @@ import {
 }                                    from "../../shared/domain/value_objects/email"
 import {
   BaseException
-}                   from "../../shared/domain/exceptions/base_exception"
-import { UserAuth } from "@/modules/user/domain/user"
+}                                    from "../../shared/domain/exceptions/base_exception"
+import { UserAuth }                  from "@/modules/user/domain/user"
 import {
   UserResponse
-}                   from "@/modules/user/application/models/user_response"
+}                                    from "@/modules/user/application/models/user_response"
 import {
   ValidString
 }                                    from "@/modules/shared/domain/value_objects/valid_string"
-import { RoleType } from "@/modules/user/domain/role_type"
+import { RoleType }                  from "@/modules/user/domain/role_type"
 
 export class UserMapper {
   static toDTO( user: UserAuth ): UserResponse {
@@ -21,20 +21,22 @@ export class UserMapper {
       user_id  : user.userId.toString(),
       email    : user.email.value,
       full_name: user.fullName.value,
+      username : user.username.value,
       avatar   : user.avatar?.value,
-      status    : user.status.value,
-      role    : user.role.toString(),
+      status   : user.status.value,
+      role     : user.role.toString()
     }
   }
 
-  static toJSON( auth: UserResponse ): Record<string, any> {
+  static toJSON( user: UserResponse ): Record<string, any> {
     return {
-      user_id  : auth.user_id,
-      email    : auth.email,
-      avatar   : auth.avatar,
-      full_name: auth.full_name,
-      status   : auth.status,
-      role     : auth.role,
+      user_id  : user.user_id,
+      email    : user.email,
+      avatar   : user.avatar,
+      full_name: user.full_name,
+      username : user.username,
+      status   : user.status,
+      role     : user.role
     }
   }
 
@@ -45,6 +47,13 @@ export class UserMapper {
 
     if ( id instanceof BaseException ) {
       errors.push( id )
+    }
+
+    const username = wrapType(
+      () => ValidString.from( json.username ) )
+
+    if ( username instanceof BaseException ) {
+      errors.push( username )
     }
 
     const email = wrapType(
@@ -68,12 +77,12 @@ export class UserMapper {
       errors.push( avatar )
     }
 
-    const role =wrapType(()=> RoleType.from( json.role ) )
+    const role = wrapType( () => RoleType.from( json.role ) )
     if ( role instanceof BaseException ) {
       errors.push( role )
     }
 
-    const status = wrapType(()=>ValidString.from( json.status ) )
+    const status = wrapType( () => ValidString.from( json.status ) )
 
     if ( status instanceof BaseException ) {
       errors.push( status )
@@ -86,6 +95,9 @@ export class UserMapper {
     return {
       user_id  : (
         id as ValidString
+      ).value,
+      username : (
+        username as ValidString
       ).value,
       email    : (
         email as Email
@@ -107,11 +119,12 @@ export class UserMapper {
     return UserAuth.fromPrimitives(
       json.user_id,
       json.email,
+      json.username,
       json.full_name,
       json.created_at,
       json.role,
       json.status,
-      json.avatar,
+      json.avatar
     )
   }
 }
