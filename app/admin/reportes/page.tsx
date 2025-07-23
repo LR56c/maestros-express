@@ -1,6 +1,5 @@
 "use client"
 import * as React                from "react"
-import { useCallback, useState } from "react"
 import { ColumnDef }             from "@tanstack/react-table"
 
 import {
@@ -76,8 +75,7 @@ const columns: ColumnDef<ReportDTO>[] = [
     //     </DropdownMenu>
     //   )
     // },
-    cell: ( { row } ) => {
-      const speciality = row.original
+    cell: (  ) => {
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -114,15 +112,6 @@ export default function ReportPage() {
     defaultPageSize: 10
   } )
 
-  const [selecteds, setSelecteds] = useState<ReportDTO[]>( [] )
-
-  const handleSelectionChange = useCallback(
-    ( rows: ReportDTO[] ) => {
-      setSelecteds( rows )
-    },
-    []
-  )
-
   if ( isError ) {
     return (
       <div className="p-4 text-sm text-destructive">
@@ -151,7 +140,6 @@ export default function ReportPage() {
         total={ total }
         pageIndex={ pageIndex }
         pageSize={ pageSize }
-        onSelectionChange={ handleSelectionChange }
         getRowId={ ( row ) => row.id }
         makeHref={ makeHref }
         onPageChange={ setPageIndex }

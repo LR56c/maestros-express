@@ -1,7 +1,6 @@
 "use client"
-import * as React                from "react"
-import { useCallback, useState } from "react"
-import { ColumnDef }             from "@tanstack/react-table"
+import * as React    from "react"
+import { ColumnDef } from "@tanstack/react-table"
 
 import {
   DataTablePaginated
@@ -80,8 +79,7 @@ const columns: ColumnDef<CurrencyDTO>[] = [
     //     </DropdownMenu>
     //   )
     // },
-    cell: ( { row } ) => {
-      const currency = row.original
+    cell: () => {
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -118,15 +116,6 @@ export default function CurrencyPage() {
     defaultPageSize: 10
   } )
 
-  const [selecteds, setSelecteds] = useState<CurrencyDTO[]>( [] )
-
-  const handleSelectionChange = useCallback(
-    ( rows: CurrencyDTO[] ) => {
-      setSelecteds( rows )
-    },
-    []
-  )
-
   if ( isError ) {
     return (
       <div className="p-4 text-sm text-destructive">
@@ -155,7 +144,6 @@ export default function CurrencyPage() {
         total={ total }
         pageIndex={ pageIndex }
         pageSize={ pageSize }
-        onSelectionChange={ handleSelectionChange }
         getRowId={ ( row ) => row.code }
         makeHref={ makeHref }
         onPageChange={ setPageIndex }

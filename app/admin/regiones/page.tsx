@@ -1,28 +1,33 @@
 "use client"
-import * as React                from "react"
-import { useCallback, useState } from "react"
-import { ColumnDef }             from "@tanstack/react-table"
+import * as React    from "react"
+import { useState }  from "react"
+import { ColumnDef } from "@tanstack/react-table"
 
 import {
   DataTablePaginated
-}                           from "@/components/data_table/data_table_paginated"
-import { usePagedResource } from "@/components/data_table/usePagedQuery"
-import { MoreHorizontal }   from "lucide-react"
-import { Checkbox }         from "@/components/ui/checkbox"
-import { Button }           from "@/components/ui/button"
+}                                      from "@/components/data_table/data_table_paginated"
+import {
+  usePagedResource
+}                                      from "@/components/data_table/usePagedQuery"
+import { Loader2Icon, MoreHorizontal } from "lucide-react"
+import { Checkbox }                    from "@/components/ui/checkbox"
+import { Button }                      from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger
-}                           from "@/components/ui/dropdown-menu"
-import { RegionDTO }        from "@/modules/region/application/region_dto"
-import { RegionAdminDialog } from "@/components/admin/region_admin_dialog"
-import { useMutation } from "@tanstack/react-query"
-import { toast } from "sonner"
-import { Input } from "@/components/ui/input"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
-import { Loader2Icon } from "lucide-react"
+}                                      from "@/components/ui/dropdown-menu"
+import {
+  RegionDTO
+}                                      from "@/modules/region/application/region_dto"
+import {
+  RegionAdminDialog
+}                                      from "@/components/admin/region_admin_dialog"
+import { useMutation }                 from "@tanstack/react-query"
+import { toast }                       from "sonner"
+import { Input }                       from "@/components/ui/input"
+import { Dialog, DialogContent }       from "@/components/ui/dialog"
 
 interface RegionFilters {
   name?: string
@@ -50,7 +55,6 @@ export default function RegionPage() {
     defaultPageSize: 10
   } )
 
-  const [selecteds, setSelecteds] = useState<RegionDTO[]>( [] )
   const [searchName, setSearchName] = useState( filters?.name ?? "" )
 
   const applyFilterForm = () => {
@@ -111,13 +115,6 @@ export default function RegionPage() {
       toast.success( "Región creada correctamente" )
     }
   } )
-
-  const handleSelectionChange = useCallback(
-    ( rows: RegionDTO[] ) => {
-      setSelecteds( rows )
-    },
-    []
-  )
 
   const [creating, setCreating] = useState( false )
   const [updating, setUpdating] = useState( false )
@@ -263,7 +260,6 @@ export default function RegionPage() {
         pageIndex={ pageIndex }
         pageSize={ pageSize }
         getRowId={ row => row.id }
-        onSelectionChange={ handleSelectionChange }
         makeHref={ makeHref }
         onPageChange={ setPageIndex }
         onPageHover={ p1 => prefetchPage( p1 - 1 ) }

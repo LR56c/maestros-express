@@ -370,8 +370,7 @@ export async function ai() {
   } )
 }
 
-const uploader: UploadFileRepository = new SupabaseFileUploadData(
-  await createClient() )
+// const uploader: UploadFileRepository = new SupabaseFileUploadData( await createClient() )
 
 export async function aiRepo() {
   return new OpenaiWorkerEmbeddingData( await ai() )

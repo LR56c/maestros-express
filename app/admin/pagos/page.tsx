@@ -1,6 +1,5 @@
 "use client"
 import * as React                from "react"
-import { useCallback, useState } from "react"
 import { ColumnDef }             from "@tanstack/react-table"
 
 import {
@@ -70,8 +69,7 @@ const columns: ColumnDef<PaymentResponse>[] = [
     //     </DropdownMenu>
     //   )
     // },
-    cell: ( { row } ) => {
-      const speciality = row.original
+    cell: (  ) => {
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -108,14 +106,6 @@ export default function PaymentPage() {
     defaultPageSize: 10
   } )
 
-  const [selecteds, setSelecteds] = useState<PaymentResponse[]>( [] )
-
-  const handleSelectionChange = useCallback(
-    ( rows: PaymentResponse[] ) => {
-      setSelecteds( rows )
-    },
-    []
-  )
 
   if ( isError ) {
     return (
@@ -145,7 +135,6 @@ export default function PaymentPage() {
         total={ total }
         pageIndex={ pageIndex }
         pageSize={ pageSize }
-        onSelectionChange={ handleSelectionChange }
         getRowId={ ( row ) => row.id }
         makeHref={ makeHref }
         onPageChange={ setPageIndex }

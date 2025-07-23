@@ -1,6 +1,5 @@
 "use client"
 import * as React                from "react"
-import { useCallback, useState } from "react"
 import { ColumnDef }             from "@tanstack/react-table"
 
 import {
@@ -124,15 +123,6 @@ export default function WorkersPage() {
     defaultPageSize: 10
   } )
 
-  const [selecteds, setSelecteds] = useState<WorkerResponse[]>( [] )
-
-  const handleSelectionChange = useCallback(
-    ( rows: WorkerResponse[] ) => {
-      setSelecteds( rows )
-    },
-    []
-  )
-
   if ( isError ) {
     return (
       <div className="p-4 text-sm text-destructive">
@@ -163,7 +153,6 @@ export default function WorkersPage() {
         total={ total }
         pageIndex={ pageIndex }
         pageSize={ pageSize }
-        onSelectionChange={ handleSelectionChange }
         getRowId={ ( row ) => row.user.user_id }
         makeHref={ makeHref }
         onPageChange={ setPageIndex }

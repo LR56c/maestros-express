@@ -1,33 +1,33 @@
 "use client"
-import * as React                from "react"
-import { useCallback, useState } from "react"
-import { ColumnDef }             from "@tanstack/react-table"
+import * as React    from "react"
+import { useState }  from "react"
+import { ColumnDef } from "@tanstack/react-table"
 
 import {
   DataTablePaginated
-}                           from "@/components/data_table/data_table_paginated"
-import { usePagedResource }            from "@/components/data_table/usePagedQuery"
+}                                      from "@/components/data_table/data_table_paginated"
+import {
+  usePagedResource
+}                                      from "@/components/data_table/usePagedQuery"
 import { Loader2Icon, MoreHorizontal } from "lucide-react"
 import { Checkbox }                    from "@/components/ui/checkbox"
-import { Button }                from "@/components/ui/button"
+import { Button }                      from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger
-}                                from "@/components/ui/dropdown-menu"
-import { CountryDTO }            from "@/modules/country/application/country_dto"
-import { CountryAdminDialog }    from "@/components/admin/country_admin_dialog"
-import { Input }                 from "@/components/ui/input"
+}                                      from "@/components/ui/dropdown-menu"
 import {
-  SpecialityAdminDialog
-}                                from "@/components/admin/speciality_admin_dialog"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
+  CountryDTO
+}                                      from "@/modules/country/application/country_dto"
 import {
-  SpecialityDTO
-}                                from "@/modules/speciality/application/speciality_dto"
-import { useMutation }           from "@tanstack/react-query"
-import { toast }                 from "sonner"
+  CountryAdminDialog
+}                                      from "@/components/admin/country_admin_dialog"
+import { Input }                       from "@/components/ui/input"
+import { Dialog, DialogContent }       from "@/components/ui/dialog"
+import { useMutation }                 from "@tanstack/react-query"
+import { toast }                       from "sonner"
 
 interface CountryFilters {
   name?: string
@@ -56,7 +56,6 @@ export default function CountryPage() {
     defaultPageSize: 10
   } )
 
-  const [selecteds, setSelecteds]   = useState<CountryDTO[]>( [] )
   const [searchName, setSearchName] = useState( filters?.name ?? "" )
 
   const applyFilterForm = () => {
@@ -88,10 +87,10 @@ export default function CountryPage() {
         }
         return await response.json()
       },
-      onError   : ( error, variables, context ) => {
+      onError   : () => {
         toast.error( "Error al eliminar" )
       },
-      onSuccess : async ( data, variables, context ) => {
+      onSuccess : async () => {
         await refetch()
         toast.success( "Pais eliminado correctamente" )
       }
@@ -116,10 +115,10 @@ export default function CountryPage() {
         }
         return await response.json()
       },
-      onError   : ( error, variables, context ) => {
+      onError   : () => {
         toast.error( "Error al actualizar" )
       },
-      onSuccess : async ( data, variables, context ) => {
+      onSuccess : async () => {
         await refetch()
         toast.success( "Pais actualizado correctamente" )
       }
@@ -145,22 +144,14 @@ export default function CountryPage() {
         }
         return await response.json()
       },
-      onError   : ( error, variables, context ) => {
+      onError   : () => {
         toast.error( "Error al crear" )
       },
-      onSuccess : async ( data, variables, context ) => {
+      onSuccess : async () => {
         await refetch()
         toast.success( "Pais creado correctamente" )
       }
     } )
-
-
-  const handleSelectionChange = useCallback(
-    ( rows: CountryDTO[] ) => {
-      setSelecteds( rows )
-    },
-    []
-  )
 
   const [creating, setCreating]         = useState( false )
   const [updating, setUpdating]         = useState( false )
@@ -303,7 +294,6 @@ export default function CountryPage() {
           pageIndex={ pageIndex }
           pageSize={ pageSize }
           getRowId={ ( row ) => row.id }
-          onSelectionChange={ handleSelectionChange }
           makeHref={ makeHref }
           onPageChange={ setPageIndex }
           onPageHover={ ( p1 ) => prefetchPage( p1 - 1 ) }

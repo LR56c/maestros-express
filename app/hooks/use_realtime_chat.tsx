@@ -21,7 +21,7 @@ const EVENT_PAYMENT_TYPE = "payment"
 export function useRealtimeChat( {
   roomName,
   username,
-  senderId
+  // senderId
 }: RealtimeChatProps )
 {
   const supabase                      = createClient()

@@ -200,7 +200,7 @@ export const WorkerProvider = ( { children }: { children: ReactNode } ) => {
     if ( !response.ok ) {
       return false
     }
-    const data = await response.json()
+    // const data = await response.json()
     return true
   }
 

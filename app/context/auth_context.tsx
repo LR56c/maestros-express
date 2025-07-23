@@ -77,7 +77,7 @@ export const AuthProvider = ( { children }: { children: ReactNode } ) => {
       WorkerStatusEnum.INCOMPLETE
     if ( check ) {
       console.log( "User is not a worker, redirecting to apply page" )
-      await router.replace( "/trabajador/aplicar" )
+       router.replace( "/trabajador/aplicar" )
     }
   }
 
@@ -109,7 +109,7 @@ export const AuthProvider = ( { children }: { children: ReactNode } ) => {
       const { data, error } = await supabase.auth.getSession()
       if ( error || !data?.session ) {
         await anonymous()
-        await router.refresh()
+         router.refresh()
       }
       else {
         setUser( parseAuthResponse( data?.session?.user ) )

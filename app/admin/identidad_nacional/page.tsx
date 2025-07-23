@@ -1,6 +1,5 @@
 "use client"
 import * as React                from "react"
-import { useCallback, useState } from "react"
 import { ColumnDef }             from "@tanstack/react-table"
 
 import {
@@ -79,8 +78,7 @@ const columns: ColumnDef<NationalIdentityFormatDTO>[] = [
     //     </DropdownMenu>
     //   )
     // },
-    cell: ( { row } ) => {
-      const identity = row.original
+    cell: (  ) => {
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -117,15 +115,6 @@ export default function NationalIdentityPage() {
     defaultPageSize: 10
   } )
 
-  const [selecteds, setSelecteds] = useState<NationalIdentityFormatDTO[]>( [] )
-
-  const handleSelectionChange = useCallback(
-    ( rows: NationalIdentityFormatDTO[] ) => {
-      setSelecteds( rows )
-    },
-    []
-  )
-
   if ( isError ) {
     return (
       <div className="p-4 text-sm text-destructive">
@@ -154,7 +143,6 @@ export default function NationalIdentityPage() {
         total={ total }
         pageIndex={ pageIndex }
         pageSize={ pageSize }
-        onSelectionChange={ handleSelectionChange }
         getRowId={ ( row ) => row.id }
         makeHref={ makeHref }
         onPageChange={ setPageIndex }

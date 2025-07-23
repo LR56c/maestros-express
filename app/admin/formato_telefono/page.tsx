@@ -1,7 +1,6 @@
 "use client"
-import * as React                from "react"
-import { useCallback, useState } from "react"
-import { ColumnDef }             from "@tanstack/react-table"
+import * as React    from "react"
+import { ColumnDef } from "@tanstack/react-table"
 
 import {
   DataTablePaginated
@@ -51,11 +50,11 @@ const columns: ColumnDef<PhoneFormatDTO>[] = [
     enableHiding : false
   },
   {
-    header     : "Pais",
-    cell: ( { row } ) => {
+    header: "Pais",
+    cell  : ( { row } ) => {
       const phone = row.original
       return (
-          <span className="capitalize">{ phone.country.name }</span>
+        <span className="capitalize">{ phone.country.name }</span>
       )
     }
   },
@@ -79,8 +78,7 @@ const columns: ColumnDef<PhoneFormatDTO>[] = [
     //     </DropdownMenu>
     //   )
     // },
-    cell: ( { row } ) => {
-      const phone = row.original
+    cell: () => {
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -117,15 +115,6 @@ export default function PhonePage() {
     defaultPageSize: 10
   } )
 
-  const [selecteds, setSelecteds] = useState<PhoneFormatDTO[]>( [] )
-
-  const handleSelectionChange = useCallback(
-    ( rows: PhoneFormatDTO[] ) => {
-      setSelecteds( rows )
-    },
-    []
-  )
-
   if ( isError ) {
     return (
       <div className="p-4 text-sm text-destructive">
@@ -154,7 +143,6 @@ export default function PhonePage() {
         total={ total }
         pageIndex={ pageIndex }
         pageSize={ pageSize }
-        onSelectionChange={ handleSelectionChange }
         getRowId={ ( row ) => row.id }
         makeHref={ makeHref }
         onPageChange={ setPageIndex }

@@ -1,7 +1,7 @@
 "use client"
-import * as React                from "react"
-import { useCallback, useState } from "react"
-import { ColumnDef }             from "@tanstack/react-table"
+import * as React    from "react"
+import { useState }  from "react"
+import { ColumnDef } from "@tanstack/react-table"
 
 import {
   DataTablePaginated
@@ -128,7 +128,6 @@ export default function SpecialityPage() {
     defaultPageSize: 10
   } )
 
-  const [selecteds, setSelecteds]   = useState<SpecialityDTO[]>( [] )
   const [searchName, setSearchName] = useState( filters?.name ?? "" )
 
   const applyFilterForm = () => {
@@ -159,10 +158,10 @@ export default function SpecialityPage() {
         }
         return await response.json()
       },
-      onError   : ( error, variables, context ) => {
+      onError   : () => {
         toast.error( "Error al eliminar" )
       },
-      onSuccess : async ( data, variables, context ) => {
+      onSuccess : async () => {
         await refetch()
         toast.success( "Especialidad eliminada correctamente" )
       }
@@ -187,10 +186,10 @@ export default function SpecialityPage() {
         }
         return await response.json()
       },
-      onError   : ( error, variables, context ) => {
+      onError   : () => {
         toast.error( "Error al actualizar" )
       },
-      onSuccess : async ( data, variables, context ) => {
+      onSuccess : async () => {
         await refetch()
         toast.success( "Especialidad actualizada correctamente" )
       }
@@ -215,21 +214,14 @@ export default function SpecialityPage() {
         }
         return await response.json()
       },
-      onError   : ( error, variables, context ) => {
+      onError   : () => {
         toast.error( "Error al crear" )
       },
-      onSuccess : async ( data, variables, context ) => {
+      onSuccess : async () => {
         await refetch()
         toast.success( "Especialidad creada correctamente" )
       }
     } )
-
-  const handleSelectionChange = useCallback(
-    ( rows: SpecialityDTO[] ) => {
-      setSelecteds( rows )
-    },
-    []
-  )
 
   const [creating, setCreating]         = useState( false )
   const [updating, setUpdating]         = useState( false )
@@ -314,7 +306,6 @@ export default function SpecialityPage() {
         total={ total }
         pageIndex={ pageIndex }
         pageSize={ pageSize }
-        onSelectionChange={ handleSelectionChange }
         getRowId={ ( row ) => row.id }
         makeHref={ makeHref }
         onPageChange={ setPageIndex }

@@ -1,6 +1,5 @@
 "use client"
 import * as React                from "react"
-import { useCallback, useState } from "react"
 import { ColumnDef }             from "@tanstack/react-table"
 
 import {
@@ -27,6 +26,7 @@ import {
   DialogTitle
 }                           from "@/components/ui/dialog"
 import { UserAdminDialog }  from "@/components/admin/user_admin_dialog"
+import { useState }         from "react"
 
 interface SpecialityFilters {
 }
@@ -130,15 +130,6 @@ export default function UsersPage() {
     defaultPageSize: 10
   } )
 
-  const [selecteds, setSelecteds] = useState<UserResponse[]>( [] )
-
-  const handleSelectionChange = useCallback(
-    ( rows: UserResponse[] ) => {
-      setSelecteds( rows )
-    },
-    []
-  )
-
   if ( isError ) {
     return (
       <div className="p-4 text-sm text-destructive">
@@ -167,7 +158,6 @@ export default function UsersPage() {
         total={ total }
         pageIndex={ pageIndex }
         pageSize={ pageSize }
-        onSelectionChange={ handleSelectionChange }
         getRowId={ ( row ) => row.user_id }
         makeHref={ makeHref }
         onPageChange={ setPageIndex }

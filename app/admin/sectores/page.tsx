@@ -50,7 +50,6 @@ export default function SectorPage() {
     defaultPageSize: 10
   } )
 
-  const [selecteds, setSelecteds] = useState<SectorDTO[]>( [] )
   const [searchName, setSearchName] = useState( filters?.name ?? "" )
 
   const applyFilterForm = () => {
