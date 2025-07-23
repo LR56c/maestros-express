@@ -29,18 +29,8 @@ export class SupabaseUserData implements AuthAppService {
       throw new InfrastructureException( error.message )
     }
 
-    const metadata = data.user!.user_metadata
-
-    return {
-      user_id  : data.user!.id,
-      email    : data.user!.email!,
-      full_name: metadata.name,
-      avatar   : metadata.avatar,
-      role     : metadata.role,
-      status   : metadata.status
-    }
+    return this.getUserMetadata( data.user! )
   }
-
 
 
   async anonymous(): Promise<UserResponse> {
@@ -50,12 +40,18 @@ export class SupabaseUserData implements AuthAppService {
       throw new InfrastructureException( error.message )
     }
 
-    const metadata = data.user!.user_metadata
+    return this.getUserMetadata( data.user! )
+  }
+
+  private async getUserMetadata( user : any ): Promise<UserResponse> {
+    const metadata = user.user_metadata
 
     return {
-      user_id  : data.user!.id,
-      email    : data.user!.email!,
+      user_id  : user.id,
+      email    : user.email!,
+      username : metadata.username,
       full_name: metadata.name,
+      avatar   : metadata.avatar,
       role     : metadata.role,
       status   : metadata.status
     }
@@ -67,16 +63,7 @@ export class SupabaseUserData implements AuthAppService {
     if ( error ) {
       throw new InfrastructureException( error.message )
     }
-    const metadata = data.user!.user_metadata
-
-    return {
-      user_id  : data.user!.id,
-      email    : data.user!.email!,
-      full_name: metadata.name,
-      avatar   : metadata.avatar,
-      role     : metadata.role,
-      status   : metadata.status
-    }
+    return this.getUserMetadata( data.user! )
   }
 
   async logout( token?: string ): Promise<void> {
@@ -100,15 +87,6 @@ export class SupabaseUserData implements AuthAppService {
     if ( error ) {
       throw new InfrastructureException( error.message )
     }
-    const metadata = data.user!.user_metadata
-
-    return {
-      user_id  : data.user!.id,
-      email    : data.user!.email!,
-      full_name: metadata.name,
-      avatar   : metadata.avatar,
-      role     : metadata.role,
-      status   : metadata.status
-    }
+    return this.getUserMetadata( data.user! )
   }
 }
