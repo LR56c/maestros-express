@@ -20,15 +20,15 @@ import {
   DataNotFoundException
 }                                      from "@/modules/shared/domain/exceptions/data_not_found_exception"
 import {
-  RegisterAuth
-}                                      from "@/modules/user/application/auth_use_cases/register_auth"
-import {
   SearchNationalIdentityFormat
 }                                      from "@/modules/national_identity_format/application/search_national_identity_format"
 import {
   WorkerStatusEnum
 }                                      from "@/modules/worker/domain/worker_status"
 import { RoleLevelType }               from "@/modules/user/domain/role_type"
+import {
+  RegisterAuth
+}                                      from "@/modules/user/application/register_auth"
 
 export class AddWorker {
   constructor(
@@ -62,10 +62,10 @@ export class AddWorker {
 
     const userResult = await this.register.execute( worker.user,
       RoleLevelType.WORKER, status )
+
     if ( isLeft( userResult ) ) {
       return left( userResult.left )
     }
-
 
     const newWorker = Worker.create(
       userResult.right,
