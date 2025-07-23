@@ -20,6 +20,7 @@ import { RoleType }                  from "@/modules/user/domain/role_type"
 export abstract class User {
   abstract readonly userId: UUID
   abstract readonly email: Email
+  abstract readonly username: ValidString
   abstract readonly fullName: ValidString
   abstract readonly createdAt: ValidDate
   abstract readonly role: RoleType
@@ -31,6 +32,7 @@ export class UserAnon implements User {
   private constructor(
     readonly userId: UUID,
     readonly email: Email,
+    readonly username: ValidString,
     readonly fullName: ValidString,
     readonly createdAt: ValidDate,
     readonly role: RoleType,
@@ -43,6 +45,7 @@ export class UserAnon implements User {
   static fromPrimitives(
     userId: string,
     email: string,
+    username: string,
     fullName: string,
     status: string,
     createdAt: Date | string
@@ -54,6 +57,12 @@ export class UserAnon implements User {
 
     if ( userIdValue instanceof BaseException ) {
       errors.push( userIdValue )
+    }
+
+    const vusername = wrapType( () => ValidString.from( username ) )
+
+    if ( vusername instanceof BaseException ) {
+      errors.push( vusername )
     }
 
     const vemail = wrapType(
@@ -98,6 +107,7 @@ export class UserAnon implements User {
     return new UserAnon(
       userIdValue as UUID,
       vemail as Email,
+      vusername as ValidString,
       vname as ValidString,
       vcreatedAt as ValidDate,
       vrole as RoleType,
@@ -112,6 +122,7 @@ export class UserAuth implements User {
   private constructor(
     readonly userId: UUID,
     readonly email: Email,
+    readonly username: ValidString,
     readonly fullName: ValidString,
     readonly createdAt: ValidDate,
     readonly role: RoleType,
@@ -124,12 +135,14 @@ export class UserAuth implements User {
   static create(
     userId: string,
     email: string,
+    username: string,
     fullName: string,
     role: string | number,
     status: string,
     avatar: string | null
   ): UserAuth | Errors {
-    return UserAuth.fromPrimitives( userId, email, fullName, new Date(), role,
+    return UserAuth.fromPrimitives( userId, email, username, fullName,
+      new Date(), role,
       status,
       avatar )
   }
@@ -137,19 +150,22 @@ export class UserAuth implements User {
   static from(
     userId: UUID,
     email: Email,
+    username: ValidString,
     fullName: ValidString,
     createdAt: ValidDate,
     role: RoleType,
     status: ValidString,
     avatar   ?: ValidString
   ): UserAuth {
-    return new UserAuth( userId, email, fullName, createdAt, role, status,
+    return new UserAuth( userId, email, username, fullName, createdAt, role,
+      status,
       avatar )
   }
 
   static fromPrimitiveThrow(
     userId: string,
     email: string,
+    username: string,
     fullName: string,
     createdAt: Date | string,
     role: string | number,
@@ -159,6 +175,7 @@ export class UserAuth implements User {
     return new UserAuth(
       UUID.from( userId ),
       Email.from( email ),
+      ValidString.from( username ),
       ValidString.from( fullName ),
       ValidDate.from( createdAt ),
       RoleType.from( role ),
@@ -170,6 +187,7 @@ export class UserAuth implements User {
   static fromPrimitives(
     userId: string,
     email: string,
+    username: string,
     fullName: string,
     createdAt: Date | string,
     role: string | number,
@@ -197,6 +215,13 @@ export class UserAuth implements User {
 
     if ( vname instanceof BaseException ) {
       errors.push( vname )
+    }
+
+    const vusername = wrapType(
+      () => ValidString.from( username ) )
+
+    if ( vusername instanceof BaseException ) {
+      errors.push( vusername )
     }
 
     const vavatar = wrapTypeDefault( undefined,
@@ -234,6 +259,7 @@ export class UserAuth implements User {
     return new UserAuth(
       userIdValue as UUID,
       vemail as Email,
+      vusername as ValidString,
       vname as ValidString,
       vcreatedAt as ValidDate,
       vrole as RoleType,

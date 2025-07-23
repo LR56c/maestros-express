@@ -74,7 +74,7 @@ model Story {
 model StoryDocument {
   id        String              @id @default(uuid()) @db.Uuid
   type      PackageDocumentType @map("type")
-  name       String              @map("name")
+  name      String              @map("name")
   url       String              @map("url")
   createdAt DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
   storyId   String              @map("story_id") @db.Uuid
@@ -495,7 +495,8 @@ enum CertificateType {
 model User {
   id                 String               @id @db.Uuid
   name               String
-  email              String
+  username           String               @unique
+  email              String               @unique
   avatar             String?
   createdAt          DateTime
   role               String
@@ -513,8 +514,6 @@ model User {
   FromUserReport     Report[]             @relation("FromUserReports")
   ToUserReport       Report[]             @relation("ToUserReports")
 
-
-  @@unique([email])
   @@map("user")
 }
 

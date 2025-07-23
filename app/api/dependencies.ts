@@ -248,23 +248,8 @@ import {
   UpsertWorkerTax
 }                       from "@/modules/worker_tax/application/upsert_worker_tax"
 import {
-  PrismaUserData
-}                       from "@/modules/user/infrastructure/prisma_user_data"
-import {
   SupabaseAdminUserData
 }                       from "@/modules/user/infrastructure/supabase_admin_user_data"
-import {
-  AddUser
-}                       from "@/modules/user/application/user_use_cases/add_user"
-import {
-  RegisterAuth
-}                       from "@/modules/user/application/auth_use_cases/register_auth"
-import {
-  GetAuth
-}                       from "@/modules/user/application/auth_use_cases/get_auth"
-import {
-  SearchUser
-}                       from "@/modules/user/application/user_use_cases/search_user"
 import {
   PrismaWorkerBookingData
 }                       from "@/modules/worker_booking/infrastructure/prisma_worker_booking_data"
@@ -352,14 +337,23 @@ import {
 }                       from "@/modules/report/application/search_report"
 import {
   UploadFileRepository
-} from "@/modules/shared/domain/upload_file_repository"
+}                       from "@/modules/shared/domain/upload_file_repository"
 import {
   SupabaseFileUploadData
-} from "@/modules/shared/infrastructure/supabase_file_upload_data"
+}                       from "@/modules/shared/infrastructure/supabase_file_upload_data"
 import {
-  UpdateAuth
-}                       from "@/modules/user/application/auth_use_cases/update_auth"
-import { GetChatById }  from "@/modules/chat/application/get_chat_by_id"
+  GetChatById
+}                       from "@/modules/chat/application/get_chat_by_id"
+import {
+  SearchUsers
+}                       from "@/modules/user/application/search_auth"
+import { RegisterAuth } from "@/modules/user/application/register_auth"
+import { UpdateAuth }   from "@/modules/user/application/update_auth"
+import { GetAuthByEmail } from "@/modules/user/application/get_auth_by_email"
+import {
+  GetAuthByUsername
+} from "@/modules/user/application/get_auth_by_username"
+import { PrismaUserData } from "@/modules/user/infrastructure/prisma_user_data"
 
 export async function ai() {
   return new OpenAI( {
@@ -458,28 +452,29 @@ export async function getZonesWorker() {
   return new GetZonesByWorker( zoneData )
 }
 
-const userDao = new PrismaUserData( prisma )
 const authDao = new SupabaseAdminUserData( await createClient() )
+const userDao = new PrismaUserData( prisma )
 
-export async function addUser() {
-  return new AddUser( userDao, await getUser() )
+export async function searchUser() {
+  return new SearchUsers( userDao )
 }
 
 export async function registerAuth() {
   return new RegisterAuth( authDao )
 }
 
-export async function updateAuth(){
-  return new UpdateAuth(authDao)
+export async function updateAuth() {
+  return new UpdateAuth( authDao )
 }
 
-export async function getUser() {
-  return new GetAuth( authDao )
+export async function getUserByEmail() {
+  return new GetAuthByEmail( authDao )
 }
 
-export async function searchUser() {
-  return new SearchUser( userDao )
+export async function getUserByUsername() {
+  return new GetAuthByUsername( authDao )
 }
+
 
 const bookingData = new PrismaWorkerBookingData( prisma )
 
@@ -732,6 +727,7 @@ export async function searchCurrency() {
 }
 
 const chatData = new PrismaChatData( prisma )
+
 
 export async function addChat() {
   return new AddChat( chatData, await searchUser() )

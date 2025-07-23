@@ -6,19 +6,22 @@ import {
 }                         from "@/modules/shared/domain/exceptions/base_exception"
 import { User }           from "@/modules/user/domain/user"
 import { wrapType }       from "@/modules/shared/utils/wrap_type"
+import {
+  ValidString
+}                         from "@/modules/shared/domain/value_objects/valid_string"
 
-export class GetAuth {
+export class GetAuthByUsername {
   constructor( private readonly repo: AuthRepository ) {
   }
 
-  async execute( email: string ): Promise<Either<BaseException[], User>> {
-    const userEmail = wrapType( () => Email.from( email ) )
+  async execute( username: string ): Promise<Either<BaseException[], User>> {
+    const vusername = wrapType( () => ValidString.from( username ) )
 
-    if ( userEmail instanceof BaseException ) {
-      return left( [userEmail] )
+    if ( vusername instanceof BaseException ) {
+      return left( [vusername] )
     }
 
-    return this.repo.getByEmail( userEmail )
+    return this.repo.getByEmail( vusername )
   }
 
 }

@@ -23,13 +23,13 @@ import {
   InfrastructureException
 }                                      from "@/modules/shared/domain/exceptions/infrastructure_exception"
 import {
-  SearchUser
-}                                      from "@/modules/user/application/user_use_cases/search_user"
+  SearchUsers
+}                                      from "@/modules/user/application/search_auth"
 
 export class AddChat {
   constructor(
     private readonly dao: ChatDAO,
-    private readonly searchUser: SearchUser
+    private readonly searchUser: SearchUsers
   )
   {
   }

@@ -17,4 +17,7 @@ export abstract class AuthAppService {
   abstract register( request: UserRegisterRequest ): Promise<UserResponse>
 
   abstract anonymous(): Promise<UserResponse>
+  // abstract requestResetPassword( method: ResetPassword, data ?: string ): Promise<Either<BaseException, boolean>>
+  // abstract singinOauth( method: AuthMethod, token?: ValidString ): Promise<Either<BaseException[], User>>
+  // abstract confirmResetPassword( userId: ValidString, method: ResetPassword, data ?: string ): Promise<Either<BaseException, boolean>>
 }
