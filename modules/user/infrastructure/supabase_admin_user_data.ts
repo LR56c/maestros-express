@@ -18,12 +18,6 @@ import { AuthRepository }      from "@/modules/user/domain/auth_repository"
 import {
   Errors
 }                              from "@/modules/shared/domain/exceptions/errors"
-import {
-  ValidInteger
-}                              from "@/modules/shared/domain/value_objects/valid_integer"
-import {
-  PaginatedResult
-}                              from "@/modules/shared/domain/paginated_result"
 
 
 export class SupabaseAdminUserData implements AuthRepository {
@@ -62,43 +56,6 @@ export class SupabaseAdminUserData implements AuthRepository {
       return left( user.values )
     }
     return right( user )
-  }
-
-  async search( query: Record<string, any>, limit?: ValidInteger,
-    skip?: ValidString,
-    sortBy?: ValidString,
-    sortType?: ValidString ): Promise<Either<BaseException[], PaginatedResult<User>>> {
-    console.log( "search", query, limit, skip, sortBy, sortType )
-    const { data, error } = await this.client.rpc(
-      "search_users_by_json_paginated", {
-        p_filters  : query,
-        p_limit    : limit?.value,
-        p_offset   : skip?.value,
-        p_order_by : sortBy?.value,
-        p_order_dir: sortType?.value
-      } )
-    console.log( "data", data, error )
-    if ( error ) {
-      return left( [new InfrastructureException( error.message )] )
-    }
-    return left( [new InfrastructureException()] )
-    // const d        = data as any
-    // const metadata = d.raw_user_meta_data
-    //
-    // const user = UserAuth.fromPrimitives(
-    //   d.id,
-    //   d.email,
-    //   metadata.username,
-    //   metadata.name,
-    //   d.created_at,
-    //   metadata.role,
-    //   metadata.status,
-    //   metadata.avatar
-    // )
-    // if ( user instanceof Errors ) {
-    //   return left( user.values )
-    // }
-    // return right( user )
   }
 
 

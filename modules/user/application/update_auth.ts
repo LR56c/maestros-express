@@ -38,6 +38,7 @@ export class UpdateAuth {
     const updatedUser = UserAuth.fromPrimitives(
       exist.right.userId.toString(),
       exist.right.email.value,
+      exist.right.username.value,
       exist.right.fullName.value,
       exist.right.createdAt.toString(),
       auth.role ? auth.role : exist.right.role.toString(),

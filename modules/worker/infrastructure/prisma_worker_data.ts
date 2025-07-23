@@ -81,6 +81,7 @@ export const mapWorkerRelations = async ( w: any ): Promise<Either<BaseException
   const userMapped = UserAuth.fromPrimitives(
     w.user.id.toString(),
     w.user.email,
+    w.user.username,
     w.user.name,
     w.user.createdAt,
     w.user.role,

@@ -43,6 +43,7 @@ export class RegisterAuth {
     const user = UserAuth.create(
       UUID.create().value,
       dto.email,
+      dto.username,
       dto.full_name,
       role,
       status,
