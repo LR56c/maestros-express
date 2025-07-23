@@ -1,14 +1,13 @@
 import {
   WorkerScheduleDAO
-} from "@/modules/worker_schedule/domain/worker_schedule_dao"
-import { UUID }                        from "@/modules/shared/domain/value_objects/uuid"
+}                                      from "@/modules/worker_schedule/domain/worker_schedule_dao"
 import { Either, isLeft, left, right } from "fp-ts/Either"
 import {
   BaseException
 }                                      from "@/modules/shared/domain/exceptions/base_exception"
 import {
   ensureWorkerScheduleExist
-} from "@/modules/worker_schedule/utils/ensure_worker_schedule_exist"
+}                                      from "@/modules/worker_schedule/utils/ensure_worker_schedule_exist"
 
 export class RemoveWorkerSchedule {
   constructor( private readonly dao: WorkerScheduleDAO ) {

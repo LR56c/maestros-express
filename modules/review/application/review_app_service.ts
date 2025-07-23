@@ -1,4 +1,4 @@
-import { ReviewDTO }   from "@/modules/review/application/review_dto"
+import { ReviewDTO } from "@/modules/review/application/review_dto"
 
 export abstract class ReviewAppService {
   abstract add( review : ReviewDTO ): Promise<void>

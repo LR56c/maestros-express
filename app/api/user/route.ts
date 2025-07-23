@@ -7,22 +7,15 @@ import {
 import {
   parseData
 }                                    from "@/modules/shared/application/parse_handlers"
-import { isLeft }                                from "fp-ts/Either"
-import { searchUser, updateAuth, updateMessage } from "@/app/api/dependencies"
+import { isLeft }                    from "fp-ts/Either"
+import { searchUser, updateAuth }    from "@/app/api/dependencies"
 import {
   UserMapper
-}                                                from "@/modules/user/application/user_mapper"
+}                                    from "@/modules/user/application/user_mapper"
 import {
-  messageUpdateSchema
-}                                    from "@/modules/message/application/message_update_dto"
-import {
-  MessageMapper
-}                                    from "@/modules/message/application/message_mapper"
-import {
-  UserUpdateDTO,
   userUpdateSchema
-} from "@/modules/user/application/models/user_update_dto"
-import { createClientServer }                    from "@/utils/supabase/server"
+}                                    from "@/modules/user/application/models/user_update_dto"
+import { createClientServer }        from "@/utils/supabase/server"
 
 export async function GET( request: NextRequest ) {
   const { searchParams }                             = new URL( request.url )

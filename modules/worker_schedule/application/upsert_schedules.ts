@@ -7,18 +7,20 @@ import {
 }                                      from "@/modules/shared/domain/exceptions/base_exception"
 import {
   WorkerScheduleDAO
-}                      from "@/modules/worker_schedule/domain/worker_schedule_dao"
+}                                      from "@/modules/worker_schedule/domain/worker_schedule_dao"
 import {
   WorkerScheduleDTO
-}                      from "@/modules/worker_schedule/application/worker_schedule_dto"
+}                                      from "@/modules/worker_schedule/application/worker_schedule_dto"
 import {
   SearchWorkerSchedule
-} from "@/modules/worker_schedule/application/search_worker_schedule"
-import { wrapType }             from "@/modules/shared/utils/wrap_type"
+}                                      from "@/modules/worker_schedule/application/search_worker_schedule"
+import { wrapType }                    from "@/modules/shared/utils/wrap_type"
 import {
   UUID
-}                               from "@/modules/shared/domain/value_objects/uuid"
-import { Errors } from "@/modules/shared/domain/exceptions/errors"
+}                                      from "@/modules/shared/domain/value_objects/uuid"
+import {
+  Errors
+}                                      from "@/modules/shared/domain/exceptions/errors"
 
 export class UpsertSchedules {
   constructor(

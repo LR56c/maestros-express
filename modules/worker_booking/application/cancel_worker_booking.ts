@@ -7,7 +7,7 @@ import {
 }                                      from "@/modules/shared/domain/exceptions/base_exception"
 import {
   ensureWorkerBookingExist
-} from "@/modules/worker_booking/utils/ensure_worker_booking_exist"
+}                                      from "@/modules/worker_booking/utils/ensure_worker_booking_exist"
 
 export class CancelWorkerBooking {
   constructor(private readonly dao : WorkerBookingDAO) {

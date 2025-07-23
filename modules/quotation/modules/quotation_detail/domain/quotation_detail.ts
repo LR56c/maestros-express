@@ -1,10 +1,16 @@
-import { UUID }        from "@/modules/shared/domain/value_objects/uuid"
-import { ValidDate }   from "@/modules/shared/domain/value_objects/valid_date"
-import { ValidString } from "@/modules/shared/domain/value_objects/valid_string"
+import { UUID }                      from "@/modules/shared/domain/value_objects/uuid"
+import {
+  ValidDate
+}                                    from "@/modules/shared/domain/value_objects/valid_date"
+import {
+  ValidString
+}                                    from "@/modules/shared/domain/value_objects/valid_string"
 import {
   ValidInteger
-}                      from "@/modules/shared/domain/value_objects/valid_integer"
-import { Errors }      from "@/modules/shared/domain/exceptions/errors"
+}                                    from "@/modules/shared/domain/value_objects/valid_integer"
+import {
+  Errors
+}                                    from "@/modules/shared/domain/exceptions/errors"
 import {
   BaseException
 }                                    from "@/modules/shared/domain/exceptions/base_exception"

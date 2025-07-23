@@ -3,7 +3,9 @@ import { Either, isLeft, left, right } from "fp-ts/Either"
 import {
   BaseException
 }                                      from "@/modules/shared/domain/exceptions/base_exception"
-import { ensureStoryExist } from "@/modules/story/utils/ensure_story_exist"
+import {
+  ensureStoryExist
+}                                      from "@/modules/story/utils/ensure_story_exist"
 
 export class RemoveStory {
   constructor(private readonly dao : StoryDAO) {}

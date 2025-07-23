@@ -1,17 +1,21 @@
-import { UUID }        from "@/modules/shared/domain/value_objects/uuid"
-import { ValidDate }   from "@/modules/shared/domain/value_objects/valid_date"
-import { ValidString } from "@/modules/shared/domain/value_objects/valid_string"
-import { Errors }      from "@/modules/shared/domain/exceptions/errors"
+import { UUID }     from "@/modules/shared/domain/value_objects/uuid"
+import {
+  ValidDate
+}                   from "@/modules/shared/domain/value_objects/valid_date"
+import {
+  ValidString
+}                   from "@/modules/shared/domain/value_objects/valid_string"
+import { Errors }   from "@/modules/shared/domain/exceptions/errors"
 import {
   BaseException
-}                      from "@/modules/shared/domain/exceptions/base_exception"
-import { wrapType }    from "@/modules/shared/utils/wrap_type"
+}                   from "@/modules/shared/domain/exceptions/base_exception"
+import { wrapType } from "@/modules/shared/utils/wrap_type"
 import {
   ValidDecimal
-} from "@/modules/shared/domain/value_objects/valid_decimal"
+}                   from "@/modules/shared/domain/value_objects/valid_decimal"
 import {
   PackageDocument
-} from "@/modules/package/modules/package_document/domain/package_document"
+}                   from "@/modules/package/modules/package_document/domain/package_document"
 
 export class Package {
   private constructor(

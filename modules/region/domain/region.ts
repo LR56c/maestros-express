@@ -8,10 +8,12 @@ import {
   BaseException
 }                      from "../../shared/domain/exceptions/base_exception"
 import { wrapType }    from "../../shared/utils/wrap_type"
-import { UUID }        from "@/modules/shared/domain/value_objects/uuid"
+import {
+  UUID
+}                      from "@/modules/shared/domain/value_objects/uuid"
 import {
   InvalidUUIDException
-} from "@/modules/shared/domain/exceptions/invalid_uuid_exception"
+}                      from "@/modules/shared/domain/exceptions/invalid_uuid_exception"
 
 export class Region {
   private constructor(

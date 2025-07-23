@@ -1,7 +1,7 @@
 import { z } from "zod"
 import {
   InvalidPackageDocumentTypeException
-} from "@/modules/package/modules/package_document/domain/exception/invalid_package_document_type_exception"
+}            from "@/modules/package/modules/package_document/domain/exception/invalid_package_document_type_exception"
 
 export enum PackageDocumentTypeEnum {
   PDF   = "PDF",

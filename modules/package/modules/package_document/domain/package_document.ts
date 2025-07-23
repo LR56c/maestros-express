@@ -1,14 +1,18 @@
-import { UUID }        from "@/modules/shared/domain/value_objects/uuid"
-import { ValidDate }   from "@/modules/shared/domain/value_objects/valid_date"
-import { ValidString } from "@/modules/shared/domain/value_objects/valid_string"
+import { UUID }     from "@/modules/shared/domain/value_objects/uuid"
+import {
+  ValidDate
+}                   from "@/modules/shared/domain/value_objects/valid_date"
+import {
+  ValidString
+}                   from "@/modules/shared/domain/value_objects/valid_string"
 import {
   PackageDocumentType
-}                      from "@/modules/package/modules/package_document/domain/package_document_type"
-import { Errors }      from "@/modules/shared/domain/exceptions/errors"
+}                   from "@/modules/package/modules/package_document/domain/package_document_type"
+import { Errors }   from "@/modules/shared/domain/exceptions/errors"
 import {
   BaseException
-}                      from "@/modules/shared/domain/exceptions/base_exception"
-import { wrapType }    from "@/modules/shared/utils/wrap_type"
+}                   from "@/modules/shared/domain/exceptions/base_exception"
+import { wrapType } from "@/modules/shared/utils/wrap_type"
 
 export class PackageDocument {
   private constructor(

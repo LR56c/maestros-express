@@ -7,11 +7,8 @@ import {
   BaseException
 }                              from "@/modules/shared/domain/exceptions/base_exception"
 import {
-  ValidInteger
-}                              from "@/modules/shared/domain/value_objects/valid_integer"
-import {
   ensureNotificationConfigExist
-} from "@/modules/notification_config/utils/ensure_notification_config_exist"
+}                              from "@/modules/notification_config/utils/ensure_notification_config_exist"
 
 export class RemoveNotificationConfig {
   constructor( private readonly dao: NotificationConfigDAO ) {

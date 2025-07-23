@@ -1,21 +1,19 @@
-import { CountryDAO } from "@/modules/country/domain/country_dao"
 import { Either, isLeft, left, right } from "fp-ts/Either"
 import {
   BaseException
-} from "@/modules/shared/domain/exceptions/base_exception"
-import { Country } from "@/modules/country/domain/country"
+}                                      from "@/modules/shared/domain/exceptions/base_exception"
 import {
   ValidInteger
-} from "@/modules/shared/domain/value_objects/valid_integer"
+}                                      from "@/modules/shared/domain/value_objects/valid_integer"
 import {
   DataNotFoundException
-} from "@/modules/shared/domain/exceptions/data_not_found_exception"
+}                                      from "@/modules/shared/domain/exceptions/data_not_found_exception"
 import {
   WorkerScheduleDAO
 }                                      from "@/modules/worker_schedule/domain/worker_schedule_dao"
 import {
   WorkerSchedule
-} from "@/modules/worker_schedule/domain/worker_schedule"
+}                                      from "@/modules/worker_schedule/domain/worker_schedule"
 
 export const ensureWorkerScheduleExist = async ( dao: WorkerScheduleDAO,
   countryId: string ): Promise<Either<BaseException[], WorkerSchedule>> => {

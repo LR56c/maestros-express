@@ -1,6 +1,6 @@
 import {
   InvalidReviewTypeException
-} from "@/modules/review/domain/exception/invalid_review_type_exception"
+}            from "@/modules/review/domain/exception/invalid_review_type_exception"
 import { z } from "zod"
 
 export enum ReviewTypeEnum {

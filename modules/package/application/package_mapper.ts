@@ -1,10 +1,10 @@
-import { Package } from "@/modules/package/domain/package"
+import { Package }  from "@/modules/package/domain/package"
 import {
   PackageResponse
-}                  from "@/modules/package/application/package_response"
+}                   from "@/modules/package/application/package_response"
 import {
   Errors
-}                  from "@/modules/shared/domain/exceptions/errors"
+}                   from "@/modules/shared/domain/exceptions/errors"
 import { wrapType } from "@/modules/shared/utils/wrap_type"
 import {
   UUID

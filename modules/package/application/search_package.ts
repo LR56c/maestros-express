@@ -3,7 +3,6 @@ import { Either, isLeft, left } from "fp-ts/Either"
 import {
   BaseException
 }                               from "@/modules/shared/domain/exceptions/base_exception"
-import { Speciality }           from "@/modules/speciality/domain/speciality"
 import {
   genericEnsureSearch
 }                               from "@/modules/shared/utils/generic_ensure_search"

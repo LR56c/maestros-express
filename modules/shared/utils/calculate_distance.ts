@@ -1,7 +1,5 @@
 import { getDistance } from "geolib"
-import {
-  LatLng
-}                      from "@/modules/shared/domain/value_objects/position"
+import { LatLng }      from "@/modules/shared/domain/value_objects/position"
 
 export const  calculateDistance=( origin: LatLng, target: LatLng ): string =>{
   const meters = getDistance( origin, target )

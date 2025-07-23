@@ -1,18 +1,26 @@
-import { CountryMapper } from "@/modules/country/application/country_mapper"
-import { Errors }                    from "@/modules/shared/domain/exceptions/errors"
+import { CountryMapper }             from "@/modules/country/application/country_mapper"
+import {
+  Errors
+}                                    from "@/modules/shared/domain/exceptions/errors"
 import { wrapType, wrapTypeDefault } from "@/modules/shared/utils/wrap_type"
-import { UUID }                      from "@/modules/shared/domain/value_objects/uuid"
+import {
+  UUID
+}                                    from "@/modules/shared/domain/value_objects/uuid"
 import {
   BaseException
-}                        from "@/modules/shared/domain/exceptions/base_exception"
+}                                    from "@/modules/shared/domain/exceptions/base_exception"
 import {
   ValidString
-}                        from "@/modules/shared/domain/value_objects/valid_string"
-import { CountryDTO }    from "@/modules/country/application/country_dto"
-import { PhoneFormat }   from "@/modules/phone_format/domain/phone_format"
+}                                    from "@/modules/shared/domain/value_objects/valid_string"
+import {
+  CountryDTO
+}                                    from "@/modules/country/application/country_dto"
+import {
+  PhoneFormat
+}                                    from "@/modules/phone_format/domain/phone_format"
 import {
   PhoneFormatDTO
-} from "@/modules/phone_format/application/phone_format_dto"
+}                                    from "@/modules/phone_format/application/phone_format_dto"
 
 export class PhoneFormatMapper {
   static toDTO( nationalIdentity: PhoneFormat ): PhoneFormatDTO {

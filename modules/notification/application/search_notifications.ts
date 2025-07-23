@@ -6,9 +6,7 @@ import { isLeft, left } from "fp-ts/Either"
 import {
   BaseException
 }                       from "@/modules/shared/domain/exceptions/base_exception"
-import {
-  Notification
-}                       from "@/modules/notification/domain/notification"
+import { Notification } from "@/modules/notification/domain/notification"
 import {
   genericEnsureSearch
 }                       from "@/modules/shared/utils/generic_ensure_search"

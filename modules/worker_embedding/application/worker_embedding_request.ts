@@ -6,7 +6,6 @@ import { storySchema } from "@/modules/story/application/story_dto"
 import {
   WorkerEmbeddingTypeEnum
 }                      from "@/modules/worker_embedding/domain/worker_embedding_type"
-import { latLngSchema } from "@/modules/shared/domain/value_objects/position"
 
 const workEmbedSchema = workerResponseSchema.extend( {
   type: z.literal( WorkerEmbeddingTypeEnum.WORKER )

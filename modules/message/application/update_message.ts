@@ -1,17 +1,18 @@
-import { MessageDAO }  from "@/modules/message/domain/message_dao"
+import { MessageDAO }                  from "@/modules/message/domain/message_dao"
 import { Message }                     from "@/modules/message/domain/message"
 import { Either, isLeft, left, right } from "fp-ts/Either"
 import {
   BaseException
 }                                      from "@/modules/shared/domain/exceptions/base_exception"
-import { MessageResponse } from "@/modules/message/application/message_response"
-import { Errors }          from "@/modules/shared/domain/exceptions/errors"
+import {
+  Errors
+}                                      from "@/modules/shared/domain/exceptions/errors"
 import {
   MessageUpdateDTO
-} from "@/modules/message/application/message_update_dto"
+}                                      from "@/modules/message/application/message_update_dto"
 import {
   ensureMessageExist
-} from "@/modules/message/utils/ensure_message_exist"
+}                                      from "@/modules/message/utils/ensure_message_exist"
 
 export class UpdateMessage {
   constructor( private readonly dao: MessageDAO ) {

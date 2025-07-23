@@ -1,24 +1,11 @@
 "use server"
 
 import { NextRequest, NextResponse } from "next/server"
-import {
-  parseData
-}                                    from "@/modules/shared/application/parse_handlers"
 import { isLeft }                    from "fp-ts/Either"
-import { z }                         from "zod"
-import {
-  storySchema
-}                                    from "@/modules/story/application/story_dto"
 import {
   StoryMapper
 }                                    from "@/modules/story/application/story_mapper"
-import {
-  addStory,
-  getStories,
-  removeStory,
-  updateStory
-}                                    from "@/app/api/dependencies"
-
+import { getStories }                from "@/app/api/dependencies"
 
 
 export async function GET( request: NextRequest ) {

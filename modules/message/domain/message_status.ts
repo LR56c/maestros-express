@@ -1,7 +1,7 @@
 import { z } from "zod"
 import {
   InvalidMessageStatusException
-} from "@/modules/message/domain/exception/invalid_message_status_exception"
+}            from "@/modules/message/domain/exception/invalid_message_status_exception"
 
 export enum MessageStatusEnum {
   SENDING = "SENDING",

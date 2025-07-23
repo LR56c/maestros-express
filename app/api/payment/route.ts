@@ -22,9 +22,6 @@ import {
   searchPayment,
   updatePayment
 }                                    from "@/app/api/dependencies"
-import {
-  SpecialityMapper
-}                                    from "@/modules/speciality/application/speciality_mapper"
 
 
 export async function POST( request: NextRequest ) {

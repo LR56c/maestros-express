@@ -1,19 +1,12 @@
-import { SpecialityDAO } from "@/modules/speciality/domain/speciality_dao"
-import {
-  ValidInteger
-}                         from "@/modules/shared/domain/value_objects/valid_integer"
-import {
-  ValidString
-}                               from "@/modules/shared/domain/value_objects/valid_string"
+import { SpecialityDAO }        from "@/modules/speciality/domain/speciality_dao"
 import { Either, isLeft, left } from "fp-ts/Either"
 import {
   BaseException
 }                               from "@/modules/shared/domain/exceptions/base_exception"
-import { Speciality }     from "@/modules/speciality/domain/speciality"
-import { Zone }           from "@/modules/zone/domain/zone"
+import { Speciality }           from "@/modules/speciality/domain/speciality"
 import {
   genericEnsureSearch
-}                         from "@/modules/shared/utils/generic_ensure_search"
+}                               from "@/modules/shared/utils/generic_ensure_search"
 import { PaginatedResult }      from "@/modules/shared/domain/paginated_result"
 
 export class SearchSpeciality {

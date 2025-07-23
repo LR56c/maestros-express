@@ -7,14 +7,16 @@ import {
 }                                      from "@/modules/shared/domain/exceptions/base_exception"
 import {
   NotificationConfigDTO
-}                               from "@/modules/notification_config/application/notification_config_dto"
+}                                      from "@/modules/notification_config/application/notification_config_dto"
 import {
   ensureNotificationConfigExist
-}                               from "@/modules/notification_config/utils/ensure_notification_config_exist"
+}                                      from "@/modules/notification_config/utils/ensure_notification_config_exist"
 import {
   NotificationConfig
-}                               from "@/modules/notification_config/domain/notification_config"
-import { Errors }               from "@/modules/shared/domain/exceptions/errors"
+}                                      from "@/modules/notification_config/domain/notification_config"
+import {
+  Errors
+}                                      from "@/modules/shared/domain/exceptions/errors"
 
 export class UpdateNotificationConfig {
   constructor( private readonly dao: NotificationConfigDAO ) {

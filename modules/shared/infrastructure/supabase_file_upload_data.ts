@@ -1,10 +1,10 @@
 import {
   UploadFileRepository
-} from "@/modules/shared/domain/upload_file_repository"
+}                         from "@/modules/shared/domain/upload_file_repository"
 import { SupabaseClient } from "@supabase/supabase-js"
 import {
   InfrastructureException
-} from "@/modules/shared/domain/exceptions/infrastructure_exception"
+}                         from "@/modules/shared/domain/exceptions/infrastructure_exception"
 
 export class SupabaseFileUploadData implements UploadFileRepository{
   constructor( private readonly client: SupabaseClient ) {

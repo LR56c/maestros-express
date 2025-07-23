@@ -1,7 +1,7 @@
 import { z } from "zod"
 import {
   InvalidPaymentTypeException
-} from "@/modules/payment/domain/exception/invalid_payment_type_exception"
+}            from "@/modules/payment/domain/exception/invalid_payment_type_exception"
 
 export enum PaymentTypeEnum {
   SERVICE = "SERVICE",

@@ -1,10 +1,11 @@
-import { SectorDAO } from "@/modules/sector/domain/sector_dao"
-import { UUID }                        from "@/modules/shared/domain/value_objects/uuid"
+import { SectorDAO }                   from "@/modules/sector/domain/sector_dao"
 import { Either, isLeft, left, right } from "fp-ts/Either"
 import {
   BaseException
 }                                      from "@/modules/shared/domain/exceptions/base_exception"
-import { ensureSectorExist } from "@/modules/sector/utils/ensure_sector_exist"
+import {
+  ensureSectorExist
+}                                      from "@/modules/sector/utils/ensure_sector_exist"
 
 export class RemoveSector {
   constructor(private  readonly dao : SectorDAO) {

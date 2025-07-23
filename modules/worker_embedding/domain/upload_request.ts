@@ -1,8 +1,10 @@
-import { ValidString } from "@/modules/shared/domain/value_objects/valid_string"
+import { ValidString }               from "@/modules/shared/domain/value_objects/valid_string"
 import {
   UploadRequestType
-} from "@/modules/worker_embedding/domain/upload_request_type"
-import { Errors }                    from "@/modules/shared/domain/exceptions/errors"
+}                                    from "@/modules/worker_embedding/domain/upload_request_type"
+import {
+  Errors
+}                                    from "@/modules/shared/domain/exceptions/errors"
 import { wrapType, wrapTypeDefault } from "@/modules/shared/utils/wrap_type"
 import {
   BaseException

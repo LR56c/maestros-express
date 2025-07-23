@@ -1,20 +1,22 @@
 import { Payment }         from "@/modules/payment/domain/payment"
 import { PaymentResponse } from "@/modules/payment/application/payment_response"
-import { Errors }        from "@/modules/shared/domain/exceptions/errors"
-import { wrapType }      from "@/modules/shared/utils/wrap_type"
-import { UUID }          from "@/modules/shared/domain/value_objects/uuid"
+import { Errors }          from "@/modules/shared/domain/exceptions/errors"
+import { wrapType }        from "@/modules/shared/utils/wrap_type"
+import { UUID }            from "@/modules/shared/domain/value_objects/uuid"
 import {
   BaseException
-}                        from "@/modules/shared/domain/exceptions/base_exception"
-import { PaymentType }   from "@/modules/payment/domain/payment_type"
-import { PaymentStatus } from "@/modules/payment/domain/payment_status"
+}                          from "@/modules/shared/domain/exceptions/base_exception"
+import { PaymentType }     from "@/modules/payment/domain/payment_type"
+import { PaymentStatus }   from "@/modules/payment/domain/payment_status"
 import {
   ValidInteger
-}                        from "@/modules/shared/domain/value_objects/valid_integer"
-import { ValidDate }     from "@/modules/shared/domain/value_objects/valid_date"
+}                          from "@/modules/shared/domain/value_objects/valid_integer"
+import {
+  ValidDate
+}                          from "@/modules/shared/domain/value_objects/valid_date"
 import {
   ValidString
-}                        from "@/modules/shared/domain/value_objects/valid_string"
+}                          from "@/modules/shared/domain/value_objects/valid_string"
 
 export class PaymentMapper {
   static toDTO( payment: Payment ): PaymentResponse {

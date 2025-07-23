@@ -1,24 +1,22 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse }      from "next/server"
 import {
   parseData
-}                                    from "@/modules/shared/application/parse_handlers"
+}                                         from "@/modules/shared/application/parse_handlers"
 import {
   storySchema
-}                                    from "@/modules/story/application/story_dto"
-import { z }                         from "zod"
-import { isLeft }                    from "fp-ts/Either"
+}                                         from "@/modules/story/application/story_dto"
+import { z }                              from "zod"
+import { isLeft }                         from "fp-ts/Either"
 import {
   StoryMapper
 }                                         from "@/modules/story/application/story_mapper"
+import { upsertEmbedding, upsertStories } from "@/app/api/dependencies"
 import {
-  removeEmbedding,
-  upsertEmbedding,
-  upsertStories
-} from "@/app/api/dependencies"
-import { UUID } from "@/modules/shared/domain/value_objects/uuid"
+  UUID
+}                                         from "@/modules/shared/domain/value_objects/uuid"
 import {
   WorkerEmbeddingTypeEnum
-} from "@/modules/worker_embedding/domain/worker_embedding_type"
+}                                         from "@/modules/worker_embedding/domain/worker_embedding_type"
 
 export async function POST( request: NextRequest ) {
   const body = await request.json()

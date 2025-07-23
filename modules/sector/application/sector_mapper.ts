@@ -1,24 +1,26 @@
-import { Errors }   from "../../shared/domain/exceptions/errors"
+import { Errors }         from "../../shared/domain/exceptions/errors"
 import {
   ValidString
-}                   from "../../shared/domain/value_objects/valid_string"
+}                         from "../../shared/domain/value_objects/valid_string"
 import {
   InvalidStringException
-}                   from "../../shared/domain/exceptions/invalid_string_exception"
-import { wrapType } from "../../shared/utils/wrap_type"
+}                         from "../../shared/domain/exceptions/invalid_string_exception"
+import { wrapType }       from "../../shared/utils/wrap_type"
 import {
   BaseException
-}                   from "../../shared/domain/exceptions/base_exception"
-import { Sector }   from "@/modules/sector/domain/sector"
-import type {
-  SectorDTO
-}                   from "@/modules/sector/application/sector_dto"
-import { RegionMapper } from "@/modules/region/application/region_mapper"
-import { UUID } from "@/modules/shared/domain/value_objects/uuid"
+}                         from "../../shared/domain/exceptions/base_exception"
+import { Sector }         from "@/modules/sector/domain/sector"
+import type { SectorDTO } from "@/modules/sector/application/sector_dto"
+import {
+  RegionMapper
+}                         from "@/modules/region/application/region_mapper"
+import {
+  UUID
+}                         from "@/modules/shared/domain/value_objects/uuid"
 import {
   InvalidUUIDException
-} from "@/modules/shared/domain/exceptions/invalid_uuid_exception"
-import { RegionDTO } from "@/modules/region/application/region_dto"
+}                         from "@/modules/shared/domain/exceptions/invalid_uuid_exception"
+import { RegionDTO }      from "@/modules/region/application/region_dto"
 
 export class SectorMapper {
   static toDTO( sector: Sector ): SectorDTO {

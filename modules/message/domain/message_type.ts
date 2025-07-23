@@ -1,7 +1,7 @@
 import { z } from "zod"
 import {
   InvalidMessageTypeException
-} from "@/modules/message/domain/exception/invalid_message_type_exception"
+}            from "@/modules/message/domain/exception/invalid_message_type_exception"
 
 export enum MessageTypeEnum {
   SUBJECT = "SUBJECT",

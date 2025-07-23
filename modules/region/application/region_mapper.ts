@@ -15,10 +15,12 @@ import {
   BaseException
 }                          from "../../shared/domain/exceptions/base_exception"
 import { type CountryDTO } from "../../country/application/country_dto"
-import { UUID }            from "@/modules/shared/domain/value_objects/uuid"
+import {
+  UUID
+}                          from "@/modules/shared/domain/value_objects/uuid"
 import {
   InvalidUUIDException
-} from "@/modules/shared/domain/exceptions/invalid_uuid_exception"
+}                          from "@/modules/shared/domain/exceptions/invalid_uuid_exception"
 
 export class RegionMapper {
   static toDTO( region: Region ): RegionDTO {

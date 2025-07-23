@@ -1,13 +1,15 @@
-import { UUID }      from "@/modules/shared/domain/value_objects/uuid"
-import { ValidDate } from "@/modules/shared/domain/value_objects/valid_date"
+import { UUID }     from "@/modules/shared/domain/value_objects/uuid"
+import {
+  ValidDate
+}                   from "@/modules/shared/domain/value_objects/valid_date"
 import {
   WorkingBookingStatus
-} from "@/modules/worker_booking/domain/worker_booking_status"
-import { Errors }    from "@/modules/shared/domain/exceptions/errors"
-import { wrapType }  from "@/modules/shared/utils/wrap_type"
+}                   from "@/modules/worker_booking/domain/worker_booking_status"
+import { Errors }   from "@/modules/shared/domain/exceptions/errors"
+import { wrapType } from "@/modules/shared/utils/wrap_type"
 import {
   BaseException
-} from "@/modules/shared/domain/exceptions/base_exception"
+}                   from "@/modules/shared/domain/exceptions/base_exception"
 
 export class WorkerBooking {
   private constructor(

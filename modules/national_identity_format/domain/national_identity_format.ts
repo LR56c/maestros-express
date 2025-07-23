@@ -1,12 +1,14 @@
-import { UUID }        from "@/modules/shared/domain/value_objects/uuid"
-import { ValidString } from "@/modules/shared/domain/value_objects/valid_string"
-import { ValidDate }   from "@/modules/shared/domain/value_objects/valid_date"
-import { Country }     from "@/modules/country/domain/country"
-import { wrapType }    from "@/modules/shared/utils/wrap_type"
-import { Errors }      from "@/modules/shared/domain/exceptions/errors"
+import { UUID }      from "@/modules/shared/domain/value_objects/uuid"
+import {
+  ValidString
+}                    from "@/modules/shared/domain/value_objects/valid_string"
+import { ValidDate } from "@/modules/shared/domain/value_objects/valid_date"
+import { Country }   from "@/modules/country/domain/country"
+import { wrapType }  from "@/modules/shared/utils/wrap_type"
+import { Errors }    from "@/modules/shared/domain/exceptions/errors"
 import {
   BaseException
-}                      from "@/modules/shared/domain/exceptions/base_exception"
+}                    from "@/modules/shared/domain/exceptions/base_exception"
 
 export class NationalIdentityFormat {
   private constructor(

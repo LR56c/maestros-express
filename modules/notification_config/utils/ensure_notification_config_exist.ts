@@ -2,7 +2,6 @@ import { Either, isLeft, left, right } from "fp-ts/Either"
 import {
   BaseException
 }                                      from "@/modules/shared/domain/exceptions/base_exception"
-import { Sector }                      from "@/modules/sector/domain/sector"
 import {
   NotificationConfig
 }                                      from "@/modules/notification_config/domain/notification_config"

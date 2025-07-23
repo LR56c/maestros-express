@@ -1,18 +1,20 @@
 import {
   StoryDocument
-} from "@/modules/story/modules/story_document/domain/story_document"
+}                   from "@/modules/story/modules/story_document/domain/story_document"
 import {
   StoryDocumentDTO
-} from "@/modules/story/modules/story_document/application/story_document_dto"
-import { Errors } from "@/modules/shared/domain/exceptions/errors"
+}                   from "@/modules/story/modules/story_document/application/story_document_dto"
+import { Errors }   from "@/modules/shared/domain/exceptions/errors"
 import {
   StoryDocumentType
-} from "@/modules/story/modules/story_document/domain/story_document_type"
-import { ValidString } from "@/modules/shared/domain/value_objects/valid_string"
-import { UUID } from "@/modules/shared/domain/value_objects/uuid"
+}                   from "@/modules/story/modules/story_document/domain/story_document_type"
+import {
+  ValidString
+}                   from "@/modules/shared/domain/value_objects/valid_string"
+import { UUID }     from "@/modules/shared/domain/value_objects/uuid"
 import {
   BaseException
-} from "@/modules/shared/domain/exceptions/base_exception"
+}                   from "@/modules/shared/domain/exceptions/base_exception"
 import { wrapType } from "@/modules/shared/utils/wrap_type"
 
 export class StoryDocumentMapper {

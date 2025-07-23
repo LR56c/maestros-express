@@ -14,10 +14,10 @@ import {
 }                                    from "@/modules/story/application/story_mapper"
 import {
   addStory,
-  getStories, getStory,
+  getStory,
   removeStory,
   updateStory
-} from "@/app/api/dependencies"
+}                                    from "@/app/api/dependencies"
 
 
 export async function POST( request: NextRequest ) {

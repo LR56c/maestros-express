@@ -1,13 +1,15 @@
 import {
   ValidInteger
-}                      from "@/modules/shared/domain/value_objects/valid_integer"
-import { ValidString } from "@/modules/shared/domain/value_objects/valid_string"
-import { Speciality }  from "@/modules/speciality/domain/speciality"
+}                          from "@/modules/shared/domain/value_objects/valid_integer"
+import {
+  ValidString
+}                          from "@/modules/shared/domain/value_objects/valid_string"
+import { Speciality }      from "@/modules/speciality/domain/speciality"
 import {
   BaseException
-}                      from "@/modules/shared/domain/exceptions/base_exception"
-import { Either }      from "fp-ts/Either"
-import type { UUID }   from "@/modules/shared/domain/value_objects/uuid"
+}                          from "@/modules/shared/domain/exceptions/base_exception"
+import { Either }          from "fp-ts/Either"
+import type { UUID }       from "@/modules/shared/domain/value_objects/uuid"
 import { PaginatedResult } from "@/modules/shared/domain/paginated_result"
 
 export abstract class SpecialityDAO {

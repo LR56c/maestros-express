@@ -17,12 +17,18 @@ import {
 }                              from "@/modules/shared/domain/exceptions/infrastructure_exception"
 import * as changeCase         from "change-case"
 import { Country }             from "@/modules/country/domain/country"
-import { Errors }              from "@/modules/shared/domain/exceptions/errors"
-import { PhoneFormat }         from "@/modules/phone_format/domain/phone_format"
+import {
+  Errors
+}                              from "@/modules/shared/domain/exceptions/errors"
+import {
+  PhoneFormat
+}                              from "@/modules/phone_format/domain/phone_format"
 import {
   PhoneFormatDAO
 }                              from "@/modules/phone_format/domain/phone_format_dao"
-import { PaginatedResult }     from "@/modules/shared/domain/paginated_result"
+import {
+  PaginatedResult
+}                              from "@/modules/shared/domain/paginated_result"
 
 export class PrismaPhoneFormatData
   implements PhoneFormatDAO {

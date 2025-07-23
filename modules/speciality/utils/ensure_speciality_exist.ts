@@ -1,22 +1,19 @@
 import { type Either, isLeft, left, right } from "fp-ts/Either"
 import {
   BaseException
-}                                      from "@/modules/shared/domain/exceptions/base_exception"
-import {
-  DataAlreadyExistException
-}                                      from "@/modules/shared/domain/exceptions/data_already_exist_exception"
+}                                           from "@/modules/shared/domain/exceptions/base_exception"
 import {
   ValidInteger
-}                                      from "@/modules/shared/domain/value_objects/valid_integer"
+}                                           from "@/modules/shared/domain/value_objects/valid_integer"
 import {
   SpecialityDAO
-}                                      from "@/modules/speciality/domain/speciality_dao"
+}                                           from "@/modules/speciality/domain/speciality_dao"
 import {
   Speciality
-}                                      from "@/modules/speciality/domain/speciality"
+}                                           from "@/modules/speciality/domain/speciality"
 import {
   DataNotFoundException
-}                                      from "@/modules/shared/domain/exceptions/data_not_found_exception"
+}                                           from "@/modules/shared/domain/exceptions/data_not_found_exception"
 
 export const ensureSpecialityExist = async ( dao: SpecialityDAO,
   id: string ): Promise<Either<BaseException[], Speciality>> => {

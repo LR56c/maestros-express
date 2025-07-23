@@ -1,7 +1,7 @@
 import { z } from "zod"
 import {
   InvalidQuotationStatusException
-} from "@/modules/quotation/domain/exception/invalid_quotation_status_exception"
+}            from "@/modules/quotation/domain/exception/invalid_quotation_status_exception"
 
 export enum QuotationStatusEnum {
   PENDING = "PENDING",

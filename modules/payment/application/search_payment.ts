@@ -1,13 +1,13 @@
-import { PaymentDAO }     from "@/modules/payment/domain/payment_dao"
+import { PaymentDAO }           from "@/modules/payment/domain/payment_dao"
 import { Either, isLeft, left } from "fp-ts/Either"
 import {
   BaseException
 }                               from "@/modules/shared/domain/exceptions/base_exception"
-import { Payment }        from "@/modules/payment/domain/payment"
+import { Payment }              from "@/modules/payment/domain/payment"
 import {
   genericEnsureSearch
-}                         from "@/modules/shared/utils/generic_ensure_search"
-import { PaginatedResult } from "@/modules/shared/domain/paginated_result"
+}                               from "@/modules/shared/utils/generic_ensure_search"
+import { PaginatedResult }      from "@/modules/shared/domain/paginated_result"
 
 export class SearchPayment {
   constructor(private readonly dao: PaymentDAO) {

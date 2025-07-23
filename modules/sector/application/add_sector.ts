@@ -1,21 +1,27 @@
-import { SectorDAO } from "@/modules/sector/domain/sector_dao"
+import { SectorDAO }                   from "@/modules/sector/domain/sector_dao"
 import { Either, isLeft, left, right } from "fp-ts/Either"
 import {
   BaseException
-} from "@/modules/shared/domain/exceptions/base_exception"
-import { SectorDTO } from "@/modules/sector/application/sector_dto"
-import { ensureRegionExist } from "@/modules/region/utils/ensure_region_exist"
-import { containError } from "@/modules/shared/utils/contain_error"
+}                                      from "@/modules/shared/domain/exceptions/base_exception"
+import {
+  SectorDTO
+}                                      from "@/modules/sector/application/sector_dto"
+import {
+  containError
+}                                      from "@/modules/shared/utils/contain_error"
 import {
   DataNotFoundException
-} from "@/modules/shared/domain/exceptions/data_not_found_exception"
-import { Region } from "@/modules/region/domain/region"
+}                                      from "@/modules/shared/domain/exceptions/data_not_found_exception"
 import {
   Errors
-} from "@/modules/shared/domain/exceptions/errors"
-import { ensureSectorExist } from "@/modules/sector/utils/ensure_sector_exist"
-import { SearchRegion } from "@/modules/region/application/search_region"
-import { Sector }            from "@/modules/sector/domain/sector"
+}                                      from "@/modules/shared/domain/exceptions/errors"
+import {
+  ensureSectorExist
+}                                      from "@/modules/sector/utils/ensure_sector_exist"
+import {
+  SearchRegion
+}                                      from "@/modules/region/application/search_region"
+import { Sector }                      from "@/modules/sector/domain/sector"
 
 export class AddSector {
   constructor(

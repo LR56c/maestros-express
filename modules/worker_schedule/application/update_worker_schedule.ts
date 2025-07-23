@@ -1,6 +1,6 @@
 import {
   WorkerScheduleDAO
-} from "@/modules/worker_schedule/domain/worker_schedule_dao"
+}                                      from "@/modules/worker_schedule/domain/worker_schedule_dao"
 import {
   WorkerSchedule
 }                                      from "@/modules/worker_schedule/domain/worker_schedule"
@@ -10,11 +10,13 @@ import {
 }                                      from "@/modules/shared/domain/exceptions/base_exception"
 import {
   WorkerScheduleDTO
-} from "@/modules/worker_schedule/application/worker_schedule_dto"
+}                                      from "@/modules/worker_schedule/application/worker_schedule_dto"
 import {
   ensureWorkerScheduleExist
-} from "@/modules/worker_schedule/utils/ensure_worker_schedule_exist"
-import { Errors }               from "@/modules/shared/domain/exceptions/errors"
+}                                      from "@/modules/worker_schedule/utils/ensure_worker_schedule_exist"
+import {
+  Errors
+}                                      from "@/modules/shared/domain/exceptions/errors"
 
 export class UpdateWorkerSchedule {
   constructor( private readonly dao: WorkerScheduleDAO ) {

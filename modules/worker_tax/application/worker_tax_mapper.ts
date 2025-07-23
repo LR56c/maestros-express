@@ -1,11 +1,11 @@
 import { WorkerTax }    from "@/modules/worker_tax/domain/worker_tax"
 import { WorkerTaxDTO } from "@/modules/worker_tax/application/worker_tax_dto"
 import { Errors }       from "@/modules/shared/domain/exceptions/errors"
-import { wrapType } from "@/modules/shared/utils/wrap_type"
-import { UUID } from "@/modules/shared/domain/value_objects/uuid"
+import { wrapType }     from "@/modules/shared/utils/wrap_type"
+import { UUID }         from "@/modules/shared/domain/value_objects/uuid"
 import {
   BaseException
-} from "@/modules/shared/domain/exceptions/base_exception"
+}                       from "@/modules/shared/domain/exceptions/base_exception"
 import {
   ValidString
 }                       from "@/modules/shared/domain/value_objects/valid_string"

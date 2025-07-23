@@ -1,29 +1,15 @@
 "use server"
 
 import { NextRequest, NextResponse } from "next/server"
-import prisma                        from "@/lib/prisma"
 import {
   querySchema
 }                                    from "@/modules/shared/application/query_dto"
 import {
   parseData
 }                                    from "@/modules/shared/application/parse_handlers"
-import { isLeft }                    from "fp-ts/Either"
 import {
-  PrismaPackageData
-}                                    from "@/modules/package/infrastructure/prisma_package_data"
-import {
-  AddPackage
-}                                    from "@/modules/package/application/add_package"
-import {
-  RemovePackage
-}                                    from "@/modules/package/application/remove_package"
-import {
-  UpdatePackage
-}                                    from "@/modules/package/application/update_package"
-import {
-  SearchPackage
-}                                    from "@/modules/package/application/search_package"
+  isLeft
+}                                    from "fp-ts/Either"
 import {
   packageRequestSchema
 }                                    from "@/modules/package/application/package_request"
@@ -34,13 +20,11 @@ import {
   packageUpdateSchema
 }                                    from "@/modules/package/application/package_update_dto"
 import {
-  UpsertPackages
-}                                    from "@/modules/package/application/upsert_packages"
-import {
-  addPackage, removePackage,
+  addPackage,
+  removePackage,
   searchPackage,
   updatePackage
-} from "@/app/api/dependencies"
+}                                    from "@/app/api/dependencies"
 
 
 export async function POST( request: NextRequest ) {

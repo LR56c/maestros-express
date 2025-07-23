@@ -1,7 +1,7 @@
 import { z } from "zod"
 import {
   InvalidCertificateTypeException
-} from "@/modules/certificate/domain/exception/invalid_certificate_type_exception"
+}            from "@/modules/certificate/domain/exception/invalid_certificate_type_exception"
 
 export enum CertificateTypeEnum {
   PDF = "PDF",

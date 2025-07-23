@@ -1,16 +1,18 @@
-import { ChatDAO } from "@/modules/chat/domain/chat_dao"
+import { ChatDAO }                     from "@/modules/chat/domain/chat_dao"
 import { Either, isLeft, left, right } from "fp-ts/Either"
 import {
   BaseException
-} from "@/modules/shared/domain/exceptions/base_exception"
+}                                      from "@/modules/shared/domain/exceptions/base_exception"
 import {
   ensureChatExist
-} from "@/modules/chat/utils/ensure_chat_exist"
-import { Chat } from "@/modules/chat/domain/chat"
+}                                      from "@/modules/chat/utils/ensure_chat_exist"
+import { Chat }                        from "@/modules/chat/domain/chat"
 import {
   Errors
-} from "@/modules/shared/domain/exceptions/errors"
-import { ChatUpdateDTO } from "@/modules/chat/application/chat_update_dto"
+}                                      from "@/modules/shared/domain/exceptions/errors"
+import {
+  ChatUpdateDTO
+}                                      from "@/modules/chat/application/chat_update_dto"
 
 export class UpdateChat {
   constructor( private readonly dao: ChatDAO ) {

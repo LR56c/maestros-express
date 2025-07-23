@@ -1,12 +1,14 @@
 import {
   ValidInteger
-} from "@/modules/shared/domain/value_objects/valid_integer"
-import { ValidString } from "@/modules/shared/domain/value_objects/valid_string"
-import { Either } from "fp-ts/Either"
+}                          from "@/modules/shared/domain/value_objects/valid_integer"
+import {
+  ValidString
+}                          from "@/modules/shared/domain/value_objects/valid_string"
+import { Either }          from "fp-ts/Either"
 import {
   BaseException
-} from "@/modules/shared/domain/exceptions/base_exception"
-import { Payment } from "@/modules/payment/domain/payment"
+}                          from "@/modules/shared/domain/exceptions/base_exception"
+import { Payment }         from "@/modules/payment/domain/payment"
 import { PaginatedResult } from "@/modules/shared/domain/paginated_result"
 
 export abstract class PaymentDAO {

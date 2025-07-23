@@ -3,7 +3,7 @@ import { Either, isLeft, left, right } from "fp-ts/Either"
 import {
   BaseException
 }                                      from "@/modules/shared/domain/exceptions/base_exception"
-import { Report }    from "@/modules/report/domain/report"
+import { Report }                      from "@/modules/report/domain/report"
 import {
   DataNotFoundException
 }                                      from "@/modules/shared/domain/exceptions/data_not_found_exception"

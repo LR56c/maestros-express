@@ -1,7 +1,7 @@
 import { z } from "zod"
 import {
   InvalidUploadRequestTypeException
-} from "@/modules/worker_embedding/domain/exception/invalid_upload_request_type_exception"
+}            from "@/modules/worker_embedding/domain/exception/invalid_upload_request_type_exception"
 
 export enum UploadRequestTypeEnum {
   VALID      = "VALID",

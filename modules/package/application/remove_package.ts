@@ -5,7 +5,7 @@ import {
 }                                      from "@/modules/shared/domain/exceptions/base_exception"
 import {
   ensurePackageExist
-}                         from "@/modules/package/utils/ensure_package_exist"
+}                                      from "@/modules/package/utils/ensure_package_exist"
 
 export class RemovePackage {
   constructor(private readonly dao : PackageDAO) {

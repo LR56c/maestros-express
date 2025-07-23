@@ -1,12 +1,14 @@
-import { Report } from "@/modules/report/domain/report"
+import { Report }    from "@/modules/report/domain/report"
 import { ReportDTO } from "@/modules/report/application/report_dto"
-import { Errors } from "@/modules/shared/domain/exceptions/errors"
-import { wrapType } from "@/modules/shared/utils/wrap_type"
-import { UUID } from "@/modules/shared/domain/value_objects/uuid"
+import { Errors }    from "@/modules/shared/domain/exceptions/errors"
+import { wrapType }  from "@/modules/shared/utils/wrap_type"
+import { UUID }      from "@/modules/shared/domain/value_objects/uuid"
 import {
   BaseException
-} from "@/modules/shared/domain/exceptions/base_exception"
-import { ValidString } from "@/modules/shared/domain/value_objects/valid_string"
+}                    from "@/modules/shared/domain/exceptions/base_exception"
+import {
+  ValidString
+}                    from "@/modules/shared/domain/value_objects/valid_string"
 
 export class ReportMapper {
   static toDTO(report: Report): ReportDTO {

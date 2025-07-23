@@ -5,11 +5,11 @@ import {
 import {
   WorkerProfileDTO
 }                              from "@/modules/worker/application/worker_profile_dto"
-import { Worker }                    from "@/modules/worker/domain/worker"
-import { wrapType, wrapTypeDefault } from "@/modules/shared/utils/wrap_type"
+import { Worker }              from "@/modules/worker/domain/worker"
+import { wrapTypeDefault }     from "@/modules/shared/utils/wrap_type"
 import {
   Position
-}                                    from "@/modules/shared/domain/value_objects/position"
+}                              from "@/modules/shared/domain/value_objects/position"
 import { calculateDistance }   from "@/modules/shared/utils/calculate_distance"
 import { WorkerMapper }        from "@/modules/worker/application/worker_mapper"
 import { calculateAge }        from "@/modules/shared/utils/calculate_age"

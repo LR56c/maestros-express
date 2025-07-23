@@ -1,7 +1,7 @@
 import { z } from "zod"
 import {
   packageDocumentSchema
-} from "@/modules/package/modules/package_document/application/package_document_dto"
+}            from "@/modules/package/modules/package_document/application/package_document_dto"
 
 export const packageUpdateSchema = z.object( {
   id           : z.string(),

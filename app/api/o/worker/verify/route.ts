@@ -1,28 +1,32 @@
 import { NextRequest, NextResponse } from "next/server"
-import { isLeft }                    from "fp-ts/Either"
+import {
+  isLeft
+}                                    from "fp-ts/Either"
 import {
   parseData
-}                                               from "@/modules/shared/application/parse_handlers"
+}                                    from "@/modules/shared/application/parse_handlers"
 import {
   getStories,
   updateAuth,
   updateWorker,
   upsertEmbedding
-} from "@/app/api/dependencies"
+}                                    from "@/app/api/dependencies"
 import {
   UserUpdateDTO
-}                                               from "@/modules/user/application/models/user_update_dto"
+}                                    from "@/modules/user/application/models/user_update_dto"
 import {
   WorkerUpdateDTO,
   workerUpdateSchema
 }                                    from "@/modules/worker/application/worker_update_dto"
 import {
   StoryMapper
-}                                               from "@/modules/story/application/story_mapper"
-import { UUID } from "@/modules/shared/domain/value_objects/uuid"
+}                                    from "@/modules/story/application/story_mapper"
+import {
+  UUID
+}                                    from "@/modules/shared/domain/value_objects/uuid"
 import {
   WorkerEmbeddingTypeEnum
-} from "@/modules/worker_embedding/domain/worker_embedding_type"
+}                                    from "@/modules/worker_embedding/domain/worker_embedding_type"
 
 
 export async function PUT( request: NextRequest ) {

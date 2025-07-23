@@ -7,11 +7,15 @@ import { wrapType }      from "@/modules/shared/utils/wrap_type"
 import {
   BaseException
 }                        from "@/modules/shared/domain/exceptions/base_exception"
-import { UUID }          from "@/modules/shared/domain/value_objects/uuid"
+import {
+  UUID
+}                        from "@/modules/shared/domain/value_objects/uuid"
 import {
   WorkingBookingStatus
 }                        from "@/modules/worker_booking/domain/worker_booking_status"
-import { ValidDate }     from "@/modules/shared/domain/value_objects/valid_date"
+import {
+  ValidDate
+}                        from "@/modules/shared/domain/value_objects/valid_date"
 
 export class WorkerBookingMapper {
   static toDTO( book: WorkerBooking ): WorkerBookingDTO {

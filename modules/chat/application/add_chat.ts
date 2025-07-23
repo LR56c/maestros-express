@@ -24,7 +24,7 @@ import {
 }                                      from "@/modules/shared/domain/exceptions/infrastructure_exception"
 import {
   SearchUsers
-}                                      from "@/modules/user/application/search_auth"
+}                                      from "@/modules/user/application/search_users"
 
 export class AddChat {
   constructor(

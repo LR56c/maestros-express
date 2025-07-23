@@ -23,7 +23,9 @@ import * as changeCase         from "change-case"
 import {
   Errors
 }                              from "@/modules/shared/domain/exceptions/errors"
-import { PaginatedResult }     from "@/modules/shared/domain/paginated_result"
+import {
+  PaginatedResult
+}                              from "@/modules/shared/domain/paginated_result"
 
 export class PrismaSpecialityData implements SpecialityDAO {
   constructor( private readonly db: PrismaClient ) {

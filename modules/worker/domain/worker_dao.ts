@@ -1,14 +1,14 @@
 import {
   ValidInteger
-}                      from "@/modules/shared/domain/value_objects/valid_integer"
+}                          from "@/modules/shared/domain/value_objects/valid_integer"
 import {
   ValidString
-}                      from "@/modules/shared/domain/value_objects/valid_string"
-import type { Either } from "fp-ts/Either"
+}                          from "@/modules/shared/domain/value_objects/valid_string"
+import type { Either }     from "fp-ts/Either"
 import {
   BaseException
-}                      from "@/modules/shared/domain/exceptions/base_exception"
-import { Worker }      from "@/modules/worker/domain/worker"
+}                          from "@/modules/shared/domain/exceptions/base_exception"
+import { Worker }          from "@/modules/worker/domain/worker"
 import { PaginatedResult } from "@/modules/shared/domain/paginated_result"
 
 export abstract class WorkerDAO {

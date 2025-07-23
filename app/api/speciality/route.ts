@@ -14,7 +14,6 @@ import { isLeft }                    from "fp-ts/Either"
 import {
   SpecialityMapper
 }                                    from "@/modules/speciality/application/speciality_mapper"
-import { z }                         from "zod"
 import {
   addSpeciality,
   removeSpeciality,

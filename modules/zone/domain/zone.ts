@@ -1,14 +1,16 @@
-import { UUID }      from "@/modules/shared/domain/value_objects/uuid"
-import { Errors }    from "@/modules/shared/domain/exceptions/errors"
-import { wrapType }  from "@/modules/shared/utils/wrap_type"
+import { UUID }     from "@/modules/shared/domain/value_objects/uuid"
+import { Errors }   from "@/modules/shared/domain/exceptions/errors"
+import { wrapType } from "@/modules/shared/utils/wrap_type"
 import {
   InvalidUUIDException
-}                    from "@/modules/shared/domain/exceptions/invalid_uuid_exception"
+}                   from "@/modules/shared/domain/exceptions/invalid_uuid_exception"
 import {
   BaseException
-}                    from "@/modules/shared/domain/exceptions/base_exception"
-import { ValidDate } from "@/modules/shared/domain/value_objects/valid_date"
-import { Sector }    from "@/modules/sector/domain/sector"
+}                   from "@/modules/shared/domain/exceptions/base_exception"
+import {
+  ValidDate
+}                   from "@/modules/shared/domain/value_objects/valid_date"
+import { Sector }   from "@/modules/sector/domain/sector"
 
 export class Zone {
   private constructor(

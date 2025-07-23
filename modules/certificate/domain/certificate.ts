@@ -1,5 +1,4 @@
 import { UUID }            from "@/modules/shared/domain/value_objects/uuid"
-import { Sector }          from "@/modules/sector/domain/sector"
 import {
   ValidDate
 }                          from "@/modules/shared/domain/value_objects/valid_date"

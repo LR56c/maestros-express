@@ -1,7 +1,7 @@
 import { z } from "zod"
 import {
   InvalidWorkerEmbeddingTypeException
-} from "@/modules/worker_embedding/domain/exception/invalid_worker_embedding_type_exception"
+}            from "@/modules/worker_embedding/domain/exception/invalid_worker_embedding_type_exception"
 
 export enum WorkerEmbeddingTypeEnum {
   STORY = "STORY",

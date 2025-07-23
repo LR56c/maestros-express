@@ -13,9 +13,6 @@ import {
 }                                      from "@/modules/worker/application/search_worker"
 import { wrapType }                    from "@/modules/shared/utils/wrap_type"
 import {
-  WorkerProfileDTO
-}                                      from "@/modules/worker/application/worker_profile_dto"
-import {
   ValidString
 }                                      from "@/modules/shared/domain/value_objects/valid_string"
 import {

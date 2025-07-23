@@ -1,4 +1,3 @@
-
 import { Either, isLeft, left, right } from "fp-ts/Either"
 import {
   BaseException
@@ -11,22 +10,22 @@ import {
 }                                      from "@/modules/shared/domain/exceptions/data_not_found_exception"
 import {
   Errors
-} from "@/modules/shared/domain/exceptions/errors"
+}                                      from "@/modules/shared/domain/exceptions/errors"
 import {
   NationalIdentityFormatDAO
-} from "@/modules/national_identity_format/domain/national_identity_format_dao"
+}                                      from "@/modules/national_identity_format/domain/national_identity_format_dao"
 import {
   NationalIdentityFormat
-} from "@/modules/national_identity_format/domain/national_identity_format"
+}                                      from "@/modules/national_identity_format/domain/national_identity_format"
 import {
   NationalIdentityFormatDTO
-} from "@/modules/national_identity_format/application/national_identity_format_dto"
+}                                      from "@/modules/national_identity_format/application/national_identity_format_dto"
 import {
   ensureNationalIdentityFormatExist
-} from "@/modules/national_identity_format/utils/ensure_national_identity_format_exist"
+}                                      from "@/modules/national_identity_format/utils/ensure_national_identity_format_exist"
 import {
   SearchCountry
-} from "@/modules/country/application/search_country"
+}                                      from "@/modules/country/application/search_country"
 
 export class AddNationalIdentityFormat {
   constructor(

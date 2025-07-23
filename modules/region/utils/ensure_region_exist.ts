@@ -5,11 +5,11 @@ import {
 }                                      from "@/modules/shared/domain/exceptions/base_exception"
 import {
   ValidInteger
-}                               from "@/modules/shared/domain/value_objects/valid_integer"
-import { Region }               from "@/modules/region/domain/region"
+}                                      from "@/modules/shared/domain/value_objects/valid_integer"
+import { Region }                      from "@/modules/region/domain/region"
 import {
   DataNotFoundException
-}                               from "@/modules/shared/domain/exceptions/data_not_found_exception"
+}                                      from "@/modules/shared/domain/exceptions/data_not_found_exception"
 
 export const ensureRegionExist = async ( dao: RegionDAO,
   regionId: string ): Promise<Either<BaseException[], Region>> => {

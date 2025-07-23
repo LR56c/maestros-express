@@ -1,5 +1,6 @@
-
-import { QuotationResponse } from "@/modules/quotation/application/quotation_response"
+import {
+  QuotationResponse
+} from "@/modules/quotation/application/quotation_response"
 
 export abstract class QuotationAppService {
   abstract add( quotation : QuotationResponse ): Promise<void>

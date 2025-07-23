@@ -1,20 +1,21 @@
-import { UUID }      from "@/modules/shared/domain/value_objects/uuid"
+import { UUID }     from "@/modules/shared/domain/value_objects/uuid"
 import {
   WorkerEmbeddingType
-}                    from "@/modules/worker_embedding/domain/worker_embedding_type"
-import { ValidDate } from "@/modules/shared/domain/value_objects/valid_date"
-import { Worker }    from "@/modules/worker/domain/worker"
-import { Story }     from "@/modules/story/domain/story"
-import { Errors }    from "@/modules/shared/domain/exceptions/errors"
-import { wrapType }  from "@/modules/shared/utils/wrap_type"
+}                   from "@/modules/worker_embedding/domain/worker_embedding_type"
 import {
-  InvalidUUIDException
-}                    from "@/modules/shared/domain/exceptions/invalid_uuid_exception"
+  ValidDate
+}                   from "@/modules/shared/domain/value_objects/valid_date"
+import { Errors }   from "@/modules/shared/domain/exceptions/errors"
+import { wrapType } from "@/modules/shared/utils/wrap_type"
 import {
   BaseException
-}                    from "@/modules/shared/domain/exceptions/base_exception"
-import { ValidString } from "@/modules/shared/domain/value_objects/valid_string"
-import { Position } from "@/modules/shared/domain/value_objects/position"
+}                   from "@/modules/shared/domain/exceptions/base_exception"
+import {
+  ValidString
+}                   from "@/modules/shared/domain/value_objects/valid_string"
+import {
+  Position
+}                   from "@/modules/shared/domain/value_objects/position"
 
 export class WorkerEmbedding {
   private constructor(

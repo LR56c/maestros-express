@@ -9,10 +9,12 @@ import {
 import { wrapType }    from "../../shared/utils/wrap_type"
 import type { Region } from "@/modules/region/domain/region"
 import { Country }     from "@/modules/country/domain/country"
-import { UUID }        from "@/modules/shared/domain/value_objects/uuid"
+import {
+  UUID
+}                      from "@/modules/shared/domain/value_objects/uuid"
 import {
   InvalidUUIDException
-} from "@/modules/shared/domain/exceptions/invalid_uuid_exception"
+}                      from "@/modules/shared/domain/exceptions/invalid_uuid_exception"
 
 export class Sector {
   private constructor(

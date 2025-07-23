@@ -1,14 +1,11 @@
-import { SpecialityDAO } from "@/modules/speciality/domain/speciality_dao"
-import type {
-  UUID
-} from "@/modules/shared/domain/value_objects/uuid"
+import { SpecialityDAO }               from "@/modules/speciality/domain/speciality_dao"
 import { Either, isLeft, left, right } from "fp-ts/Either"
 import {
   BaseException
-} from "@/modules/shared/domain/exceptions/base_exception"
+}                                      from "@/modules/shared/domain/exceptions/base_exception"
 import {
   ValidInteger
-} from "@/modules/shared/domain/value_objects/valid_integer"
+}                                      from "@/modules/shared/domain/value_objects/valid_integer"
 
 export class RemoveSpeciality {
   constructor( private readonly dao: SpecialityDAO ) {

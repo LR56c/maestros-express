@@ -5,14 +5,18 @@ import {
 import { PrismaClient }        from "@/lib/generated/prisma"
 import { Review }              from "@/modules/review/domain/review"
 import { Either, left, right } from "fp-ts/Either"
-import { UUID }                from "@/modules/shared/domain/value_objects/uuid"
+import {
+  UUID
+}                              from "@/modules/shared/domain/value_objects/uuid"
 import {
   InfrastructureException
 }                              from "@/modules/shared/domain/exceptions/infrastructure_exception"
-import { Errors }              from "@/modules/shared/domain/exceptions/errors"
+import {
+  Errors
+}                              from "@/modules/shared/domain/exceptions/errors"
 import {
   DataNotFoundException
-} from "@/modules/shared/domain/exceptions/data_not_found_exception"
+}                              from "@/modules/shared/domain/exceptions/data_not_found_exception"
 
 export class PrismaReviewData implements ReviewDAO {
 

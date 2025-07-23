@@ -3,7 +3,9 @@ import { Either, isLeft, left, right } from "fp-ts/Either"
 import {
   BaseException
 }                                      from "@/modules/shared/domain/exceptions/base_exception"
-import { ensureRegionExist } from "@/modules/region/utils/ensure_region_exist"
+import {
+  ensureRegionExist
+}                                      from "@/modules/region/utils/ensure_region_exist"
 
 export class RemoveRegion {
   constructor(

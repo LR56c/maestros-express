@@ -8,11 +8,15 @@ import {
 import {
   BaseException
 }                      from "@/modules/shared/domain/exceptions/base_exception"
-import { UUID } from "@/modules/shared/domain/value_objects/uuid"
+import {
+  UUID
+}                      from "@/modules/shared/domain/value_objects/uuid"
 import {
   NationalIdentityFormat
-}               from "@/modules/national_identity_format/domain/national_identity_format"
-import { PaginatedResult } from "@/modules/shared/domain/paginated_result"
+}                      from "@/modules/national_identity_format/domain/national_identity_format"
+import {
+  PaginatedResult
+}                      from "@/modules/shared/domain/paginated_result"
 
 export abstract class NationalIdentityFormatDAO{
 

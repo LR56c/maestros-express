@@ -1,14 +1,16 @@
-import { UUID } from "@/modules/shared/domain/value_objects/uuid"
-import { ValidString } from "@/modules/shared/domain/value_objects/valid_string"
+import { UUID }      from "@/modules/shared/domain/value_objects/uuid"
+import {
+  ValidString
+}                    from "@/modules/shared/domain/value_objects/valid_string"
 import {
   ValidInteger
-} from "@/modules/shared/domain/value_objects/valid_integer"
+}                    from "@/modules/shared/domain/value_objects/valid_integer"
 import { ValidDate } from "@/modules/shared/domain/value_objects/valid_date"
-import { Errors } from "@/modules/shared/domain/exceptions/errors"
-import { wrapType } from "@/modules/shared/utils/wrap_type"
+import { Errors }    from "@/modules/shared/domain/exceptions/errors"
+import { wrapType }  from "@/modules/shared/utils/wrap_type"
 import {
   BaseException
-} from "@/modules/shared/domain/exceptions/base_exception"
+}                    from "@/modules/shared/domain/exceptions/base_exception"
 
 export class WorkerTax {
   private constructor(

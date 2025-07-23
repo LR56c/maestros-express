@@ -1,7 +1,7 @@
 import { z } from "zod"
 import {
   InvalidPaymentStatusException
-} from "@/modules/payment/domain/exception/invalid_payment_status_exception"
+}            from "@/modules/payment/domain/exception/invalid_payment_status_exception"
 
 export enum PaymentStatusEnum {
   PENDING = "PENDING",

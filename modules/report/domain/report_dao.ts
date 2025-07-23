@@ -1,12 +1,14 @@
 import {
   ValidInteger
-} from "@/modules/shared/domain/value_objects/valid_integer"
-import { ValidString } from "@/modules/shared/domain/value_objects/valid_string"
-import { Report } from "@/modules/report/domain/report"
+}                          from "@/modules/shared/domain/value_objects/valid_integer"
+import {
+  ValidString
+}                          from "@/modules/shared/domain/value_objects/valid_string"
+import { Report }          from "@/modules/report/domain/report"
 import {
   BaseException
-} from "@/modules/shared/domain/exceptions/base_exception"
-import { Either } from "fp-ts/Either"
+}                          from "@/modules/shared/domain/exceptions/base_exception"
+import { Either }          from "fp-ts/Either"
 import { PaginatedResult } from "@/modules/shared/domain/paginated_result"
 
 export abstract class ReportDAO {

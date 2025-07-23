@@ -1,19 +1,25 @@
 import {
   QuotationDetail
-}                   from "@/modules/quotation/modules/quotation_detail/domain/quotation_detail"
+}                                    from "@/modules/quotation/modules/quotation_detail/domain/quotation_detail"
 import {
   QuotationDetailDTO
-}                   from "@/modules/quotation/modules/quotation_detail/application/quotation_detail_dto"
-import { Errors }                    from "@/modules/shared/domain/exceptions/errors"
+}                                    from "@/modules/quotation/modules/quotation_detail/application/quotation_detail_dto"
+import {
+  Errors
+}                                    from "@/modules/shared/domain/exceptions/errors"
 import { wrapType, wrapTypeDefault } from "@/modules/shared/utils/wrap_type"
-import { UUID }                      from "@/modules/shared/domain/value_objects/uuid"
+import {
+  UUID
+}                                    from "@/modules/shared/domain/value_objects/uuid"
 import {
   BaseException
-}                   from "@/modules/shared/domain/exceptions/base_exception"
-import { ValidString } from "@/modules/shared/domain/value_objects/valid_string"
+}                                    from "@/modules/shared/domain/exceptions/base_exception"
+import {
+  ValidString
+}                                    from "@/modules/shared/domain/value_objects/valid_string"
 import {
   ValidInteger
-} from "@/modules/shared/domain/value_objects/valid_integer"
+}                                    from "@/modules/shared/domain/value_objects/valid_integer"
 
 export class QuotationDetailMapper {
   static toDTO( quotation: QuotationDetail ): QuotationDetailDTO {

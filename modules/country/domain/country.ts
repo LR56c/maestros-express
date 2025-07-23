@@ -13,10 +13,12 @@ import { wrapType }    from "../../shared/utils/wrap_type"
 import {
   InvalidStringException
 }                      from "../../shared/domain/exceptions/invalid_string_exception"
-import { UUID }        from "@/modules/shared/domain/value_objects/uuid"
+import {
+  UUID
+}                      from "@/modules/shared/domain/value_objects/uuid"
 import {
   InvalidUUIDException
-} from "@/modules/shared/domain/exceptions/invalid_uuid_exception"
+}                      from "@/modules/shared/domain/exceptions/invalid_uuid_exception"
 
 export class Country {
   private constructor(

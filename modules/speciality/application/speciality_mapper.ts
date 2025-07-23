@@ -1,12 +1,14 @@
-import { Speciality } from "@/modules/speciality/domain/speciality"
+import { Speciality }    from "@/modules/speciality/domain/speciality"
 import { SpecialityDTO } from "@/modules/speciality/application/speciality_dto"
-import { Errors } from "@/modules/shared/domain/exceptions/errors"
-import { wrapType } from "@/modules/shared/utils/wrap_type"
-import { UUID } from "@/modules/shared/domain/value_objects/uuid"
+import { Errors }        from "@/modules/shared/domain/exceptions/errors"
+import { wrapType }      from "@/modules/shared/utils/wrap_type"
+import { UUID }          from "@/modules/shared/domain/value_objects/uuid"
 import {
   BaseException
-} from "@/modules/shared/domain/exceptions/base_exception"
-import { ValidString } from "@/modules/shared/domain/value_objects/valid_string"
+}                        from "@/modules/shared/domain/exceptions/base_exception"
+import {
+  ValidString
+}                        from "@/modules/shared/domain/value_objects/valid_string"
 
 export class SpecialityMapper {
   static toDTO( speciality: Speciality ): SpecialityDTO {

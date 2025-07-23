@@ -1,7 +1,6 @@
 "use server"
 
 import { NextRequest, NextResponse } from "next/server"
-import prisma                        from "@/lib/prisma"
 import {
   querySchema
 }                                    from "@/modules/shared/application/query_dto"
@@ -10,18 +9,6 @@ import {
 }                                    from "@/modules/shared/application/parse_handlers"
 import { isLeft }                    from "fp-ts/Either"
 import {
-  PrismaQuotationData
-}                                    from "@/modules/quotation/infrastructure/prisma_quotation_data"
-import {
-  AddQuotation
-}                                    from "@/modules/quotation/application/add_quotation"
-import {
-  SearchQuotation
-}                                    from "@/modules/quotation/application/search_quotation"
-import {
-  UpdateQuotation
-}                                    from "@/modules/quotation/application/update_quotation"
-import {
   quotationRequestSchema
 }                                    from "@/modules/quotation/application/quotation_request"
 import {
@@ -29,13 +16,12 @@ import {
 }                                    from "@/modules/quotation/application/quotation_mapper"
 import {
   quotationUpdateSchema
-}                                        from "@/modules/quotation/application/quotation_update_dto"
+}                                    from "@/modules/quotation/application/quotation_update_dto"
 import {
   addQuotation,
   searchQuotation,
   updateQuotation
-} from "@/app/api/dependencies"
-
+}                                    from "@/app/api/dependencies"
 
 
 export async function POST( request: NextRequest ) {

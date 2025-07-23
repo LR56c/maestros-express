@@ -1,15 +1,15 @@
-import { Country }     from "./country"
-import { type Either } from "fp-ts/Either"
+import { Country }         from "./country"
+import { type Either }     from "fp-ts/Either"
 import {
   ValidInteger
-}                      from "@/modules/shared/domain/value_objects/valid_integer"
+}                          from "@/modules/shared/domain/value_objects/valid_integer"
 import {
   ValidString
-}                      from "@/modules/shared/domain/value_objects/valid_string"
+}                          from "@/modules/shared/domain/value_objects/valid_string"
 import {
   BaseException
-}                      from "@/modules/shared/domain/exceptions/base_exception"
-import { UUID }        from "@/modules/shared/domain/value_objects/uuid"
+}                          from "@/modules/shared/domain/exceptions/base_exception"
+import { UUID }            from "@/modules/shared/domain/value_objects/uuid"
 import { PaginatedResult } from "@/modules/shared/domain/paginated_result"
 
 export abstract class CountryDAO {

@@ -1,11 +1,13 @@
-import { UUID } from "@/modules/shared/domain/value_objects/uuid"
+import { UUID }      from "@/modules/shared/domain/value_objects/uuid"
 import { ValidDate } from "@/modules/shared/domain/value_objects/valid_date"
-import { ValidString } from "@/modules/shared/domain/value_objects/valid_string"
-import { Errors } from "@/modules/shared/domain/exceptions/errors"
-import { wrapType } from "@/modules/shared/utils/wrap_type"
+import {
+  ValidString
+}                    from "@/modules/shared/domain/value_objects/valid_string"
+import { Errors }    from "@/modules/shared/domain/exceptions/errors"
+import { wrapType }  from "@/modules/shared/utils/wrap_type"
 import {
   BaseException
-} from "@/modules/shared/domain/exceptions/base_exception"
+}                    from "@/modules/shared/domain/exceptions/base_exception"
 
 export class Speciality {
  private constructor(

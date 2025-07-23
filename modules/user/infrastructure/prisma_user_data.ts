@@ -1,23 +1,26 @@
-import { PrismaClient } from "@/lib/generated/prisma"
-import { UserDAO }      from "@/modules/user/domain/user_dao"
+import { PrismaClient }        from "@/lib/generated/prisma"
+import { UserDAO }             from "@/modules/user/domain/user_dao"
 import {
   ValidString
-}                          from "@/modules/shared/domain/value_objects/valid_string"
+}                              from "@/modules/shared/domain/value_objects/valid_string"
 import {
   ValidInteger
-}                          from "@/modules/shared/domain/value_objects/valid_integer"
-import { PaginatedResult } from "@/modules/shared/domain/paginated_result"
-import { User, UserAuth } from "@/modules/user/domain/user"
+}                              from "@/modules/shared/domain/value_objects/valid_integer"
+import {
+  PaginatedResult
+}                              from "@/modules/shared/domain/paginated_result"
+import { User, UserAuth }      from "@/modules/user/domain/user"
 import {
   BaseException
-}                          from "@/modules/shared/domain/exceptions/base_exception"
+}                              from "@/modules/shared/domain/exceptions/base_exception"
 import { Either, left, right } from "fp-ts/Either"
 import * as changeCase         from "change-case"
-import { Country }         from "@/modules/country/domain/country"
-import { Errors }          from "@/modules/shared/domain/exceptions/errors"
+import {
+  Errors
+}                              from "@/modules/shared/domain/exceptions/errors"
 import {
   InfrastructureException
-} from "@/modules/shared/domain/exceptions/infrastructure_exception"
+}                              from "@/modules/shared/domain/exceptions/infrastructure_exception"
 
 export class PrismaUserData  implements  UserDAO{
   constructor( private readonly db: PrismaClient ) {

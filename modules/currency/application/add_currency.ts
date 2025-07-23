@@ -3,12 +3,16 @@ import { Either, isLeft, left, right } from "fp-ts/Either"
 import {
   BaseException
 }                                      from "@/modules/shared/domain/exceptions/base_exception"
-import { CurrencyDTO } from "@/modules/currency/application/currency_dto"
+import {
+  CurrencyDTO
+}                                      from "@/modules/currency/application/currency_dto"
 import {
   ensureCurrencyExist
-} from "@/modules/currency/utils/ensure_currency_exist"
-import { Currency }             from "@/modules/currency/domain/currency"
-import { Errors }               from "@/modules/shared/domain/exceptions/errors"
+}                                      from "@/modules/currency/utils/ensure_currency_exist"
+import { Currency }                    from "@/modules/currency/domain/currency"
+import {
+  Errors
+}                                      from "@/modules/shared/domain/exceptions/errors"
 
 export class AddCurrency {
   constructor(

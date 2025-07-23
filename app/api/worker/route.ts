@@ -1,35 +1,20 @@
 "use server"
 
-import { NextRequest, NextResponse }             from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import {
   querySchema
-}                                                from "@/modules/shared/application/query_dto"
+}                                    from "@/modules/shared/application/query_dto"
 import {
   parseData
-}                                                from "@/modules/shared/application/parse_handlers"
-import { isLeft }                                from "fp-ts/Either"
+}                                    from "@/modules/shared/application/parse_handlers"
+import { isLeft }                    from "fp-ts/Either"
 import {
   workerRequestSchema
-}                                                from "@/modules/worker/application/worker_request"
-import {
-  workerUpdateSchema
-}                                                from "@/modules/worker/application/worker_update_dto"
-import {
-  addWorker,
-  getStories, removeEmbedding,
-  searchWorker,
-  updateWorker, upsertEmbedding
-} from "@/app/api/dependencies"
+}                                    from "@/modules/worker/application/worker_request"
+import { addWorker, searchWorker }   from "@/app/api/dependencies"
 import {
   TransformWorkerProfile
-}                                                from "@/modules/worker/application/transform_worker_profile"
-import {
-  StoryMapper
-}                                                from "@/modules/story/application/story_mapper"
-import { UUID } from "@/modules/shared/domain/value_objects/uuid"
-import {
-  WorkerEmbeddingTypeEnum
-} from "@/modules/worker_embedding/domain/worker_embedding_type"
+}                                    from "@/modules/worker/application/transform_worker_profile"
 
 
 export async function POST( request: NextRequest ) {

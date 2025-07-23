@@ -21,7 +21,9 @@ import {
 import {
   ValidInteger
 }                              from "@/modules/shared/domain/value_objects/valid_integer"
-import { PaginatedResult }     from "@/modules/shared/domain/paginated_result"
+import {
+  PaginatedResult
+}                              from "@/modules/shared/domain/paginated_result"
 
 
 export class SupabaseAdminUserData implements AuthRepository {

@@ -17,8 +17,6 @@ import {
 import {
   UUID
 }                                   from "@/modules/shared/domain/value_objects/uuid"
-import { boolean }                  from "fp-ts"
-import { undefined }                from "zod"
 
 export class PrismaZoneData implements ZoneDAO {
   constructor( private readonly db: PrismaClient ) {

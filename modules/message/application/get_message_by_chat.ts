@@ -3,9 +3,9 @@ import { Either, left } from "fp-ts/Either"
 import {
   BaseException
 }                       from "@/modules/shared/domain/exceptions/base_exception"
-import { Message } from "@/modules/message/domain/message"
-import { UUID } from "@/modules/shared/domain/value_objects/uuid"
-import { wrapType } from "@/modules/shared/utils/wrap_type"
+import { Message }      from "@/modules/message/domain/message"
+import { UUID }         from "@/modules/shared/domain/value_objects/uuid"
+import { wrapType }     from "@/modules/shared/utils/wrap_type"
 
 export class GetMessageByChat {
   constructor(private readonly dao : MessageDAO) {

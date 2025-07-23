@@ -5,10 +5,9 @@ import { Either, isLeft, left } from "fp-ts/Either"
 import {
   BaseException
 }                               from "@/modules/shared/domain/exceptions/base_exception"
-import { Quotation }      from "@/modules/quotation/domain/quotation"
 import {
   genericEnsureSearch
-}                         from "@/modules/shared/utils/generic_ensure_search"
+}                               from "@/modules/shared/utils/generic_ensure_search"
 import {
   WorkerBooking
 }                               from "@/modules/worker_booking/domain/worker_booking"

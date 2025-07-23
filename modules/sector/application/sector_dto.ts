@@ -1,4 +1,4 @@
-import { z } from "zod"
+import { z }            from "zod"
 import { regionSchema } from "@/modules/region/application/region_dto"
 
 export const sectorSchema = z.object( {

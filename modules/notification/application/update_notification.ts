@@ -24,7 +24,7 @@ import {
 }                              from "@/modules/shared/domain/exceptions/data_not_found_exception"
 import {
   NotificationUpdateDTO
-} from "@/modules/notification/application/notification_update_dto"
+}                              from "@/modules/notification/application/notification_update_dto"
 
 export class UpdateNotification {
   constructor( private readonly repo: NotificationRepository ) {

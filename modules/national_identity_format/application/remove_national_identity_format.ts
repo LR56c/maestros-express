@@ -3,14 +3,11 @@ import {
   BaseException
 }                                           from "@/modules/shared/domain/exceptions/base_exception"
 import {
-  ensureCountryExist
-} from "@/modules/country/utils/ensure_country_exist"
-import {
   NationalIdentityFormatDAO
-} from "@/modules/national_identity_format/domain/national_identity_format_dao"
+}                                           from "@/modules/national_identity_format/domain/national_identity_format_dao"
 import {
   ensureNationalIdentityFormatExist
-} from "@/modules/national_identity_format/utils/ensure_national_identity_format_exist"
+}                                           from "@/modules/national_identity_format/utils/ensure_national_identity_format_exist"
 
 export class RemoveNationalIdentityFormat {
   constructor( private readonly dao: NationalIdentityFormatDAO ) {

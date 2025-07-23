@@ -346,14 +346,22 @@ import {
 }                       from "@/modules/chat/application/get_chat_by_id"
 import {
   SearchUsers
-}                       from "@/modules/user/application/search_auth"
-import { RegisterAuth } from "@/modules/user/application/register_auth"
-import { UpdateAuth }   from "@/modules/user/application/update_auth"
-import { GetAuthByEmail } from "@/modules/user/application/get_auth_by_email"
+}                       from "@/modules/user/application/search_users"
+import {
+  RegisterAuth
+}                       from "@/modules/user/application/register_auth"
+import {
+  UpdateAuth
+}                       from "@/modules/user/application/update_auth"
+import {
+  GetAuthByEmail
+}                       from "@/modules/user/application/get_auth_by_email"
 import {
   GetAuthByUsername
-} from "@/modules/user/application/get_auth_by_username"
-import { PrismaUserData } from "@/modules/user/infrastructure/prisma_user_data"
+}                       from "@/modules/user/application/get_auth_by_username"
+import {
+  PrismaUserData
+}                       from "@/modules/user/infrastructure/prisma_user_data"
 
 export async function ai() {
   return new OpenAI( {

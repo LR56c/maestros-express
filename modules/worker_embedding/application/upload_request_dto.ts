@@ -1,7 +1,7 @@
 import { z } from "zod"
 import {
   UploadRequestTypeEnum
-} from "@/modules/worker_embedding/domain/upload_request_type"
+}            from "@/modules/worker_embedding/domain/upload_request_type"
 
 
 export const uploadRequest = z.object( {

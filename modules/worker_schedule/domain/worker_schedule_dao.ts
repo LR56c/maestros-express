@@ -11,7 +11,7 @@ import {
 import { UUID }        from "@/modules/shared/domain/value_objects/uuid"
 import {
   WorkerSchedule
-} from "@/modules/worker_schedule/domain/worker_schedule"
+}                      from "@/modules/worker_schedule/domain/worker_schedule"
 
 export abstract class WorkerScheduleDAO {
   abstract search( query: Record<string, any>, limit?: ValidInteger,

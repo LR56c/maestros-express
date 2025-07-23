@@ -1,5 +1,4 @@
 import { AuthRepository } from "@/modules/user/domain/auth_repository"
-import { Email }          from "@/modules/shared/domain/value_objects/email"
 import { Either, left }   from "fp-ts/Either"
 import {
   BaseException

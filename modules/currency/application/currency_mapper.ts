@@ -1,14 +1,16 @@
-import { Currency } from "@/modules/currency/domain/currency"
+import { Currency }    from "@/modules/currency/domain/currency"
 import { CurrencyDTO } from "@/modules/currency/application/currency_dto"
-import { Errors } from "@/modules/shared/domain/exceptions/errors"
-import { wrapType } from "@/modules/shared/utils/wrap_type"
-import { ValidString } from "@/modules/shared/domain/value_objects/valid_string"
+import { Errors }      from "@/modules/shared/domain/exceptions/errors"
+import { wrapType }    from "@/modules/shared/utils/wrap_type"
+import {
+  ValidString
+}                      from "@/modules/shared/domain/value_objects/valid_string"
 import {
   BaseException
-} from "@/modules/shared/domain/exceptions/base_exception"
+}                      from "@/modules/shared/domain/exceptions/base_exception"
 import {
   ValidInteger
-} from "@/modules/shared/domain/value_objects/valid_integer"
+}                      from "@/modules/shared/domain/value_objects/valid_integer"
 
 export class CurrencyMapper {
   static toDTO(currency: Currency): CurrencyDTO {

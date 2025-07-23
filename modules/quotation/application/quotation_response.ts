@@ -1,7 +1,7 @@
 import { z } from "zod"
 import {
   quotationDetailSchema
-} from "@/modules/quotation/modules/quotation_detail/application/quotation_detail_dto"
+}            from "@/modules/quotation/modules/quotation_detail/application/quotation_detail_dto"
 
 export const quotationResponseSchema = z.object( {
   id            : z.string(),

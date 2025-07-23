@@ -18,7 +18,6 @@ import {
   DataNotFoundException
 }                              from "@/modules/shared/domain/exceptions/data_not_found_exception"
 import { UserAuth }            from "@/modules/user/domain/user"
-import { Message }             from "@/modules/message/domain/message"
 
 export class PrismaChatData implements ChatDAO {
   constructor( private readonly db: PrismaClient ) {

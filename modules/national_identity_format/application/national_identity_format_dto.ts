@@ -1,9 +1,11 @@
-import { z }             from "zod"
-import { countrySchema } from "@/modules/country/application/country_dto"
+import { z } from "zod"
+import {
+  countrySchema
+}            from "@/modules/country/application/country_dto"
 import {
   ensureRegexAnchors,
   removeDoubleEscape
-} from "@/modules/shared/utils/ensure_regex"
+}            from "@/modules/shared/utils/ensure_regex"
 
 export const nationalIdentityFormatSchema = z.object( {
   id     : z.string(),

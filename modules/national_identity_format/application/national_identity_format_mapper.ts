@@ -1,23 +1,28 @@
 import {
   NationalIdentityFormat
-}                        from "@/modules/national_identity_format/domain/national_identity_format"
+}                   from "@/modules/national_identity_format/domain/national_identity_format"
 import {
   NationalIdentityFormatDTO
-}                        from "@/modules/national_identity_format/application/national_identity_format_dto"
-import { CountryMapper } from "@/modules/country/application/country_mapper"
-import { Errors }        from "@/modules/shared/domain/exceptions/errors"
-import { wrapType }      from "@/modules/shared/utils/wrap_type"
-import { UUID }          from "@/modules/shared/domain/value_objects/uuid"
+}                   from "@/modules/national_identity_format/application/national_identity_format_dto"
 import {
-  InvalidUUIDException
-}                        from "@/modules/shared/domain/exceptions/invalid_uuid_exception"
+  CountryMapper
+}                   from "@/modules/country/application/country_mapper"
+import {
+  Errors
+}                   from "@/modules/shared/domain/exceptions/errors"
+import { wrapType } from "@/modules/shared/utils/wrap_type"
+import {
+  UUID
+}                   from "@/modules/shared/domain/value_objects/uuid"
 import {
   BaseException
-}                        from "@/modules/shared/domain/exceptions/base_exception"
+}                   from "@/modules/shared/domain/exceptions/base_exception"
 import {
   ValidString
-}                        from "@/modules/shared/domain/value_objects/valid_string"
-import { CountryDTO }    from "@/modules/country/application/country_dto"
+}                   from "@/modules/shared/domain/value_objects/valid_string"
+import {
+  CountryDTO
+}                   from "@/modules/country/application/country_dto"
 
 export class NationalIdentityFormatMapper {
   static toDTO( nationalIdentity: NationalIdentityFormat ): NationalIdentityFormatDTO {

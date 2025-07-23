@@ -1,7 +1,7 @@
 import { z } from "zod"
 import {
   InvalidStoryDocumentTypeException
-} from "@/modules/story/modules/story_document/domain/exception/invalid_story_document_type_exception"
+}            from "@/modules/story/modules/story_document/domain/exception/invalid_story_document_type_exception"
 
 export enum StoryDocumentTypeEnum {
   VIDEO = "VIDEO",
