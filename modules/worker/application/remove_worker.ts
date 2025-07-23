@@ -5,10 +5,7 @@ import {
 import { WorkerDAO }                   from "@/modules/worker/domain/worker_dao"
 import {
   RemoveAuth
-}                                      from "@/modules/user/application/auth_use_cases/remove_auth"
-import {
-  ValidInteger
-}                                      from "@/modules/shared/domain/value_objects/valid_integer"
+}                                      from "@/modules/user/application/remove_auth"
 
 export class RemoveWorker {
   constructor(
