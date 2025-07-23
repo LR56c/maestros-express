@@ -19,8 +19,6 @@ import {
   WorkerResponse
 }                                               from "@/modules/worker/application/worker_response"
 
-interface WorkerFilters {
-}
 
 function getColumns( invalidateTable: () => void ): ColumnDef<WorkerResponse>[] {
   return [
@@ -118,7 +116,7 @@ export default function WorkersPage() {
           isFetching,
           isError,
           error
-        } = usePagedResource<WorkerResponse, WorkerFilters>( {
+        } = usePagedResource<WorkerResponse>( {
     endpoint       : "/api/worker/admin",
     defaultPageSize: 10
   } )

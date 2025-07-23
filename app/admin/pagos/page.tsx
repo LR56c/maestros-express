@@ -19,9 +19,6 @@ import {
   PaymentResponse
 }                           from "@/modules/payment/application/payment_response"
 
-interface PaymentFilters {
-}
-
 
 const columns: ColumnDef<PaymentResponse>[] = [
   {
@@ -101,7 +98,7 @@ export default function PaymentPage() {
           isFetching,
           isError,
           error
-        } = usePagedResource<PaymentResponse, PaymentFilters>( {
+        } = usePagedResource<PaymentResponse>( {
     endpoint       : "/api/payment",
     defaultPageSize: 10
   } )

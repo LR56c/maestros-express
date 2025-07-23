@@ -19,10 +19,6 @@ import {
   PhoneFormatDTO
 }                           from "@/modules/phone_format/application/phone_format_dto"
 
-interface PhoneFilters {
-}
-
-
 const columns: ColumnDef<PhoneFormatDTO>[] = [
   {
     id           : "select",
@@ -110,7 +106,7 @@ export default function PhonePage() {
           isFetching,
           isError,
           error
-        } = usePagedResource<PhoneFormatDTO, PhoneFilters>( {
+        } = usePagedResource<PhoneFormatDTO>( {
     endpoint       : "/api/phone_format",
     defaultPageSize: 10
   } )

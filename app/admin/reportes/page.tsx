@@ -17,9 +17,6 @@ import {
 }                           from "@/components/ui/dropdown-menu"
 import { ReportDTO }        from "@/modules/report/application/report_dto"
 
-interface ReportFilters {
-}
-
 
 const columns: ColumnDef<ReportDTO>[] = [
   {
@@ -107,7 +104,7 @@ export default function ReportPage() {
           isFetching,
           isError,
           error
-        } = usePagedResource<ReportDTO, ReportFilters>( {
+        } = usePagedResource<ReportDTO>( {
     endpoint       : "/api/report",
     defaultPageSize: 10
   } )

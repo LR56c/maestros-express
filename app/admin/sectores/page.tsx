@@ -1,28 +1,28 @@
 "use client"
-import * as React                from "react"
-import { useCallback, useState } from "react"
-import { ColumnDef }             from "@tanstack/react-table"
+import * as React    from "react"
+import { useState }  from "react"
+import { ColumnDef } from "@tanstack/react-table"
 
 import {
   DataTablePaginated
-}                           from "@/components/data_table/data_table_paginated"
-import { usePagedResource } from "@/components/data_table/usePagedQuery"
-import { MoreHorizontal }   from "lucide-react"
-import { Checkbox }         from "@/components/ui/checkbox"
-import { Button }           from "@/components/ui/button"
+}                                from "@/components/data_table/data_table_paginated"
+import { usePagedResource }      from "@/components/data_table/usePagedQuery"
+import { MoreHorizontal }        from "lucide-react"
+import { Checkbox }              from "@/components/ui/checkbox"
+import { Button }                from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger
-}                           from "@/components/ui/dropdown-menu"
-import { SectorDTO }        from "@/modules/sector/application/sector_dto"
-import { SectorAdminDialog } from "@/components/admin/sector_admin_dialog"
-import { useMutation } from "@tanstack/react-query"
-import { toast } from "sonner"
-import { Input } from "@/components/ui/input"
+}                                from "@/components/ui/dropdown-menu"
+import { SectorDTO }             from "@/modules/sector/application/sector_dto"
+import { SectorAdminDialog }     from "@/components/admin/sector_admin_dialog"
+import { useMutation }           from "@tanstack/react-query"
+import { toast }                 from "sonner"
+import { Input }                 from "@/components/ui/input"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
-import { Loader2Icon } from "lucide-react"
+import { Loader2Icon }           from "lucide-react"
 
 interface SectorFilters {
   name?: string
@@ -57,69 +57,65 @@ export default function SectorPage() {
     if ( searchName.trim() ) newFilters.name = searchName.trim()
     setFilters( Object.keys( newFilters ).length ? newFilters : undefined )
   }
-  const clearFilters = () => setFilters( undefined )
+  const clearFilters    = () => setFilters( undefined )
 
-  const { mutateAsync: removeMutateAsync, status: removeStatus } = useMutation( {
-    mutationFn: async ( id: string ) => {
-      const param = new URLSearchParams()
-      param.set( "id", id )
-      const response = await fetch( `/api/sector/?${param.toString()}`, {
-        method  : "DELETE",
-        headers : { "Content-Type": "application/json" }
-      } )
-      if ( !response.ok ) return undefined
-      return await response.json()
-    },
-    onError   : () => toast.error( "Error al eliminar" ),
-    onSuccess : async () => {
-      await refetch()
-      toast.success( "Sector eliminado correctamente" )
-    }
-  } )
+  const { mutateAsync: removeMutateAsync, status: removeStatus } = useMutation(
+    {
+      mutationFn: async ( id: string ) => {
+        const param = new URLSearchParams()
+        param.set( "id", id )
+        const response = await fetch( `/api/sector/?${ param.toString() }`, {
+          method : "DELETE",
+          headers: { "Content-Type": "application/json" }
+        } )
+        if ( !response.ok ) return undefined
+        return await response.json()
+      },
+      onError   : () => toast.error( "Error al eliminar" ),
+      onSuccess : async () => {
+        await refetch()
+        toast.success( "Sector eliminado correctamente" )
+      }
+    } )
 
-  const { mutateAsync: updateMutateAsync, status: updateStatus } = useMutation( {
-    mutationFn: async ( values: any ) => {
-      const response = await fetch( "/api/sector", {
-        method  : "PUT",
-        headers : { "Content-Type": "application/json" },
-        body    : JSON.stringify( values )
-      } )
-      if ( !response.ok ) return undefined
-      return await response.json()
-    },
-    onError   : () => toast.error( "Error al actualizar" ),
-    onSuccess : async () => {
-      await refetch()
-      toast.success( "Sector actualizado correctamente" )
-    }
-  } )
+  const { mutateAsync: updateMutateAsync, status: updateStatus } = useMutation(
+    {
+      mutationFn: async ( values: any ) => {
+        const response = await fetch( "/api/sector", {
+          method : "PUT",
+          headers: { "Content-Type": "application/json" },
+          body   : JSON.stringify( values )
+        } )
+        if ( !response.ok ) return undefined
+        return await response.json()
+      },
+      onError   : () => toast.error( "Error al actualizar" ),
+      onSuccess : async () => {
+        await refetch()
+        toast.success( "Sector actualizado correctamente" )
+      }
+    } )
 
-  const { mutateAsync: createMutateAsync, status: createStatus } = useMutation( {
-    mutationFn: async ( values: any ) => {
-      const response = await fetch( "/api/sector", {
-        method  : "POST",
-        headers : { "Content-Type": "application/json" },
-        body    : JSON.stringify( values )
-      } )
-      if ( !response.ok ) return undefined
-      return await response.json()
-    },
-    onError   : () => toast.error( "Error al crear" ),
-    onSuccess : async () => {
-      await refetch()
-      toast.success( "Sector creado correctamente" )
-    }
-  } )
+  const { mutateAsync: createMutateAsync, status: createStatus } = useMutation(
+    {
+      mutationFn: async ( values: any ) => {
+        const response = await fetch( "/api/sector", {
+          method : "POST",
+          headers: { "Content-Type": "application/json" },
+          body   : JSON.stringify( values )
+        } )
+        if ( !response.ok ) return undefined
+        return await response.json()
+      },
+      onError   : () => toast.error( "Error al crear" ),
+      onSuccess : async () => {
+        await refetch()
+        toast.success( "Sector creado correctamente" )
+      }
+    } )
 
-  const handleSelectionChange = useCallback(
-    ( rows: SectorDTO[] ) => {
-      setSelecteds( rows )
-    },
-    []
-  )
-
-  const [creating, setCreating] = useState( false )
-  const [updating, setUpdating] = useState( false )
+  const [creating, setCreating]         = useState( false )
+  const [updating, setUpdating]         = useState( false )
   const [selectedItem, setSelectedItem] = useState<any>( {} )
 
   const handleUpdateSector = async ( data: SectorDTO ) => {
@@ -179,14 +175,15 @@ export default function SectorPage() {
     },
     {
       header: "Región",
-      cell: ({ row }) => <span className="capitalize">{row.original.region?.name}</span>
+      cell  : ( { row } ) => <span
+        className="capitalize">{ row.original.region?.name }</span>
     },
     {
       accessorKey: "name",
       header     : "Nombre"
     },
     {
-      id: "actions",
+      id  : "actions",
       cell: ( { row } ) => {
         const sector = row.original
         return (
@@ -201,7 +198,8 @@ export default function SectorPage() {
                 setSelectedItem( sector )
                 setUpdating( true )
               } }>Editar</DropdownMenuItem>
-              <DropdownMenuItem onClick={ () => handleDeleteSector( sector )}>Eliminar</DropdownMenuItem>
+              <DropdownMenuItem onClick={ () => handleDeleteSector(
+                sector ) }>Eliminar</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         )
@@ -258,7 +256,6 @@ export default function SectorPage() {
         pageIndex={ pageIndex }
         pageSize={ pageSize }
         getRowId={ ( row ) => row.id }
-        onSelectionChange={ handleSelectionChange }
         makeHref={ makeHref }
         onPageChange={ setPageIndex }
         onPageHover={ ( p1 ) => prefetchPage( p1 - 1 ) }
@@ -284,7 +281,8 @@ export default function SectorPage() {
         formData={ selectedItem }
         onSave={ handleUpdateSector }
       />
-      <Dialog onOpenChange={ () => {} } open={ removeStatus === "pending" }>
+      <Dialog onOpenChange={ () => {
+      } } open={ removeStatus === "pending" }>
         <DialogContent
           className="sm:max-w-md w-full flex items-center justify-center gap-4 [&>button]:hidden">
           <Loader2Icon className="animate-spin"/>

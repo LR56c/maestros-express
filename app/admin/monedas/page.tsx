@@ -17,9 +17,6 @@ import {
 }                           from "@/components/ui/dropdown-menu"
 import { CurrencyDTO }      from "@/modules/currency/application/currency_dto"
 
-interface CurrencyFilters {
-}
-
 
 const columns: ColumnDef<CurrencyDTO>[] = [
   {
@@ -111,7 +108,7 @@ export default function CurrencyPage() {
           isFetching,
           isError,
           error
-        } = usePagedResource<CurrencyDTO, CurrencyFilters>( {
+        } = usePagedResource<CurrencyDTO>( {
     endpoint       : "/api/currency",
     defaultPageSize: 10
   } )

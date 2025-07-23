@@ -8,8 +8,9 @@ import { zodResolver }                    from "@hookform/resolvers/zod"
 import InputText                          from "@/components/form/input_text"
 import React, { useState, useTransition } from "react"
 import {
+  UserLoginRequest,
   userLoginRequestSchema
-}                                         from "@/modules/user/application/models/user_login_request"
+} from "@/modules/user/application/models/user_login_request"
 import { Loader2Icon }                    from "lucide-react"
 import { useRouter }                      from "next/navigation"
 
@@ -25,7 +26,7 @@ export default function Ingresar() {
   const router                = useRouter()
 
 
-  const onSubmit = async ( values: any ) => {
+  const onSubmit = async ( values: UserLoginRequest ) => {
     setIsError( false )
     startTransition( async () => {
       const result = await login( {

@@ -173,7 +173,7 @@ export default function SpecialityPage() {
           status     : updateStatus
         } = useMutation(
     {
-      mutationFn: async ( values: any ) => {
+      mutationFn: async ( values: SpecialityDTO ) => {
         const response = await fetch( "/api/speciality", {
           method : "PUT",
           headers: {
@@ -201,7 +201,7 @@ export default function SpecialityPage() {
           status     : createStatus
         } = useMutation(
     {
-      mutationFn: async ( values: any ) => {
+      mutationFn: async ( values: SpecialityDTO ) => {
         const response = await fetch( "/api/speciality", {
           method : "POST",
           headers: {
@@ -225,7 +225,7 @@ export default function SpecialityPage() {
 
   const [creating, setCreating]         = useState( false )
   const [updating, setUpdating]         = useState( false )
-  const [selectedItem, setSelectedItem] = useState<any>( {} )
+  const [selectedItem, setSelectedItem] = useState<SpecialityDTO | null>( null )
 
   if ( isError ) {
     return (
@@ -254,7 +254,7 @@ export default function SpecialityPage() {
       return
     }
     setUpdating( false )
-    setSelectedItem( {} )
+    setSelectedItem( null )
   }
   const handleNewSpeciality    = async ( speciality: SpecialityDTO ) => {
     const result = await createMutateAsync( speciality )
@@ -263,7 +263,7 @@ export default function SpecialityPage() {
       return
     }
     setCreating( false )
-    setSelectedItem( {} )
+    setSelectedItem( null )
   }
 
   const handleDeleteSpeciality = async ( id: string ) => {
@@ -272,7 +272,7 @@ export default function SpecialityPage() {
       toast.error( "Error al eliminar la especialidad" )
       return
     }
-    setSelectedItem( {} )
+    setSelectedItem( null )
   }
 
   return (
@@ -292,7 +292,7 @@ export default function SpecialityPage() {
         </div>
         <Button disabled={ createStatus === "pending" }
                 onClick={ () => {
-                  setSelectedItem( {} )
+                  setSelectedItem( null )
                   setCreating( true )
                 } }>Nueva
           especialidad</Button>

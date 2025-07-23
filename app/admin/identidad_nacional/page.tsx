@@ -19,8 +19,6 @@ import {
   NationalIdentityFormatDTO
 } from "@/modules/national_identity_format/application/national_identity_format_dto"
 
-interface NationalIdentityFilters {
-}
 
 
 const columns: ColumnDef<NationalIdentityFormatDTO>[] = [
@@ -110,7 +108,7 @@ export default function NationalIdentityPage() {
           isFetching,
           isError,
           error
-        } = usePagedResource<NationalIdentityFormatDTO, NationalIdentityFilters>( {
+        } = usePagedResource<NationalIdentityFormatDTO>( {
     endpoint       : "/api/national_identity_format",
     defaultPageSize: 10
   } )

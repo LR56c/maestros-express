@@ -336,12 +336,6 @@ import {
   SearchReport
 }                       from "@/modules/report/application/search_report"
 import {
-  UploadFileRepository
-}                       from "@/modules/shared/domain/upload_file_repository"
-import {
-  SupabaseFileUploadData
-}                       from "@/modules/shared/infrastructure/supabase_file_upload_data"
-import {
   GetChatById
 }                       from "@/modules/chat/application/get_chat_by_id"
 import {
@@ -353,12 +347,6 @@ import {
 import {
   UpdateAuth
 }                       from "@/modules/user/application/update_auth"
-import {
-  GetAuthByEmail
-}                       from "@/modules/user/application/get_auth_by_email"
-import {
-  GetAuthByUsername
-}                       from "@/modules/user/application/get_auth_by_username"
 import {
   PrismaUserData
 }                       from "@/modules/user/infrastructure/prisma_user_data"
@@ -474,13 +462,13 @@ export async function updateAuth() {
   return new UpdateAuth( authDao )
 }
 
-export async function getUserByEmail() {
-  return new GetAuthByEmail( authDao )
-}
+// export async function getUserByEmail() {
+//   return new GetAuthByEmail( authDao )
+// }
 
-export async function getUserByUsername() {
-  return new GetAuthByUsername( authDao )
-}
+// export async function getUserByUsername() {
+//   return new GetAuthByUsername( authDao )
+// }
 
 
 const bookingData = new PrismaWorkerBookingData( prisma )

@@ -28,9 +28,6 @@ import {
 import { UserAdminDialog }  from "@/components/admin/user_admin_dialog"
 import { useState }         from "react"
 
-interface SpecialityFilters {
-}
-
 
 const columns: ColumnDef<UserResponse>[] = [
   {
@@ -125,7 +122,7 @@ export default function UsersPage() {
           isFetching,
           isError,
           error
-        } = usePagedResource<UserResponse, SpecialityFilters>( {
+        } = usePagedResource<UserResponse>( {
     endpoint       : "/api/user",
     defaultPageSize: 10
   } )
