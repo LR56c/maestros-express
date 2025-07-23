@@ -1,10 +1,9 @@
 "use client"
-import Link                 from "next/link"
 import React, { useEffect }         from "react"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { Skeleton }                 from "@/components/ui/skeleton"
-import HistoryCircle        from "@/components/history_circle"
-import { storiesOptions } from "@/utils/tanstack_catalog"
+import HistoryCircle                from "@/components/history_circle"
+import { storiesOptions }           from "@/utils/tanstack_catalog"
 
 interface WorkerHistoriesProps {
   workerId: string

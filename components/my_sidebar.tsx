@@ -10,21 +10,21 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem
-}                                                         from "@/components/ui/sidebar"
-import { Bell, ChevronUp, Home, Inbox, Moon, Sun, User2 } from "lucide-react"
+}                                                   from "@/components/ui/sidebar"
+import { ChevronUp, Home, Inbox, Moon, Sun, User2 } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger
-}                                                         from "@/components/ui/dropdown-menu"
-import Link                                               from "next/link"
-import { useRouter }                                      from "next/navigation"
+}                                                   from "@/components/ui/dropdown-menu"
+import Link                                         from "next/link"
+import { useRouter }                                from "next/navigation"
 import {
   useAuthContext
-}                                                         from "@/app/context/auth_context"
-import { useTheme }                                       from "next-themes"
-import * as React                                         from "react"
+}                                                   from "@/app/context/auth_context"
+import { useTheme }                                 from "next-themes"
+import * as React                                   from "react"
 
 const items = [
   {

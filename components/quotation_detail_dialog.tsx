@@ -27,8 +27,6 @@ import InputTextArea
                                                from "@/components/form/input_text_area"
 
 
-
-
 export const QuotationDetailDialog: React.FC<ListInputModalProps> = ( {
   isOpen,
   onOpenChange,

@@ -3,7 +3,6 @@ import React, { useState } from "react"
 import {
   UserResponse
 }                          from "@/modules/user/application/models/user_response"
-import Image               from "next/image"
 import { Camera }          from "lucide-react"
 import ProfilePhotoModal   from "@/components/profile_photo_modal"
 import { useRouter }       from "next/navigation"

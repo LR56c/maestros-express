@@ -45,8 +45,6 @@ import { Loader2Icon }                               from "lucide-react"
 import {
   countriesOption
 }                                                    from "@/utils/tanstack_catalog"
-import ProfilePhotoModal
-                                                     from "@/components/profile_photo_modal"
 import ProfilePhotoHover
                                                      from "@/components/profile_photo_hover"
 
