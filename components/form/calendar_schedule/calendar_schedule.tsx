@@ -299,7 +299,7 @@ export default function CalendarSchedule( {
   const getVisibleDays = () => {
     const weekDays = getWeekDays()
     return weekDays.slice( currentWeekStart, currentWeekStart + visibleDays )
-                   .map( ( day, index ) => (
+                   .map( ( day, _ ) => (
                      {
                        day,
                        dateKey  : formatDateKey( day ),
@@ -312,7 +312,7 @@ export default function CalendarSchedule( {
   const getSchedulesByVisibleDays = () => {
     const visibleDaysData = getVisibleDays()
 
-    return visibleDaysData.map( ( dayData, dayIndex ) => {
+    return visibleDaysData.map( ( dayData, _ ) => {
       const daySchedules = schedules
         .map( ( schedule, index ) => (
           { schedule, index }
@@ -349,18 +349,18 @@ export default function CalendarSchedule( {
     return gridClasses[visibleDays as keyof typeof gridClasses] || "grid-cols-3"
   }
 
-  const getMaxWidthClass = () => {
-    const widthClasses = {
-      1: "max-w-xs",
-      2: "max-w-sm",
-      3: "max-w-md",
-      4: "max-w-lg",
-      5: "max-w-xl",
-      6: "max-w-2xl",
-      7: "max-w-4xl"
-    }
-    return widthClasses[visibleDays as keyof typeof widthClasses] || "max-w-md"
-  }
+  // const getMaxWidthClass = () => {
+  //   const widthClasses = {
+  //     1: "max-w-xs",
+  //     2: "max-w-sm",
+  //     3: "max-w-md",
+  //     4: "max-w-lg",
+  //     5: "max-w-xl",
+  //     6: "max-w-2xl",
+  //     7: "max-w-4xl"
+  //   }
+  //   return widthClasses[visibleDays as keyof typeof widthClasses] || "max-w-md"
+  // }
 
   // Actualizar fecha de fin cuando cambia la fecha de inicio para mantener el mismo día
   const handleStartDateChange = ( newStartDate: string ) => {

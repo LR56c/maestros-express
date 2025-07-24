@@ -40,7 +40,7 @@ export default function InputLocationDetector( {
       <Controller
         control={ control }
         name={ name }
-        render={ ( { field: { value, onBlur, onChange } } ) =>
+        render={ ( { field: { value } } ) =>
           <div className="flex items-center gap-2">
             <Input disabled value={ value
               ? value

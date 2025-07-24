@@ -26,7 +26,7 @@ export function DateTimePicker({
   value,
   onChange,
   label,
-  placeholder,
+  // placeholder,
   disabled = false,
   min,
 }: DateTimePickerProps) {

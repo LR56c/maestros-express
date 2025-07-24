@@ -6,6 +6,9 @@ import { WorkerDAO }                   from "@/modules/worker/domain/worker_dao"
 import {
   RemoveAuth
 }                                      from "@/modules/user/application/remove_auth"
+import {
+  ValidInteger
+}                                      from "@/modules/shared/domain/value_objects/valid_integer"
 
 export class RemoveWorker {
   constructor(
