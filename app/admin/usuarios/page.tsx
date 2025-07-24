@@ -21,9 +21,6 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle
 }                           from "@/components/ui/dialog"
 import { UserAdminDialog }  from "@/components/admin/user_admin_dialog"
 import { useState }         from "react"
@@ -132,7 +129,7 @@ export default function UsersPage() {
       <div className="p-4 text-sm text-destructive">
         Error: { (
         error as Error
-      )?.message ?? "desconocido" }
+      )?.message ?? "Escondido" }
       </div>
     )
   }

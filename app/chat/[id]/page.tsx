@@ -6,11 +6,8 @@ import { RealtimeChat }    from "@/components/chat/realtime_chat"
 import { ChatResponse }    from "@/modules/chat/application/chat_response"
 import { MessageResponse } from "@/modules/message/application/message_response"
 
-interface MessagePageProps {
-}
 
-
-export default function MessagePage( {}: MessagePageProps )
+export default function MessagePage()
 {
   const { id }              = useParams()
   const { user }            = useAuthContext()

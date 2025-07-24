@@ -80,7 +80,7 @@ export default function SectorPage() {
 
   const { mutateAsync: updateMutateAsync, status: updateStatus } = useMutation(
     {
-      mutationFn: async ( values: any ) => {
+      mutationFn: async ( values: SectorDTO ) => {
         const response = await fetch( "/api/sector", {
           method : "PUT",
           headers: { "Content-Type": "application/json" },
@@ -98,7 +98,7 @@ export default function SectorPage() {
 
   const { mutateAsync: createMutateAsync, status: createStatus } = useMutation(
     {
-      mutationFn: async ( values: any ) => {
+      mutationFn: async ( values: SectorDTO ) => {
         const response = await fetch( "/api/sector", {
           method : "POST",
           headers: { "Content-Type": "application/json" },
@@ -116,7 +116,7 @@ export default function SectorPage() {
 
   const [creating, setCreating]         = useState( false )
   const [updating, setUpdating]         = useState( false )
-  const [selectedItem, setSelectedItem] = useState<any>( {} )
+  const [selectedItem, setSelectedItem] = useState<SectorDTO | null>( null )
 
   const handleUpdateSector = async ( data: SectorDTO ) => {
     const result = await updateMutateAsync( data )
@@ -125,7 +125,7 @@ export default function SectorPage() {
       return
     }
     setUpdating( false )
-    setSelectedItem( {} )
+    setSelectedItem( null )
   }
 
   const handleNewSector = async ( data: SectorDTO ) => {
@@ -135,7 +135,7 @@ export default function SectorPage() {
       return
     }
     setCreating( false )
-    setSelectedItem( {} )
+    setSelectedItem( null )
   }
 
   const handleDeleteSector = async ( sector: SectorDTO ) => {
@@ -144,7 +144,7 @@ export default function SectorPage() {
       toast.error( "Error al eliminar el sector" )
       return
     }
-    setSelectedItem( {} )
+    setSelectedItem( null )
   }
 
   const columns: ColumnDef<SectorDTO>[] = [
@@ -245,7 +245,7 @@ export default function SectorPage() {
         </div>
         <Button disabled={ createStatus === "pending" }
                 onClick={ () => {
-                  setSelectedItem( {} )
+                  setSelectedItem( null )
                   setCreating( true )
                 } }>Nuevo sector</Button>
       </div>

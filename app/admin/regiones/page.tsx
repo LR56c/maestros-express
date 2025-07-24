@@ -83,7 +83,7 @@ export default function RegionPage() {
   } )
 
   const { mutateAsync: updateMutateAsync, status: updateStatus } = useMutation( {
-    mutationFn: async ( values: any ) => {
+    mutationFn: async ( values: RegionDTO ) => {
       const response = await fetch( "/api/region", {
         method  : "PUT",
         headers : { "Content-Type": "application/json" },
@@ -100,7 +100,7 @@ export default function RegionPage() {
   } )
 
   const { mutateAsync: createMutateAsync, status: createStatus } = useMutation( {
-    mutationFn: async ( values: any ) => {
+    mutationFn: async ( values: RegionDTO ) => {
       const response = await fetch( "/api/region", {
         method  : "POST",
         headers : { "Content-Type": "application/json" },
@@ -118,7 +118,7 @@ export default function RegionPage() {
 
   const [creating, setCreating] = useState( false )
   const [updating, setUpdating] = useState( false )
-  const [selectedItem, setSelectedItem] = useState<any>( {} )
+  const [selectedItem, setSelectedItem] = useState<RegionDTO | null>( null )
 
   const handleUpdateRegion = async ( data: RegionDTO ) => {
     const result = await updateMutateAsync( data )
@@ -127,7 +127,7 @@ export default function RegionPage() {
       return
     }
     setUpdating( false )
-    setSelectedItem( {} )
+    setSelectedItem( null )
   }
 
   const handleNewRegion = async ( data: RegionDTO ) => {
@@ -137,7 +137,7 @@ export default function RegionPage() {
       return
     }
     setCreating( false )
-    setSelectedItem( {} )
+    setSelectedItem( null )
   }
 
   const handleDeleteRegion = async ( region: RegionDTO ) => {
@@ -146,7 +146,7 @@ export default function RegionPage() {
       toast.error( "Error al eliminar la región" )
       return
     }
-    setSelectedItem( {} )
+    setSelectedItem( null )
   }
 
   const columns: ColumnDef<RegionDTO>[] = [
@@ -249,7 +249,7 @@ export default function RegionPage() {
         </div>
         <Button disabled={ createStatus === "pending" }
                 onClick={ () => {
-                  setSelectedItem( {} )
+                  setSelectedItem( null )
                   setCreating( true )
                 } }>Nueva región</Button>
       </div>

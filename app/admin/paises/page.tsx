@@ -102,7 +102,7 @@ export default function CountryPage() {
           status     : updateStatus
         } = useMutation(
     {
-      mutationFn: async ( values: any ) => {
+      mutationFn: async ( values: CountryDTO ) => {
         const response = await fetch( "/api/country", {
           method : "PUT",
           headers: {
@@ -131,7 +131,7 @@ export default function CountryPage() {
           status     : createStatus
         } = useMutation(
     {
-      mutationFn: async ( values: any ) => {
+      mutationFn: async ( values: CountryDTO ) => {
         const response = await fetch( "/api/country", {
           method : "POST",
           headers: {
@@ -155,7 +155,7 @@ export default function CountryPage() {
 
   const [creating, setCreating]         = useState( false )
   const [updating, setUpdating]         = useState( false )
-  const [selectedItem, setSelectedItem] = useState<any>( {} )
+  const [selectedItem, setSelectedItem] = useState<CountryDTO | null>( null  )
 
   const handleUpdateCountry = async ( data: CountryDTO ) => {
     console.log( "handleUpdateCountry", data )
@@ -165,7 +165,7 @@ export default function CountryPage() {
       return
     }
     setUpdating( false )
-    setSelectedItem( {} )
+    setSelectedItem( null )
   }
 
   const handleNewCountry = async ( data: CountryDTO ) => {
@@ -175,7 +175,7 @@ export default function CountryPage() {
       return
     }
     setCreating( false )
-    setSelectedItem( {} )
+    setSelectedItem( null )
   }
 
   const handleDeleteCountry = async ( country: CountryDTO ) => {
@@ -184,7 +184,7 @@ export default function CountryPage() {
       toast.error( "Error al eliminar el país" )
       return
     }
-    setSelectedItem( {} )
+    setSelectedItem( null )
   }
 
   const columns: ColumnDef<CountryDTO>[] = [
@@ -283,7 +283,7 @@ export default function CountryPage() {
         </div>
         <Button disabled={ createStatus === "pending" }
                 onClick={ () => {
-                  setSelectedItem( {} )
+                  setSelectedItem( null )
                   setCreating( true )
                 } }>Nuevo pais</Button>
       </div>
