@@ -54,8 +54,8 @@ export const RegionAdminDialog = ( {
   }, [data] )
 
   const initialValues = useMemo( () => {
-    if(!formData.id) {
-      formData.id = UUID.create().toString()
+    if ( !formData || !formData.id ) {
+      return { id: UUID.create().toString() }
     }
     if(formData.country ) {
       formData.country = formData.country as CountryDTO
@@ -72,7 +72,12 @@ export const RegionAdminDialog = ( {
     values  : initialValues
   } )
 
-  const handleSubmit = methods.handleSubmit( onSave )
+  const { handleSubmit, reset } = methods
+
+  const onSubmit         = async ( data: any ) => {
+    onSave( data )
+    reset()
+  }
 
   return (
     <FormProvider { ...methods }>
@@ -92,7 +97,7 @@ export const RegionAdminDialog = ( {
             } }
             name="country_name" values={ inputCountries } label="Pais"/>
           <Button
-            onClick={ handleSubmit }
+            onClick={ handleSubmit( onSubmit ) }
             type="button" disabled={ isLoading }>
             { isLoading
               ? <Loader2Icon className="animate-spin"/>

@@ -146,6 +146,8 @@ export default function WorkerApplyForm() {
                    placeholder="Ingrese su contraseña"/>
         <InputText name="confirm" label="Confirmar Contraseña" type="password"
                    placeholder="Confirme su contraseña"/>
+        <InputText name="user.username" label="Nombre de usuario" type="text"
+                   placeholder="Ingrese su nombre de usuario"/>
         <InputText name="user.full_name" label="Nombre" type="text"
                    placeholder="Ingrese su nombre completo"/>
         <SelectInput

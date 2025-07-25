@@ -158,7 +158,6 @@ export default function CountryPage() {
   const [selectedItem, setSelectedItem] = useState<CountryDTO | null>( null  )
 
   const handleUpdateCountry = async ( data: CountryDTO ) => {
-    console.log( "handleUpdateCountry", data )
     const result = await  updateMutateAsync(data)
     if ( !result ) {
       toast.error( "Error al actualizar el país" )

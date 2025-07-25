@@ -37,7 +37,7 @@ export function SpecialityAdminDialog( {
 }: SpecialityAdminDialogProps )
 {
   const initialValues = useMemo( () => {
-    if ( Object.keys( formData ).length === 0 ) {
+    if ( !formData || !formData.id ) {
       return { id: UUID.create().toString() }
     }
     return formData

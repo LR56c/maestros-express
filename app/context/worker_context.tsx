@@ -126,6 +126,15 @@ const processData           = async ( workerUser: UserResponse,
       stories.push( storyDTO )
     }
   }
+  const avatarUpload =await  uploadDocument(uploader, [workerExtra.avatar])
+
+  if ( isLeft( avatarUpload ) ) {
+    namesAdded.push( ...avatarUpload.left )
+  }
+  else {
+    workerUser.avatar = avatarUpload.right[0].url
+  }
+
   console.log( "Names added during upload:", namesAdded )
   if ( namesAdded.length > 0 ) {
     return left( namesAdded )

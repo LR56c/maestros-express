@@ -32,7 +32,7 @@ export function CountryAdminDialog( {
 }: CountryAdminDialogProps )
 {
   const initialValues = useMemo( () => {
-    if ( Object.keys( formData ).length === 0 ) {
+    if ( !formData || !formData.id ) {
       return { id: UUID.create().toString() }
     }
     return formData
@@ -43,7 +43,11 @@ export function CountryAdminDialog( {
     values  : initialValues
   } )
 
-  const handleSubmit = methods.handleSubmit( onSave )
+  const { handleSubmit, reset } = methods
+  const onSubmit         = async ( data: any ) => {
+    onSave( data )
+    reset()
+  }
 
   return (
     <FormProvider { ...methods }>
@@ -57,7 +61,7 @@ export function CountryAdminDialog( {
                      type="text"
                      placeholder="Ingrese el código del país"/>
           <Button
-            onClick={ handleSubmit }
+            onClick={ handleSubmit( onSubmit ) }
             type="button" disabled={ isLoading }>
             { isLoading
               ? <Loader2Icon className="animate-spin"/>

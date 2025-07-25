@@ -49,7 +49,7 @@ export const TaxDialog: React.FC<ListInputModalProps> = ( {
     ) ) )
   }, [data] )
   const initialValues = useMemo( () => {
-    if ( Object.keys( formData ).length === 0 ) {
+    if ( !formData || !formData.id ) {
       return { id: UUID.create().toString() }
     }
     return formData

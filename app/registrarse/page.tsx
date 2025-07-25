@@ -21,7 +21,7 @@ const registerFormSchema = userRegisterRequestSchema.extend( {
 } )
 
 export default function Registrarse() {
-  const { user, register }            = useAuthContext()
+  const {  register }            = useAuthContext()
   const [submitting, startTransition] = useTransition()
 
   const methods = useForm( {
@@ -55,7 +55,7 @@ export default function Registrarse() {
                      placeholder="Ingrese su contraseña"/>
           <InputText name="confirm" label="Confirmar Contraseña" type="password"
                      placeholder="Confirme su contraseña"/>
-          <InputText name="full_name" label="Nombre de usuario" type="text"
+          <InputText name="username" label="Nombre de usuario" type="text"
                      placeholder="Ingrese su nombre de usuario"/>
           <InputText name="full_name" label="Nombre" type="text"
                      placeholder="Ingrese su nombre completo"/>

@@ -43,7 +43,7 @@ export class SupabaseUserData implements AuthAppService {
     return this.getUserMetadata( data.user! )
   }
 
-  private async getUserMetadata( user : any ): Promise<UserResponse> {
+  private async getUserMetadata( user: any ): Promise<UserResponse> {
     const metadata = user.user_metadata
 
     return {
@@ -79,8 +79,9 @@ export class SupabaseUserData implements AuthAppService {
       password: request.password,
       options : {
         data: {
-          name  : request.full_name,
-          avatar: request.avatar
+          name    : request.full_name,
+          avatar  : request.avatar,
+          username: request.username
         }
       }
     } )
