@@ -25,77 +25,6 @@ import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Loader2Icon } from "lucide-react"
 import { PhoneFormatAdminDialog } from "@/components/admin/phone_format_admin_dialog"
 
-const columns: ColumnDef<PhoneFormatDTO>[] = [
-  {
-    id           : "select",
-    header       : ( { table } ) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (
-            table.getIsSomePageRowsSelected() && "indeterminate"
-          )
-        }
-        onCheckedChange={ ( value ) => table.toggleAllPageRowsSelected(
-          !!value ) }
-        aria-label="Select all"
-      />
-    ),
-    cell         : ( { row } ) => (
-      <Checkbox
-        checked={ row.getIsSelected() }
-        onCheckedChange={ ( value ) => row.toggleSelected( !!value ) }
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding : false
-  },
-  {
-    header: "Pais",
-    cell  : ( { row } ) => {
-      const phone = row.original
-      return (
-        <span className="capitalize">{ phone.country.name }</span>
-      )
-    }
-  },
-  {
-    accessorKey: "prefix",
-    header     : "Prefijo"
-  },
-  {
-    accessorKey: "regex",
-    header     : "Regex"
-  },
-  {
-    accessorKey: "example",
-    header     : "Ejemplo"
-  },
-  {
-    id: "actions",
-    cell: ( { row } ) => {
-      const item = row.original
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost">
-              <MoreHorizontal/>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={ () => {
-              setSelectedItem( item )
-              setUpdating( true )
-            } }>Editar</DropdownMenuItem>
-            <DropdownMenuItem onClick={ () => handleDelete( item )}>Eliminar</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
-    }
-  }
-]
-
 export default function PhonePage() {
   const {
     items,
@@ -219,6 +148,77 @@ export default function PhonePage() {
     }
     setSelectedItem( null )
   }
+
+  const columns: ColumnDef<PhoneFormatDTO>[] = [
+    {
+      id           : "select",
+      header       : ( { table } ) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (
+              table.getIsSomePageRowsSelected() && "indeterminate"
+            )
+          }
+          onCheckedChange={ ( value ) => table.toggleAllPageRowsSelected(
+            !!value ) }
+          aria-label="Select all"
+        />
+      ),
+      cell         : ( { row } ) => (
+        <Checkbox
+          checked={ row.getIsSelected() }
+          onCheckedChange={ ( value ) => row.toggleSelected( !!value ) }
+          aria-label="Select row"
+        />
+      ),
+      enableSorting: false,
+      enableHiding : false
+    },
+    {
+      header: "Pais",
+      cell  : ( { row } ) => {
+        const phone = row.original
+        return (
+          <span className="capitalize">{ phone.country.name }</span>
+        )
+      }
+    },
+    {
+      accessorKey: "prefix",
+      header     : "Prefijo"
+    },
+    {
+      accessorKey: "regex",
+      header     : "Regex"
+    },
+    {
+      accessorKey: "example",
+      header     : "Ejemplo"
+    },
+    {
+      id: "actions",
+      cell: ( { row } ) => {
+        const item = row.original
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost">
+                <MoreHorizontal/>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={ () => {
+                setSelectedItem( item )
+                setUpdating( true )
+              } }>Editar</DropdownMenuItem>
+              <DropdownMenuItem onClick={ () => handleDelete( item )}>Eliminar</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )
+      }
+    }
+  ]
 
   if ( isError ) {
     return (

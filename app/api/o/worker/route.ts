@@ -24,6 +24,7 @@ import {
 export async function PUT( request: NextRequest ) {
   const body = await request.json()
   const data = parseData( workerExtraSchema, body )
+  log
 
   if ( isLeft( data ) ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
