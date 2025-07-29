@@ -7,11 +7,16 @@ import {
 import {
   parseData
 }                                    from "@/modules/shared/application/parse_handlers"
-import { isLeft }                    from "fp-ts/Either"
-import { searchUser, updateAuth }    from "@/app/api/dependencies"
+import { isLeft }                                   from "fp-ts/Either"
+import {
+  removeAuth,
+  removeSpeciality,
+  searchUser,
+  updateAuth
+} from "@/app/api/dependencies"
 import {
   UserMapper
-}                                    from "@/modules/user/application/user_mapper"
+}                                                   from "@/modules/user/application/user_mapper"
 import {
   userUpdateSchema
 }                                    from "@/modules/user/application/models/user_update_dto"
@@ -75,6 +80,22 @@ export async function PUT( request: NextRequest ) {
   const result = await (
     await updateAuth()
   ).execute( data.right )
+
+  if ( isLeft( result ) ) {
+    return NextResponse.json( { status: 500 } )
+  }
+
+  return NextResponse.json( { status: 200 } )
+}
+
+
+export async function DELETE( request: NextRequest ) {
+  const { searchParams } = new URL( request.url )
+  const id               = searchParams.get( "id" )
+
+  const result = await (
+    await removeAuth()
+  ).execute( id ?? "" )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )

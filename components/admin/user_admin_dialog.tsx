@@ -2,10 +2,34 @@ import { UserResponse } from "@/modules/user/application/models/user_response"
 import React            from "react"
 
 interface UserAdminDialogProps {
-  user: UserResponse
+  isOpen: boolean
+  isLoading: boolean
+  onOpenChange: ( open: boolean ) => void
+  title: string
+  user: UserResponse | null
+  onSave: ( data: any ) => void
 }
 
-export function UserAdminDialog( { user }: UserAdminDialogProps ) {
+export function UserAdminDialog( {
+  isOpen,
+  isLoading,
+  onOpenChange,
+  title,
+  user,
+  onSave
+}: UserAdminDialogProps )
+{
+  if ( !user ) {
+    return (
+      <div className="p-4">
+        <div className="h-8 w-full animate-pulse bg-muted/50 mb-2"/>
+        <div className="h-8 w-full animate-pulse bg-muted/50 mb-2"/>
+        <div className="h-8 w-full animate-pulse bg-muted/50"/>
+      </div>
+    )
+  }
+
+
   return (
     <div className="flex gap-4 overflow-y-scroll">
       <div

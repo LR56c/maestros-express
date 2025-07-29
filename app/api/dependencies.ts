@@ -350,6 +350,7 @@ import {
 import {
   PrismaUserData
 }                       from "@/modules/user/infrastructure/prisma_user_data"
+import { RemoveAuth }   from "@/modules/user/application/remove_auth"
 
 export async function ai() {
   return new OpenAI( {
@@ -460,6 +461,10 @@ export async function registerAuth() {
 
 export async function updateAuth() {
   return new UpdateAuth( authDao )
+}
+
+export async function removeAuth() {
+  return new RemoveAuth( authDao )
 }
 
 // export async function getUserByEmail() {
