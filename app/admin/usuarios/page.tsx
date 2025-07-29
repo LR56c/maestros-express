@@ -1,35 +1,32 @@
 "use client"
-import * as React                from "react"
-import { ColumnDef }             from "@tanstack/react-table"
+import * as React    from "react"
+import { useState }  from "react"
+import { ColumnDef } from "@tanstack/react-table"
 
 import {
   DataTablePaginated
-}                           from "@/components/data_table/data_table_paginated"
-import { usePagedResource } from "@/components/data_table/usePagedQuery"
+}                                      from "@/components/data_table/data_table_paginated"
+import {
+  usePagedResource
+}                                      from "@/components/data_table/usePagedQuery"
 import { Loader2Icon, MoreHorizontal } from "lucide-react"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Button }           from "@/components/ui/button"
+import { Checkbox }                    from "@/components/ui/checkbox"
+import { Button }                      from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger
-}                           from "@/components/ui/dropdown-menu"
+}                                      from "@/components/ui/dropdown-menu"
 import {
   UserResponse
-} from "@/modules/user/application/models/user_response"
+}                                      from "@/modules/user/application/models/user_response"
+import { Dialog, DialogContent }       from "@/components/ui/dialog"
 import {
-  Dialog,
-  DialogContent,
-} from "@/components/ui/dialog"
-import { UserAdminDialog } from "@/components/admin/user_admin_dialog"
-import { useState } from "react"
-import { useMutation } from "@tanstack/react-query"
-import { toast } from "sonner"
-import { CountryDTO } from "@/modules/country/application/country_dto"
-import {
-  CountryAdminDialog
-} from "@/components/admin/country_admin_dialog"
+  UserAdminDialog
+}                                      from "@/components/admin/user_admin_dialog"
+import { useMutation }                 from "@tanstack/react-query"
+import { toast }                       from "sonner"
 
 interface UserFilters{
   name?: string

@@ -1,10 +1,5 @@
 "use client"
-import { useParams } from "next/navigation"
-import { useQuery }  from "@tanstack/react-query"
-import * as React    from "react"
-import {
-  WorkerProfileDTO
-}                    from "@/modules/worker/application/worker_profile_dto"
+import * as React from "react"
 
 export default function TarifaTab() {
   return (

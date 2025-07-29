@@ -1,30 +1,32 @@
 "use client"
-import * as React                from "react"
-import { ColumnDef }             from "@tanstack/react-table"
-import { useMutation }            from "@tanstack/react-query"
-import { toast }                 from "sonner"
+import * as React      from "react"
+import { ColumnDef }   from "@tanstack/react-table"
+import { useMutation } from "@tanstack/react-query"
+import { toast }       from "sonner"
 
 import {
   DataTablePaginated
-}                           from "@/components/data_table/data_table_paginated"
-import { usePagedResource } from "@/components/data_table/usePagedQuery"
-import { MoreHorizontal }   from "lucide-react"
-import { Checkbox }         from "@/components/ui/checkbox"
-import { Button }           from "@/components/ui/button"
+}                                      from "@/components/data_table/data_table_paginated"
+import {
+  usePagedResource
+}                                      from "@/components/data_table/usePagedQuery"
+import { Loader2Icon, MoreHorizontal } from "lucide-react"
+import { Checkbox }                    from "@/components/ui/checkbox"
+import { Button }                      from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger
-}                           from "@/components/ui/dropdown-menu"
+}                                      from "@/components/ui/dropdown-menu"
 import {
   NationalIdentityFormatDTO
-} from "@/modules/national_identity_format/application/national_identity_format_dto"
-import { Input }            from "@/components/ui/input"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
-import { Loader2Icon }     from "lucide-react"
-import { NationalIdentityFormatAdminDialog } from "@/components/admin/national_identity_format_admin_dialog"
-
+}                                      from "@/modules/national_identity_format/application/national_identity_format_dto"
+import { Input }                       from "@/components/ui/input"
+import { Dialog, DialogContent }       from "@/components/ui/dialog"
+import {
+  NationalIdentityFormatAdminDialog
+}                                      from "@/components/admin/national_identity_format_admin_dialog"
 
 
 export default function NationalIdentityPage() {

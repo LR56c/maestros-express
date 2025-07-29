@@ -19,7 +19,6 @@ import { createClientServer }                 from "@/utils/supabase/server"
 import { redirect }                           from "next/navigation"
 import WorkerHistories
                                               from "@/components/worker_histories"
-import { getQueryClient }                     from "@/lib/query_client"
 import WorkerTax                              from "@/components/worker_tax"
 
 export default async function TrabajadorLayout( {

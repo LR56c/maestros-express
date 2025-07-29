@@ -1,26 +1,21 @@
 "use server"
 
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse }          from "next/server"
 import {
   querySchema
-}                                    from "@/modules/shared/application/query_dto"
+}                                             from "@/modules/shared/application/query_dto"
 import {
   parseData
-}                                    from "@/modules/shared/application/parse_handlers"
-import { isLeft }                                   from "fp-ts/Either"
-import {
-  removeAuth,
-  removeSpeciality,
-  searchUser,
-  updateAuth
-} from "@/app/api/dependencies"
+}                                             from "@/modules/shared/application/parse_handlers"
+import { isLeft }                             from "fp-ts/Either"
+import { removeAuth, searchUser, updateAuth } from "@/app/api/dependencies"
 import {
   UserMapper
-}                                                   from "@/modules/user/application/user_mapper"
+}                                             from "@/modules/user/application/user_mapper"
 import {
   userUpdateSchema
-}                                    from "@/modules/user/application/models/user_update_dto"
-import { createClientServer }        from "@/utils/supabase/server"
+}                                             from "@/modules/user/application/models/user_update_dto"
+import { createClientServer }                 from "@/utils/supabase/server"
 
 export async function GET( request: NextRequest ) {
   const { searchParams }                             = new URL( request.url )

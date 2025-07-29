@@ -350,7 +350,9 @@ import {
 import {
   PrismaUserData
 }                       from "@/modules/user/infrastructure/prisma_user_data"
-import { RemoveAuth }   from "@/modules/user/application/remove_auth"
+import {
+  RemoveAuth
+}                       from "@/modules/user/application/remove_auth"
 
 export async function ai() {
   return new OpenAI( {

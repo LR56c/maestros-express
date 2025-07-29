@@ -39,8 +39,10 @@ import {
 import {
   usePathname,
   useRouter
-}                            from "next/navigation"
-import { parseAuthResponse } from "@/utils/auth_parser"
+}                       from "next/navigation"
+import {
+  parseAuthResponse
+}                       from "@/utils/auth_parser"
 
 interface AuthContextType {
   user?: UserResponse
