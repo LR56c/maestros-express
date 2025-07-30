@@ -1,9 +1,10 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState }   from "react"
 import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Eye } from "lucide-react"
+import { Button }            from "@/components/ui/button"
+import { Eye }               from "lucide-react"
+
 export interface ListViewDisplayModalProps {
   isOpen: boolean
   onOpenChange: ( open: boolean ) => void

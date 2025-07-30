@@ -1,11 +1,14 @@
-import React, { useMemo } from "react"
-import { FormProvider, useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
+import React, { useMemo }                     from "react"
+import { FormProvider, useForm }              from "react-hook-form"
+import { zodResolver }                        from "@hookform/resolvers/zod"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
-import InputText from "@/components/form/input_text"
-import { Button } from "@/components/ui/button"
-import { Loader2Icon } from "lucide-react"
-import { currencySchema } from "@/modules/currency/application/currency_dto"
+import InputText
+                                              from "@/components/form/input_text"
+import { Button }                             from "@/components/ui/button"
+import { Loader2Icon }                        from "lucide-react"
+import {
+  currencySchema
+}                                             from "@/modules/currency/application/currency_dto"
 
 interface CurrencyAdminDialogProps {
   isOpen: boolean;

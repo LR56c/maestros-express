@@ -15,9 +15,6 @@ import SelectInput, {
   SelectInputValue
 }                                              from "@/components/form/select_input"
 import {
-  CountryDTO
-}                                              from "@/modules/country/application/country_dto"
-import {
   RegionDTO
 }                                              from "@/modules/region/application/region_dto"
 import {

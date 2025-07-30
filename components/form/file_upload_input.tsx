@@ -10,13 +10,13 @@ import { useFormContext }  from "react-hook-form"
 import {
   getNestedErrorObject
 }                          from "@/utils/get_nested_error_object"
-import { Label }            from "@/components/ui/label"
-import { HelpCircle, Info } from "lucide-react"
+import { Label }           from "@/components/ui/label"
+import { HelpCircle }      from "lucide-react"
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger
-}                           from "@/components/ui/tooltip"
+}                          from "@/components/ui/tooltip"
 
 interface FileUploadInputProps {
   placeholder?: string

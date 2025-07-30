@@ -15,7 +15,9 @@ import {
   PopoverTrigger
 }                                     from "@/components/ui/popover"
 import { Controller, useFormContext } from "react-hook-form"
-import { getNestedErrorObject }       from "@/utils/get_nested_error_object"
+import {
+  getNestedErrorObject
+}                                     from "@/utils/get_nested_error_object"
 
 interface DateInputProps {
   name: string

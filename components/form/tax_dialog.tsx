@@ -25,7 +25,6 @@ import {
 import { currencyOption }                      from "@/utils/tanstack_catalog"
 
 
-
 export const TaxDialog: React.FC<ListInputModalProps> = ( {
   isOpen,
   onOpenChange,

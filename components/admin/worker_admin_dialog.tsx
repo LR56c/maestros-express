@@ -10,11 +10,11 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem
-}                                                from "@/components/ui/carousel"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+}                                              from "@/components/ui/carousel"
+import { useMutation, useQuery }               from "@tanstack/react-query"
 import {
   Skeleton
-}                                                from "@/components/ui/skeleton"
+}                                              from "@/components/ui/skeleton"
 import {
   ZoneDTO
 }                                              from "@/modules/zone/application/zone_dto"
@@ -48,7 +48,9 @@ import {
 import CalendarSchedule
                                                from "@/components/form/calendar_schedule/calendar_schedule"
 import { toast }                               from "sonner"
-import { storiesOptions }                      from "@/utils/tanstack_catalog"
+import {
+  storiesOptions
+}                                              from "@/utils/tanstack_catalog"
 
 interface WorkerAdminDialogProps {
   worker: WorkerResponse

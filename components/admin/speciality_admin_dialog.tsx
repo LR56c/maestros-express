@@ -4,14 +4,9 @@ import {
 }                                             from "@/modules/shared/domain/value_objects/uuid"
 import { FormProvider, useForm }              from "react-hook-form"
 import { zodResolver }                        from "@hookform/resolvers/zod"
-import {
-  workerTaxSchema
-}                                             from "@/modules/worker_tax/application/worker_tax_dto"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import InputText
                                               from "@/components/form/input_text"
-import SelectInput
-                                              from "@/components/form/select_input"
 import { Button }                             from "@/components/ui/button"
 import {
   specialitySchema

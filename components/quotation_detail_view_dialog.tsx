@@ -1,6 +1,8 @@
-import React from "react"
+import React                                  from "react"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
-import { ListViewDisplayModalProps } from "@/components/form/list_view_display"
+import {
+  ListViewDisplayModalProps
+}                                             from "@/components/form/list_view_display"
 
 
 export const QuotationDetailViewDialog: React.FC<ListViewDisplayModalProps> = ({

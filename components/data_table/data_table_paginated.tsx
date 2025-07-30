@@ -4,9 +4,11 @@
 import * as React from "react"
 import {
   ColumnDef,
-  getCoreRowModel, RowSelectionState,
-  useReactTable, Updater
-} from "@tanstack/react-table"
+  getCoreRowModel,
+  RowSelectionState,
+  Updater,
+  useReactTable
+}                 from "@tanstack/react-table"
 
 import { DataTable }    from "@/components/data_table/base_data_table"
 import {
