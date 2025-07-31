@@ -27,6 +27,7 @@ import {
 }                                      from "@/components/admin/user_admin_dialog"
 import { useMutation }                 from "@tanstack/react-query"
 import { toast }                       from "sonner"
+import { Input }                       from "@/components/ui/input"
 
 interface UserFilters{
   name?: string
@@ -228,6 +229,20 @@ export default function UsersPage() {
 
   return (
     <div className="p-4 space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Input value={ searchName }
+                 onChange={ ( e ) => setSearchName( e.target.value ) }
+                 placeholder="Buscar por nombre"
+          />
+          <Button size="sm" onClick={ applyFilterForm }>
+            Buscar
+          </Button>
+          <Button size="sm" variant="outline" onClick={ clearFilters }>
+            Limpiar
+          </Button>
+        </div>
+      </div>
       <DataTablePaginated
         columns={ columns }
         data={ items }
