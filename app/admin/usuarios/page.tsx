@@ -212,7 +212,7 @@ export default function UsersPage() {
       <div className="p-4 text-sm text-destructive">
         Error: { (
         error as Error
-      )?.message ?? "Escondido" }
+      )?.message ?? "Desconocido" }
       </div>
     )
   }
