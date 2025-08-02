@@ -36,12 +36,13 @@ export function UserAdminDialog( {
     ["WORKER", "Trabajador"],
     ["CLIENT", "Cliente"]
   ] )
+  const userData = user ? user : {}
   const methods = useForm( {
     resolver: zodResolver( userResponseSchema.extend( {
       role_name: z.string()
     } ) ),
-    values  : {
-      ...user,
+    defaultValues  : {
+      ...userData,
       role_name: user ? inputRolesMap.get( user.role ) || "" : ""
     }
   } )
