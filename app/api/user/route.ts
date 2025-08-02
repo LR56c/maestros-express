@@ -62,10 +62,11 @@ export async function PUT( request: NextRequest ) {
     return NextResponse.json( { status: 401 } )
   }
 
-  const body = {
-    ...await request.json(),
-    email: user.email,
-  }
+  // const body = {
+  //   ...await request.json(),
+  //   email: user.email,
+  // }
+  const body = await request.json()
   const data = parseData( userUpdateSchema, body )
 
   if ( isLeft( data ) ) {

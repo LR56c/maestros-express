@@ -92,7 +92,7 @@ export default function UsersPage() {
       },
       onSuccess : async () => {
         await refetch()
-        toast.success( "Pais eliminado correctamente" )
+        toast.success( "Usuario eliminado correctamente" )
       }
     } )
 
@@ -119,7 +119,7 @@ export default function UsersPage() {
       },
       onSuccess : async () => {
         await refetch()
-        toast.success( "Pais actualizado correctamente" )
+        toast.success( "Usuario actualizado correctamente" )
       }
     } )
 
