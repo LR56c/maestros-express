@@ -47,10 +47,16 @@ export function UserAdminDialog( {
       role_name: z.string(),
       status_name: z.string()
     } ) ),
-    values  : {
-      ...userData,
-      role_name: user ? inputRolesMap.get( user.role ) || "" : "",
-      status_name: user ? inputStatusMap.get( user.status ) || "" : ""
+    values: {
+      username: user?.username || "",
+      email: user?.email || "",
+      role: user?.role || "",
+      status: user?.status || "",
+      user_id: user?.user_id || "",
+      full_name: user?.full_name || "",
+      avatar: user?.avatar || "",
+      role_name: user ? inputRolesMap.get(user.role) || "" : "",
+      status_name: user ? inputStatusMap.get(user.status) || "" : ""
     }
   } )
 
