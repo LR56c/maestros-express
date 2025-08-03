@@ -31,6 +31,11 @@ export function UserAdminDialog( {
   onSave
 }: UserAdminDialogProps )
 {
+  const inputStatusMap = new Map<string, any>( [
+    ["INCOMPLETE", "Incompleto"],
+    ["PENDING", "Pendiente"],
+    ["VERIFIED", "Verificado"]
+  ] )
   const inputRolesMap = new Map<string, any>( [
     ["ADMIN", "Administrador"],
     ["WORKER", "Trabajador"],
@@ -39,11 +44,13 @@ export function UserAdminDialog( {
   const userData = user ? user : {}
   const methods = useForm( {
     resolver: zodResolver( userResponseSchema.extend( {
-      role_name: z.string()
+      role_name: z.string(),
+      status_name: z.string()
     } ) ),
-    defaultValues  : {
+    values  : {
       ...userData,
-      role_name: user ? inputRolesMap.get( user.role ) || "" : ""
+      role_name: user ? inputRolesMap.get( user.role ) || "" : "",
+      status_name: user ? inputStatusMap.get( user.status ) || "" : ""
     }
   } )
 
@@ -55,6 +62,12 @@ export function UserAdminDialog( {
     reset()
   }
 
+
+  const inputStatus: SelectInputValue[] = Array.from( inputStatusMap.entries() )
+                                              .map( ( [label, value] ) =>
+                                                (
+                                                  { value: label, label: value }
+                                                ) )
 
   const inputRoles: SelectInputValue[] = Array.from( inputRolesMap.entries() )
                                               .map( ( [label, value] ) =>
@@ -82,7 +95,17 @@ export function UserAdminDialog( {
               <p>Usuario: { user.username }</p>
               <p>Nombre: { user.full_name }</p>
               <p>Email: { user.email }</p>
-              <p>Estado: { user.status }</p>
+              <SelectInput
+                placeholder="Seleccione estado"
+                loading={ false }
+                onChange={ ( value ) => {
+                  const selectedStatus = inputStatusMap.get( value )
+                  if ( selectedStatus ) {
+                    methods.setValue( "status", value )
+                    methods.setValue( "status_name", selectedStatus )
+                  }
+                } }
+                name="status_name" values={ inputStatus } label="Estado"/>
               <SelectInput
                 placeholder="Seleccione rol"
                 loading={ false }
