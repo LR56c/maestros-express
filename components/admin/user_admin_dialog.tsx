@@ -41,7 +41,7 @@ export function UserAdminDialog( {
     ["WORKER", "Trabajador"],
     ["CLIENT", "Cliente"]
   ] )
-  const userData = user ? user : {}
+
   const methods = useForm( {
     resolver: zodResolver( userResponseSchema.extend( {
       role_name: z.string(),
@@ -59,7 +59,6 @@ export function UserAdminDialog( {
       status_name: user ? inputStatusMap.get(user.status) || "" : ""
     }
   } )
-
 
   const { handleSubmit, reset } = methods
 
