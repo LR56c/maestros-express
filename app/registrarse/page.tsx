@@ -21,7 +21,7 @@ const registerFormSchema = userRegisterRequestSchema.extend( {
 } )
 
 export default function Registrarse() {
-  const {  register }            = useAuthContext()
+  const { register }                  = useAuthContext()
   const [submitting, startTransition] = useTransition()
 
   const methods = useForm( {
@@ -36,7 +36,7 @@ export default function Registrarse() {
       const result = await register( {
         email    : values.email,
         full_name: values.full_name,
-        username: values.username,
+        username : values.username,
         password : values.password
       } )
       if ( !result ) {
@@ -60,6 +60,7 @@ export default function Registrarse() {
           <InputText name="full_name" label="Nombre" type="text"
                      placeholder="Ingrese su nombre completo"/>
           <Button type="button"
+                  disabled={ submitting }
                   onClick={ handleSubmit( onSubmit ) }>
             { submitting ?
               <>

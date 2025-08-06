@@ -58,6 +58,7 @@ export default function Ingresar() {
             </div> : null
           }
           <Button type="button"
+                  disabled={ submitting }
                   onClick={ handleSubmit( onSubmit ) }>
             { submitting ?
               <>
