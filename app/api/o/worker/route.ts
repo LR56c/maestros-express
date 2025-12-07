@@ -24,7 +24,7 @@ import {
 export async function PUT( request: NextRequest ) {
   const body = await request.json()
   const data = parseData( workerExtraSchema, body )
-
+  console.log( "data", data )
   if ( isLeft( data ) ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
@@ -33,12 +33,13 @@ export async function PUT( request: NextRequest ) {
   const workDto: WorkerUpdateDTO = {
     user        : data.right.user,
     status      : updatedStatus,
-    embedding   : false,
+    embedding   : true,
     specialities: data.right.specialities
   }
   const result                   = await (
     await updateWorker()
   ).execute( workDto )
+  console.log( "result", result )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )

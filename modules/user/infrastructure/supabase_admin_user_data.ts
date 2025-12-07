@@ -66,10 +66,11 @@ export class SupabaseAdminUserData implements AuthRepository {
       password     : password.value,
       email_confirm: true,
       user_metadata: {
-        name  : auth.fullName.value,
-        avatar: auth.avatar?.value,
-        role  : auth.role.toString(),
-        status: auth.status.value
+        username: auth.username.value,
+        name    : auth.fullName.value,
+        avatar  : auth.avatar?.value,
+        role    : auth.role.toString(),
+        status  : auth.status.value
       }
     } )
     if ( error ) {

@@ -37,6 +37,18 @@ export class PrismaUserData  implements  UserDAO{
           equals: query.id
         }
       }
+      if ( query.email ) {
+        // @ts-ignore
+        where["email"] = {
+          equals: query.email
+        }
+      }
+      if ( query.username ) {
+        // @ts-ignore
+        where["username"] = {
+          equals: query.username
+        }
+      }
       const orderBy = {}
       if ( sortBy ) {
         const key    = changeCase.camelCase( sortBy.value )

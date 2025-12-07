@@ -250,10 +250,6 @@ export class PrismaWorkerData implements WorkerDAO {
       ] )
       const [response, totalCount] = results
 
-      if ( !response || response.length === 0 ) {
-        return left( [new DataNotFoundException()] )
-      }
-
       if ( idsCount && response.length !== idsCount ) {
         return left( [new InfrastructureException( "Not all workers found" )] )
       }

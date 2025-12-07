@@ -9,17 +9,21 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-model Notification {
-  id        String    @id @default(uuid()) @db.Uuid
-  data      Json
-  isEnabled Boolean   @map("is_enabled")
-  viewedAt  DateTime? @map("viewed_at")
-  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
-  userId    String    @map("user_id") @db.Uuid
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+model NotificationContent {
+  id         String         @id @db.Uuid
+  data       Json
+  createdAt  DateTime       @db.Timestamptz()
+  recipients Notification[]
+}
 
-  @@index([userId])
-  @@map("notification")
+model Notification {
+  viewedAt       DateTime?           @db.Timestamptz()
+  notification   NotificationContent @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+  notificationId String              @db.Uuid
+  userId         String              @db.Uuid
+  user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([notificationId, userId])
 }
 
 model NotificationConfig {

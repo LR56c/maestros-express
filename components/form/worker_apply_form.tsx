@@ -25,7 +25,7 @@ import SelectInput, {
 import {
   useQuery
 }                                                    from "@tanstack/react-query"
-import React, { useEffect, useState, useTransition } from "react"
+import React, { useEffect, useState, useTransition, useRef } from "react"
 import {
   CountryDTO
 }                                                    from "@/modules/country/application/country_dto"
@@ -49,8 +49,9 @@ import ProfilePhotoHover
                                                      from "@/components/profile_photo_hover"
 
 const workerFormSchema = workerRequestSchema.extend( {
-  confirm: z.string(),
-  country: z.string()
+  avatar_name: z.string(),
+  confirm    : z.string(),
+  country    : z.string()
 } ).refine( ( data ) => data.user.password === data.confirm, {
   path   : ["confirm"],
   message: "Las contraseñas no coinciden"
@@ -59,7 +60,7 @@ const workerFormSchema = workerRequestSchema.extend( {
 export default function WorkerApplyForm() {
 
   const { isPending, data } = useQuery( countriesOption )
-  const { login, user }     = useAuthContext()
+  const { login }           = useAuthContext()
   const { createWorker }    = useWorkerContext()
 
   const [submitting, startTransition] = useTransition()
@@ -81,13 +82,23 @@ export default function WorkerApplyForm() {
     resolver: zodResolver( workerFormSchema )
   } )
 
-  const { handleSubmit, setValue } = methods
+  const { handleSubmit, setValue, watch, setError, clearErrors } = methods
 
   const onSubmit = async ( data: any ) => {
+    if ( checkingEmail || checkingUsername ) {
+      if ( checkingEmail ) {
+        setError( "user.email", { type: "validate", message: "Verificando email..." } )
+      }
+      if ( checkingUsername ) {
+        setError( "user.username", { type: "validate", message: "Verificando nombre de usuario..." } )
+      }
+      return
+    }
     startTransition( async () => {
       const result = await createWorker( {
         user                   : data.user,
         avatar                 : data.avatar,
+        avatar_name            : data.avatar_name,
         national_identity_id   : data.national_identity_id,
         national_identity_value: data.national_identity_value,
         birth_date             : data.birth_date,
@@ -134,11 +145,104 @@ export default function WorkerApplyForm() {
     }
   }, [formatData] )
 
+  // --- New: debounce watchers for email and username ---
+  const emailRef = useRef<number | null>( null )
+  const usernameRef = useRef<number | null>( null )
+  const [checkingEmail, setCheckingEmail] = useState( false )
+  const [checkingUsername, setCheckingUsername] = useState( false )
+
+  const watchedEmail = watch( "user.email" )
+  const watchedUsername = watch( "user.username" )
+
+  useEffect( () => {
+    // clear previous timer
+    if ( emailRef.current ) {
+      clearTimeout( emailRef.current )
+    }
+
+    if ( !watchedEmail || typeof watchedEmail !== "string" || watchedEmail.length < 3 ) {
+      clearErrors( "user.email" )
+      return
+    }
+
+    setCheckingEmail( true )
+    emailRef.current = window.setTimeout( async () => {
+      try {
+        const res = await fetch( `/api/user?email=${ encodeURIComponent( watchedEmail ) }` )
+        if ( !res.ok ) {
+          return
+        }
+        const data = await res.json()
+        const items = data.items ?? []
+        if ( items.length > 0 ) {
+          setError( "user.email", { type: "validate", message: "El email ya está en uso" } )
+        }
+        else {
+          clearErrors( "user.email" )
+        }
+      }
+      catch ( e ) {
+      }
+      finally {
+        setCheckingEmail( false )
+      }
+    }, 700 ) as unknown as number
+
+    return () => {
+      if ( emailRef.current ) {
+        clearTimeout( emailRef.current )
+      }
+    }
+  }, [watchedEmail] )
+
+  useEffect( () => {
+    if ( usernameRef.current ) {
+      clearTimeout( usernameRef.current )
+    }
+
+    if ( !watchedUsername || typeof watchedUsername !== "string" || watchedUsername.length < 3 ) {
+      clearErrors( "user.username" )
+      return
+    }
+
+    setCheckingUsername( true )
+    usernameRef.current = window.setTimeout( async () => {
+      try {
+        const res = await fetch( `/api/user?username=${ encodeURIComponent( watchedUsername ) }` )
+        if ( !res.ok ) {
+          return
+        }
+        const data = await res.json()
+        const items = data.items ?? []
+        if ( items.length > 0 ) {
+          setError( "user.username", { type: "validate", message: "El nombre de usuario ya está en uso" } )
+        }
+        else {
+          clearErrors( "user.username" )
+        }
+      }
+      catch ( e ) {
+      }
+      finally {
+        setCheckingUsername( false )
+      }
+    }, 700 ) as unknown as number
+
+    return () => {
+      if ( usernameRef.current ) {
+        clearTimeout( usernameRef.current )
+      }
+    }
+  }, [watchedUsername] )
+
   return <>
     <FormProvider { ...methods } >
       <div className="w-full max-w-lg flex flex-col gap-4">
         <div className="flex justify-center">
-        <ProfilePhotoHover onChange={(file, imageString) => setValue('avatar', imageString)}/>
+          <ProfilePhotoHover onChange={ ( file, imageString ) => {
+            setValue( "avatar", imageString )
+            setValue( "avatar_name", file.name )
+          } }/>
         </div>
         <InputText name="user.email" label="Email" type="email"
                    placeholder="Ingrese su email"/>
@@ -171,7 +275,7 @@ export default function WorkerApplyForm() {
         <InputTextArea name="description" label="Descripcion"
                        placeholder="Ingrese una breve descripcion"/>
         <InputLocationDetector name="location" label="Ubicacion"/>
-        <Button disabled={ submitting } onClick={ handleSubmit( onSubmit ) }>
+        <Button disabled={ submitting || checkingEmail || checkingUsername } onClick={ handleSubmit( onSubmit ) }>
           { submitting ?
             <>
               <Loader2Icon className="animate-spin"/>

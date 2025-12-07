@@ -32,12 +32,13 @@ import {
   StoryDocumentDTO
 }                                      from "@/modules/story/modules/story_document/application/story_document_dto"
 import { WorkerExtra }                 from "@/utils/worker_extra"
+import { base64ToFile }                from "@/utils/file_to_base"
 
 
 interface WorkerContextType {
   updateWorker: ( workerUser: UserResponse,
     workerExtra: any ) => Promise<boolean>
-  createWorker: ( worker: WorkerRequest ) => Promise<boolean>
+  createWorker: ( worker: any ) => Promise<boolean>
 }
 
 const uploader: UploadFileRepository = new SupabaseFileUploadData(
@@ -126,16 +127,7 @@ const processData           = async ( workerUser: UserResponse,
       stories.push( storyDTO )
     }
   }
-  const avatarUpload =await  uploadDocument(uploader, [workerExtra.avatar])
 
-  if ( isLeft( avatarUpload ) ) {
-    namesAdded.push( ...avatarUpload.left )
-  }
-  else {
-    workerUser.avatar = avatarUpload.right[0].url
-  }
-
-  console.log( "Names added during upload:", namesAdded )
   if ( namesAdded.length > 0 ) {
     return left( namesAdded )
   }
@@ -156,7 +148,6 @@ export const WorkerProvider = ( { children }: { children: ReactNode } ) => {
   const updateWorker = async ( workerUser: UserResponse, workerExtra: any ) => {
 
     const processResult = await processData( workerUser, workerExtra )
-
     if ( isLeft( processResult ) ) {
       const removeResult = await wrapTypeAsync(
         () => uploader.remove( processResult.left ) )
@@ -168,6 +159,7 @@ export const WorkerProvider = ( { children }: { children: ReactNode } ) => {
     }
 
     const updateData: WorkerExtra = processResult.right
+    console.log( "updateData", updateData )
     const response                = await fetch( "/api/o/worker", {
       method : "PUT",
       headers: {
@@ -198,7 +190,21 @@ export const WorkerProvider = ( { children }: { children: ReactNode } ) => {
     return true
   }
 
-  const createWorker = async ( worker: WorkerRequest ): Promise<boolean> => {
+  const createWorker = async ( worker: any ): Promise<boolean> => {
+    const avatarFile   = base64ToFile( worker.avatar, worker.avatar_name )
+    const avatarUpload = await uploadDocument( uploader, [avatarFile] )
+    console.log( "avatarUpload", avatarUpload )
+    if ( isLeft( avatarUpload ) ) {
+      const removeResult = await wrapTypeAsync(
+        () => uploader.remove( avatarUpload.left ) )
+
+      if ( removeResult instanceof BaseException ) {
+        console.error( "Error removing" )
+      }
+    }
+    else {
+      worker.avatar = avatarUpload.right[0].url
+    }
     const response = await fetch( "/api/worker", {
       method : "POST",
       headers: {
@@ -206,6 +212,7 @@ export const WorkerProvider = ( { children }: { children: ReactNode } ) => {
       },
       body   : JSON.stringify( worker )
     } )
+    console.log( "response", response )
     if ( !response.ok ) {
       return false
     }

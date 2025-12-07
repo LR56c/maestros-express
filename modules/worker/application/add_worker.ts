@@ -41,7 +41,6 @@ export class AddWorker {
 
   async execute( worker: WorkerRequest ): Promise<Either<BaseException[], Worker>> {
     const exist = await ensureWorkerExist( this.dao, worker.user.email )
-
     if ( isLeft( exist ) ) {
       if ( !containError( exist.left, new DataNotFoundException() ) ) {
         return left( exist.left )
@@ -60,9 +59,11 @@ export class AddWorker {
 
     const status = WorkerStatusEnum.INCOMPLETE
 
-    const userResult = await this.register.execute( worker.user,
+    const userResult = await this.register.execute( {
+        ...worker.user,
+        avatar: worker.avatar
+      },
       RoleLevelType.WORKER, status )
-
     if ( isLeft( userResult ) ) {
       return left( userResult.left )
     }
@@ -82,7 +83,6 @@ export class AddWorker {
     }
 
     const result = await this.dao.add( newWorker )
-
     if ( isLeft( result ) ) {
       return left( [result.left] )
     }

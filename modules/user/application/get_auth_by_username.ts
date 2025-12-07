@@ -20,7 +20,7 @@ export class GetAuthByUsername {
       return left( [vusername] )
     }
 
-    return this.repo.getByEmail( vusername )
+    return this.repo.getByUsername( vusername )
   }
 
 }

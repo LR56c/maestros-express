@@ -140,6 +140,7 @@ export default function WorkerExtraForm() {
   const [submitting, startTransition] = useTransition()
   const onSubmit                      = async ( data: any ) => {
     if ( !user ) return
+    console.log( "Submitting worker extra data:", user,data )
     startTransition( async () => {
       const result = await updateWorker( user, data )
       if ( !result ) {

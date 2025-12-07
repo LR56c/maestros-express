@@ -87,7 +87,6 @@ export const countriesOption = {
   }
 }
 
-
 export const specialitiesOption = {
   queryKey: ["specialities"],
   queryFn : async () => {
