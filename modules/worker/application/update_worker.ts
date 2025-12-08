@@ -81,50 +81,7 @@ export class UpdateWorker {
       return left( exist.left )
     }
 
-
-    const oldWorker          = exist.right
-    const updatedDescription = wrapTypeDefault( oldWorker.description,
-      ( value ) => ValidString.from( value ), worker.description )
-
-    if ( updatedDescription instanceof BaseException ) {
-      errors.push( updatedDescription )
-    }
-
-    const updatedLocation = wrapTypeDefault( oldWorker.location,
-      ( value ) => Position.fromJSON( value ), worker.location )
-
-    if ( updatedLocation instanceof BaseException ) {
-      errors.push( updatedLocation )
-    }
-
-    const updatedStatus = wrapTypeDefault( oldWorker.status,
-      ( value ) => WorkerStatus.from( value ), worker.status )
-
-    if ( updatedStatus instanceof BaseException ) {
-      errors.push( updatedStatus )
-    }
-
-    const updatedReviewCount = wrapTypeDefault( oldWorker.reviewCount,
-      ( value ) => ValidDecimal.from( value ), worker.review_count )
-
-    if ( updatedReviewCount instanceof BaseException ) {
-      errors.push( updatedReviewCount )
-    }
-
-    const updatedReviewAverage = wrapTypeDefault( oldWorker.reviewAverage,
-      ( value ) => ValidDecimal.from( value ), worker.review_average )
-
-    if ( updatedReviewAverage instanceof BaseException ) {
-      errors.push( updatedReviewAverage )
-    }
-
-    const updatedVerified = wrapTypeDefault( undefined,
-      ( value ) => ValidBool.from( value ), worker.verified )
-
-    if ( updatedVerified instanceof BaseException ) {
-      errors.push( updatedVerified )
-    }
-
+    const oldWorker : Worker                   = exist.right
     let newSpecialities: Speciality[] = []
     if ( worker.specialities ) {
       const specialities = await this.ensureSpecialities(
@@ -152,27 +109,15 @@ export class UpdateWorker {
       oldWorker.nationalIdentityId.value,
       oldWorker.nationalIdentityValue.value,
       oldWorker.birthDate.toString(),
-      (
-        updatedReviewCount as ValidDecimal
-      ).value,
-      (
-        updatedReviewAverage as ValidDecimal
-      ).value,
-      (
-        updatedLocation as Position
-      ).toString(),
-      (
-        updatedStatus as WorkerStatus
-      ).value,
+      worker.review_count ?? oldWorker.reviewCount.value,
+      worker.review_average ?? oldWorker.reviewAverage.value,
+      worker.location ?? oldWorker.location.toString(),
+      worker.status ?? oldWorker.status.value,
       newSpecialities,
       oldWorker.taxes,
       oldWorker.createdAt.toString(),
-      updatedVerified instanceof ValidBool
-        ? new Date()
-        : oldWorker.verifiedAt?.value,
-      updatedDescription instanceof ValidString
-        ? updatedDescription.value
-        : undefined
+      worker.verified ? new Date() : oldWorker.verifiedAt?.value,
+      worker.description ?? oldWorker.description?.value
     )
 
     if ( updatedWorker instanceof Errors ) {

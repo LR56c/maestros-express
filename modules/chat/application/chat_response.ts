@@ -11,9 +11,9 @@ export const chatResponseSchema = z.object( {
   worker            : userResponseSchema,
   client            : userResponseSchema,
   subject           : z.string(),
-  accepted_date     : z.string().datetime().optional(),
-  quotation_accepted: z.string().optional(),
-  worker_archived   : z.string().datetime().optional(),
+  accepted_date     : z.string().datetime().nullish(),
+  quotation_accepted: z.string().nullish(),
+  worker_archived   : z.string().datetime().nullish(),
   created_at        : z.string().datetime(),
   messages          : z.array( messageResponseSchema )
 } )

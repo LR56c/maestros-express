@@ -41,12 +41,11 @@ interface WorkerContextType {
   createWorker: ( worker: any ) => Promise<boolean>
 }
 
-const uploader: UploadFileRepository = new SupabaseFileUploadData(
-  createClient() )
+export const uploader: UploadFileRepository = new SupabaseFileUploadData( createClient() )
 const WorkerContext                  = createContext<WorkerContextType | undefined>(
   undefined )
 
-const uploadDocument = async ( repo: UploadFileRepository,
+export const uploadDocument = async ( repo: UploadFileRepository,
   documents: File[] ): Promise<Either<string[], ValidUploadDocumentDTO[]>> => {
   const namesAdded: string[] = []
 
@@ -191,7 +190,8 @@ export const WorkerProvider = ( { children }: { children: ReactNode } ) => {
   }
 
   const createWorker = async ( worker: any ): Promise<boolean> => {
-    const avatarFile   = base64ToFile( worker.avatar, worker.avatar_name )
+    console.log( "createWorker", worker.avatar_name, worker.user.avatar  )
+    const avatarFile   = base64ToFile( worker.user.avatar, worker.avatar_name )
     const avatarUpload = await uploadDocument( uploader, [avatarFile] )
     console.log( "avatarUpload", avatarUpload )
     if ( isLeft( avatarUpload ) ) {
@@ -203,7 +203,7 @@ export const WorkerProvider = ( { children }: { children: ReactNode } ) => {
       }
     }
     else {
-      worker.avatar = avatarUpload.right[0].url
+      worker.user.avatar = avatarUpload.right[0].url
     }
     const response = await fetch( "/api/worker", {
       method : "POST",

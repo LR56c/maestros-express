@@ -5,15 +5,15 @@ import {
 
 export const packageUpdateSchema = z.object( {
   id           : z.string(),
-  name         : z.string().optional(),
-  description  : z.string().optional(),
-  specification: z.string().optional(),
-  value        : z.number().optional(),
-  review_count  : z.number().optional(),
-  review_average: z.number().optional(),
-  cover_url     : z.string().optional(),
-  value_format  : z.string().optional(),
-  documents: z.array( packageDocumentSchema).optional(),
+  name         : z.string().nullish(),
+  description  : z.string().nullish(),
+  specification: z.string().nullish(),
+  value        : z.number().nullish(),
+  review_count  : z.number().nullish(),
+  review_average: z.number().nullish(),
+  cover_url     : z.string().nullish(),
+  value_format  : z.string().nullish(),
+  documents: z.array( packageDocumentSchema).nullish(),
 } )
 
 export type PackageUpdateDTO = z.infer<typeof packageUpdateSchema>

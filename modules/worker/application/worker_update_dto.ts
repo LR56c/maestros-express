@@ -8,13 +8,13 @@ import {
 
 export const workerUpdateSchema = z.object( {
   user          : userResponseSchema,
-  description   : z.string().optional(),
-  review_count  : z.number().optional(),
-  review_average: z.number().optional(),
-  status        : z.string().optional(),
-  location      : z.string().optional(),
-  verified      : z.boolean().optional(),
+  description   : z.string().nullish(),
+  review_count  : z.number().nullish(),
+  review_average: z.number().nullish(),
+  status        : z.string().nullish(),
+  location      : z.string().nullish(),
+  verified      : z.boolean().nullish(),
   embedding     : z.boolean().default(true),
-  specialities  : z.union( [z.array( specialitySchema ).optional(), z.null()] )
+  specialities  : z.union( [z.array( specialitySchema ).nullish(), z.null()] )
 } )
 export type WorkerUpdateDTO = z.infer<typeof workerUpdateSchema>

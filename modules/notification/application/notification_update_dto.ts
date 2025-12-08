@@ -2,7 +2,7 @@ import { z } from "zod"
 
 export const notificationUpdateSchema = z.object( {
   id: z.string(),
-  viewed_at: z.boolean().optional()
+  viewed_at: z.boolean().nullish()
 } )
 
 export type NotificationUpdateDTO = z.infer<typeof notificationUpdateSchema>

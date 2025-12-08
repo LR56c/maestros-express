@@ -10,7 +10,7 @@ export const quotationRequestSchema = z.object( {
   worker_id     : z.string(),
   title         : z.string(),
   details       : z.array( quotationDetailSchema ),
-  estimated_time: z.string().date().optional()
+  estimated_time: z.string().date().nullish()
 } )
 
 export type QuotationRequest = z.infer<typeof quotationRequestSchema>

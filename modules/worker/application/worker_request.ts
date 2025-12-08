@@ -11,7 +11,6 @@ const eighteenYearsAgo = new Date()
 eighteenYearsAgo.setFullYear( eighteenYearsAgo.getFullYear() - 18 )
 export const workerRequestSchema = z.object( {
   user                   : userRegisterRequestSchema,
-  avatar                 : z.string(),
   national_identity_id   : z.string(),
   national_identity_value: z.string(),
   birth_date             : z.string().date().refine(
@@ -24,7 +23,7 @@ export const workerRequestSchema = z.object( {
       message: "Debes tener al menos 18 años de edad."
     }
   ),
-  description            : z.string().optional(),
+  description            : z.string().nullish(),
   location               : latLngSchema
 } )
 

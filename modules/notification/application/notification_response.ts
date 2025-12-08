@@ -9,7 +9,7 @@ export const notificationResponseSchema = z.object( {
   viewed_at        : z.string()
                       .datetime()
                       .transform( ( value ) => new Date( value ) )
-                      .optional()
+                      .nullish()
 } )
 
 export type NotificationResponse = z.infer<typeof notificationResponseSchema>

@@ -11,10 +11,10 @@ export const workerScheduleSchema = z.object( {
                          .transform( t => formatUTCDateTime( new Date( t ) ) ),
   recurrent_start_date: z.string()
                          .transform( t => formatUTCDateTime( new Date( t ) ) )
-                         .optional(),
+                         .nullish(),
   recurrent_end_date  : z.string()
                          .transform( t => formatUTCDateTime( new Date( t ) ) )
-                         .optional()
+                         .nullish()
 } )
 
 export type WorkerScheduleDTO = z.infer<typeof workerScheduleSchema>

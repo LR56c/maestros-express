@@ -3,7 +3,7 @@ import { countrySchema } from "@/modules/country/application/country_dto"
 
 export const phoneFormatSchema = z.object( {
   id     : z.string(),
-  example: z.string().optional(),
+  example: z.string().nullish(),
   regex  : z.string(),
   prefix  : z.string(),
   country: countrySchema

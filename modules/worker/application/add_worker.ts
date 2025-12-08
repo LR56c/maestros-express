@@ -59,10 +59,7 @@ export class AddWorker {
 
     const status = WorkerStatusEnum.INCOMPLETE
 
-    const userResult = await this.register.execute( {
-        ...worker.user,
-        avatar: worker.avatar
-      },
+    const userResult = await this.register.execute( worker.user,
       RoleLevelType.WORKER, status )
     if ( isLeft( userResult ) ) {
       return left( userResult.left )
@@ -75,7 +72,7 @@ export class AddWorker {
       worker.birth_date,
       `(${ worker.location.latitude },${ worker.location.longitude })`,
       status,
-      worker.description
+      worker.description ?? undefined
     )
 
     if ( newWorker instanceof Errors ) {

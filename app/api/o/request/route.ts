@@ -18,8 +18,8 @@ import {
 export async function POST( request: NextRequest ) {
   const body = await request.json()
   const data = parseData( z.object( {
-    image   : z.string().optional(),
-    input   : z.string().optional(),
+    image   : z.string().nullish(),
+    input   : z.string().nullish(),
     location: z.string(),
     radius  : z.number().int()
   } ), body )

@@ -1,48 +1,51 @@
 "use client"
-import { UserResponse } from "@/modules/user/application/models/user_response"
+import { UserResponse }             from "@/modules/user/application/models/user_response"
 import React, {
   createContext,
   ReactNode,
   useContext,
   useEffect,
   useState
-}                       from "react"
+}                                   from "react"
 import {
   UserLoginRequest
-}                       from "@/modules/user/application/models/user_login_request"
+}                                   from "@/modules/user/application/models/user_login_request"
 import {
   UserRegisterRequest
-}                       from "@/modules/user/application/models/user_register_request"
+}                                   from "@/modules/user/application/models/user_register_request"
 import {
   SupabaseUserData
-}                       from "@/modules/user/infrastructure/supabase_user_data"
+}                                   from "@/modules/user/infrastructure/supabase_user_data"
 import {
   AuthAppService
-}                       from "@/modules/user/application/auth_app_service"
+}                                   from "@/modules/user/application/auth_app_service"
 import {
   createClient
-}                       from "@/utils/supabase/client"
+}                                   from "@/utils/supabase/client"
 import {
   RoleLevelType,
   RoleType
-}                       from "@/modules/user/domain/role_type"
+}                                   from "@/modules/user/domain/role_type"
 import {
   wrapType,
   wrapTypeAsync
-}                       from "@/modules/shared/utils/wrap_type"
+}                                   from "@/modules/shared/utils/wrap_type"
 import {
   BaseException
-}                       from "@/modules/shared/domain/exceptions/base_exception"
+}                                   from "@/modules/shared/domain/exceptions/base_exception"
 import {
   WorkerStatusEnum
-}                       from "@/modules/worker/domain/worker_status"
+}                                   from "@/modules/worker/domain/worker_status"
 import {
   usePathname,
   useRouter
-}                       from "next/navigation"
+}                                   from "next/navigation"
 import {
   parseAuthResponse
-}                       from "@/utils/auth_parser"
+}                                   from "@/utils/auth_parser"
+import { uploadDocument, uploader } from "@/app/context/worker_context"
+import { base64ToFile }             from "@/utils/file_to_base"
+import { isLeft }                   from "fp-ts/Either"
 
 interface AuthContextType {
   user?: UserResponse
@@ -55,7 +58,7 @@ interface AuthContextType {
 
   revalidate( token?: string ): Promise<void>
 
-  register( request: UserRegisterRequest ): Promise<boolean>
+  register( request: any ): Promise<boolean>
 
   hasAccess( level: RoleLevelType ): Promise<boolean>
 }
@@ -79,7 +82,7 @@ export const AuthProvider = ( { children }: { children: ReactNode } ) => {
       WorkerStatusEnum.INCOMPLETE
     if ( check ) {
       console.log( "User is not a worker, redirecting to apply page" )
-       router.replace( "/trabajador/aplicar" )
+      router.replace( "/trabajador/aplicar" )
     }
   }
 
@@ -111,7 +114,7 @@ export const AuthProvider = ( { children }: { children: ReactNode } ) => {
       const { data, error } = await supabase.auth.getSession()
       if ( error || !data?.session ) {
         await anonymous()
-         router.refresh()
+        router.refresh()
       }
       else {
         setUser( parseAuthResponse( data?.session?.user ) )
@@ -152,9 +155,23 @@ export const AuthProvider = ( { children }: { children: ReactNode } ) => {
     setUser( undefined )
   }
 
-  const register = async ( request: UserRegisterRequest ) => {
-    const userResponse = await wrapTypeAsync(
-      () => service.register( request ) )
+  const register = async ( request: any ) => {
+    let avatarImg: string| undefined = undefined
+    if ( request.avatar && request.avatar_name ) {
+      const file      = base64ToFile( request.avatar_name, request.avatar )
+      const uploadRes = await uploadDocument( uploader, [file] )
+      if ( isLeft( uploadRes ) ) {
+        return false
+      }
+      avatarImg = uploadRes.right[0].url
+    }
+    const userResponse = await wrapTypeAsync( () => service.register( {
+      email    : request.email,
+      full_name: request.full_name,
+      username : request.username,
+      avatar   : avatarImg,
+      password: request.password,
+    } ) )
 
     if ( userResponse instanceof BaseException ) {
       return false

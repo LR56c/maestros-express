@@ -9,9 +9,9 @@ import {
 export const workerProfileSchema = z.object( {
   user_id       : z.string(),
   full_name     : z.string(),
-  avatar        : z.string().optional(),
+  avatar        : z.string().nullish(),
   age           : z.number().int(),
-  description   : z.string().optional(),
+  description   : z.string().nullish(),
   review_count  : z.number(),
   review_average: z.number(),
   location      : z.string(),

@@ -5,10 +5,10 @@ import {
 
 export const quotationUpdateSchema = z.object( {
   id            : z.string(),
-  title         : z.string().optional(),
-  status        : z.string().optional(),
-  details       : z.array( quotationDetailSchema ).optional(),
-  estimated_time: z.string().datetime().optional()
+  title         : z.string().nullish(),
+  status        : z.string().nullish(),
+  details       : z.array( quotationDetailSchema ).nullish(),
+  estimated_time: z.string().datetime().nullish()
 } )
 
 export type QuotationUpdateDTO = z.infer<typeof quotationUpdateSchema>

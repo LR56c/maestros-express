@@ -3,7 +3,7 @@ import { z } from "zod"
 export const quotationDetailSchema = z.object( {
   id          : z.string(),
   name        : z.string(),
-  description : z.string().optional(),
+  description : z.string().nullish(),
   value       : z.coerce.number().int(),
   value_format: z.string()
 } )

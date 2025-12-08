@@ -14,7 +14,7 @@ export const workerResponseSchema = z.object( {
   national_identity_id   : z.string(),
   national_identity_value: z.string(),
   birth_date             : z.string(),
-  description            : z.string().optional(),
+  description            : z.string().nullish(),
   review_count           : z.number(),
   review_average         : z.number(),
   status                 : z.string(),

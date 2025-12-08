@@ -5,7 +5,7 @@ export const userRegisterRequestSchema = z.object( {
   email    : z.string().email(),
   full_name: z.string(),
   username : z.string(),
-  avatar   : z.string().optional(),
+  avatar   : z.string().nullish(),
   password : passwordSchema
 } )
 

@@ -1,58 +1,64 @@
 "use client"
-import { z }                                         from "zod"
+import { z }                                                 from "zod"
 import {
   zodResolver
-}                                                    from "@hookform/resolvers/zod"
-import { FormProvider, useForm }                     from "react-hook-form"
+}                                                            from "@hookform/resolvers/zod"
+import {
+  FormProvider,
+  useForm
+}                                                            from "react-hook-form"
 import InputText
-                                                     from "@/components/form/input_text"
+                                                             from "@/components/form/input_text"
 import {
   Button
-}                                                    from "@/components/ui/button"
+}                                                            from "@/components/ui/button"
 import {
   workerRequestSchema
-}                                                    from "@/modules/worker/application/worker_request"
+}                                                            from "@/modules/worker/application/worker_request"
 import {
   DateInput
-}                                                    from "@/components/form/date_input"
+}                                                            from "@/components/form/date_input"
 import NationalIdentityInput
-                                                     from "@/components/form/national_identity_input"
+                                                             from "@/components/form/national_identity_input"
 import InputTextArea
-                                                     from "@/components/form/input_text_area"
+                                                             from "@/components/form/input_text_area"
 import SelectInput, {
   SelectInputValue
-}                                                    from "@/components/form/select_input"
+}                                                            from "@/components/form/select_input"
 import {
   useQuery
-}                                                    from "@tanstack/react-query"
-import React, { useEffect, useState, useTransition, useRef } from "react"
+}                                                            from "@tanstack/react-query"
+import React, { useEffect, useRef, useState, useTransition } from "react"
 import {
   CountryDTO
-}                                                    from "@/modules/country/application/country_dto"
+}                                                            from "@/modules/country/application/country_dto"
 import InputLocationDetector
-                                                     from "@/components/form/input_location_detector"
+                                                             from "@/components/form/input_location_detector"
 import {
   NationalIdentityFormatDTO
-}                                                    from "@/modules/national_identity_format/application/national_identity_format_dto"
+}                                                            from "@/modules/national_identity_format/application/national_identity_format_dto"
 import {
   useWorkerContext
-}                                                    from "@/app/context/worker_context"
+}                                                            from "@/app/context/worker_context"
 import {
   useAuthContext
-}                                                    from "@/app/context/auth_context"
-import { useRouter }                                 from "next/navigation"
-import { Loader2Icon }                               from "lucide-react"
+}                                                            from "@/app/context/auth_context"
+import {
+  useRouter
+}                                                            from "next/navigation"
+import { Loader2Icon }                                       from "lucide-react"
 import {
   countriesOption
-}                                                    from "@/utils/tanstack_catalog"
+}                                                            from "@/utils/tanstack_catalog"
 import ProfilePhotoHover
-                                                     from "@/components/profile_photo_hover"
+                                                             from "@/components/profile_photo_hover"
 
 const workerFormSchema = workerRequestSchema.extend( {
   avatar_name: z.string(),
   confirm    : z.string(),
   country    : z.string()
-} ).refine( ( data ) => data.user.password === data.confirm, {
+} )
+.refine( ( data ) => data.user.password === data.confirm, {
   path   : ["confirm"],
   message: "Las contraseñas no coinciden"
 } )
@@ -60,7 +66,7 @@ const workerFormSchema = workerRequestSchema.extend( {
 export default function WorkerApplyForm() {
 
   const { isPending, data } = useQuery( countriesOption )
-  const { login }           = useAuthContext()
+  const { login } = useAuthContext()
   const { createWorker }    = useWorkerContext()
 
   const [submitting, startTransition] = useTransition()
@@ -82,7 +88,7 @@ export default function WorkerApplyForm() {
     resolver: zodResolver( workerFormSchema )
   } )
 
-  const { handleSubmit, setValue, watch, setError, clearErrors } = methods
+  const { handleSubmit, setValue, watch, setError, clearErrors, getValues } = methods
 
   const onSubmit = async ( data: any ) => {
     if ( checkingEmail || checkingUsername ) {
@@ -94,10 +100,10 @@ export default function WorkerApplyForm() {
       }
       return
     }
+    console.log("Submitting data:", data)
     startTransition( async () => {
-      const result = await createWorker( {
+      const result         = await createWorker( {
         user                   : data.user,
-        avatar                 : data.avatar,
         avatar_name            : data.avatar_name,
         national_identity_id   : data.national_identity_id,
         national_identity_value: data.national_identity_value,
@@ -145,22 +151,22 @@ export default function WorkerApplyForm() {
     }
   }, [formatData] )
 
-  // --- New: debounce watchers for email and username ---
-  const emailRef = useRef<number | null>( null )
-  const usernameRef = useRef<number | null>( null )
-  const [checkingEmail, setCheckingEmail] = useState( false )
+  const emailRef                                = useRef<number | null>( null )
+  const usernameRef                             = useRef<number | null>( null )
+  const [checkingEmail, setCheckingEmail]       = useState( false )
   const [checkingUsername, setCheckingUsername] = useState( false )
 
-  const watchedEmail = watch( "user.email" )
+  const watchedEmail    = watch( "user.email" )
   const watchedUsername = watch( "user.username" )
 
   useEffect( () => {
-    // clear previous timer
     if ( emailRef.current ) {
       clearTimeout( emailRef.current )
     }
 
-    if ( !watchedEmail || typeof watchedEmail !== "string" || watchedEmail.length < 3 ) {
+    if ( !watchedEmail || typeof watchedEmail !== "string" ||
+      watchedEmail.length < 3 )
+    {
       clearErrors( "user.email" )
       return
     }
@@ -168,14 +174,16 @@ export default function WorkerApplyForm() {
     setCheckingEmail( true )
     emailRef.current = window.setTimeout( async () => {
       try {
-        const res = await fetch( `/api/user?email=${ encodeURIComponent( watchedEmail ) }` )
+        const res = await fetch(
+          `/api/user?email=${ encodeURIComponent( watchedEmail ) }` )
         if ( !res.ok ) {
           return
         }
-        const data = await res.json()
+        const data  = await res.json()
         const items = data.items ?? []
         if ( items.length > 0 ) {
-          setError( "user.email", { type: "validate", message: "El email ya está en uso" } )
+          setError( "user.email",
+            { type: "validate", message: "El email ya está en uso" } )
         }
         else {
           clearErrors( "user.email" )
@@ -200,7 +208,9 @@ export default function WorkerApplyForm() {
       clearTimeout( usernameRef.current )
     }
 
-    if ( !watchedUsername || typeof watchedUsername !== "string" || watchedUsername.length < 3 ) {
+    if ( !watchedUsername || typeof watchedUsername !== "string" ||
+      watchedUsername.length < 3 )
+    {
       clearErrors( "user.username" )
       return
     }
@@ -208,14 +218,18 @@ export default function WorkerApplyForm() {
     setCheckingUsername( true )
     usernameRef.current = window.setTimeout( async () => {
       try {
-        const res = await fetch( `/api/user?username=${ encodeURIComponent( watchedUsername ) }` )
+        const res = await fetch(
+          `/api/user?username=${ encodeURIComponent( watchedUsername ) }` )
         if ( !res.ok ) {
           return
         }
-        const data = await res.json()
+        const data  = await res.json()
         const items = data.items ?? []
         if ( items.length > 0 ) {
-          setError( "user.username", { type: "validate", message: "El nombre de usuario ya está en uso" } )
+          setError( "user.username", {
+            type   : "validate",
+            message: "El nombre de usuario ya está en uso"
+          } )
         }
         else {
           clearErrors( "user.username" )
@@ -240,10 +254,13 @@ export default function WorkerApplyForm() {
       <div className="w-full max-w-lg flex flex-col gap-4">
         <div className="flex justify-center">
           <ProfilePhotoHover onChange={ ( file, imageString ) => {
-            setValue( "avatar", imageString )
+            setValue( "user.avatar", imageString )
             setValue( "avatar_name", file.name )
           } }/>
         </div>
+        <pre>
+          { JSON.stringify( getValues(), null, 2 ) }
+        </pre>
         <InputText name="user.email" label="Email" type="email"
                    placeholder="Ingrese su email"/>
         <InputText name="user.password" label="Contraseña" type="password"
@@ -264,6 +281,7 @@ export default function WorkerApplyForm() {
           } }
           name="country" values={ inputCountries } label="Pais origen"/>
         <NationalIdentityInput name="national_identity_value"
+                               //TODO: no carga value
                                label="Identificador" format={ identityFormat }
                                disabled={ !selectedCountry || isFormatLoading ||
                                  !identityFormat }
@@ -275,7 +293,8 @@ export default function WorkerApplyForm() {
         <InputTextArea name="description" label="Descripcion"
                        placeholder="Ingrese una breve descripcion"/>
         <InputLocationDetector name="location" label="Ubicacion"/>
-        <Button disabled={ submitting || checkingEmail || checkingUsername } onClick={ handleSubmit( onSubmit ) }>
+        <Button disabled={ submitting || checkingEmail || checkingUsername }
+                onClick={ handleSubmit( onSubmit, errors1 => console.log('errors1',errors1) ) }>
           { submitting ?
             <>
               <Loader2Icon className="animate-spin"/>

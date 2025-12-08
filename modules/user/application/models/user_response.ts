@@ -7,7 +7,7 @@ export const userResponseSchema = z.object( {
   username: z.string(),
   role     : z.string(),
   status   : z.string(),
-  avatar   : z.string().optional()
+  avatar   : z.string().nullish()
 } )
 
 export type UserResponse = z.infer<typeof userResponseSchema>
