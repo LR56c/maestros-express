@@ -1,14 +1,18 @@
-import { Notification } from "./notification"
-import { ValidInteger } from "../../shared/domain/value_objects/valid_integer"
-import { ValidString }  from "../../shared/domain/value_objects/valid_string"
+import { type Either }   from "fp-ts/lib/Either.js"
+import { BaseException } from "../../shared/domain/exceptions/base_exception.js"
 import {
-  BaseException
-}                       from "@/modules/shared/domain/exceptions/base_exception"
-import { type Either }  from "fp-ts/Either"
+  ValidInteger
+} from "@/modules/shared/domain/value_objects/valid_integer"
+import { ValidString } from "@/modules/shared/domain/value_objects/valid_string"
+import {
+  Notification
+}                                   from "@/modules/notification/domain/notification"
+import {
+  NotificationContent
+} from "@/modules/notification/domain/notification_content"
 
 export abstract class NotificationRepository {
-  abstract send( notification: Notification,
-    tokens: string[] ): Promise<Either<BaseException, boolean>>
+  abstract addBulk(notification : NotificationContent, ids : string[]): Promise<Either<BaseException, boolean>>
 
   abstract search( query: Record<string, any>, limit: ValidInteger,
     skip ?: ValidString, sortBy ?: ValidString,

@@ -1,35 +1,26 @@
-import { ValidBool }                 from "../../shared/domain/value_objects/valid_bool"
-import {
-  ValidDate
-}                                    from "../../shared/domain/value_objects/valid_date"
+import { ValidDate }                 from "../../shared/domain/value_objects/valid_date.js"
 import {
   Errors
-}                                    from "../../shared/domain/exceptions/errors"
-import { wrapType, wrapTypeDefault } from "../../shared/utils/wrap_type"
+}                                    from "../../shared/domain/exceptions/errors.js"
+import { wrapType, wrapTypeDefault } from "../../shared/utils/wrap_type.js"
 import {
   InvalidDateException
-}                                    from "../../shared/domain/exceptions/invalid_date_exception"
+}                                    from "../../shared/domain/exceptions/invalid_date_exception.js"
 import {
   BaseException
-}                                    from "../../shared/domain/exceptions/base_exception"
+}                                    from "../../shared/domain/exceptions/base_exception.js"
 import {
   UUID
-}                                    from "@/modules/shared/domain/value_objects/uuid"
+}                                    from "../../shared/domain/value_objects/uuid.js"
 import {
-  InvalidUUIDException
-}                                    from "@/modules/shared/domain/exceptions/invalid_uuid_exception"
+  ValidString
+}                                    from "../../shared/domain/value_objects/valid_string"
 
 export class Notification {
   private constructor(
     readonly id: UUID,
-    readonly userId: UUID,
+    readonly userId: ValidString,
     readonly data: Record<string, any>,
-    // readonly title : ValidString,
-    // readonly relevance : NotificationRelevance,
-    // readonly notificationFrom : ValidString,
-    // readonly contentFrom : ValidString,
-    // readonly redirectUrl : ValidString,
-    readonly isEnabled: ValidBool,
     readonly createdAt: ValidDate,
     readonly viewedAt ?: ValidDate
   )
@@ -38,14 +29,13 @@ export class Notification {
 
   static from(
     id: UUID,
-    userId: UUID,
+    userId: ValidString,
     data: Record<string, any>,
-    isEnabled: ValidBool,
     createdAt: ValidDate,
     viewedAt ?: ValidDate
   ): Notification
   {
-    return new Notification( id, userId, data, isEnabled, createdAt, viewedAt )
+    return new Notification( id, userId, data, createdAt, viewedAt )
   }
 
   static create(
@@ -53,7 +43,7 @@ export class Notification {
     userId: string,
     data: Record<string, any>
   ): Notification | Errors {
-    return Notification.fromPrimitives( id, userId, data, true,
+    return Notification.fromPrimitives( id, userId, data,
       ValidDate.nowUTC(),
       null )
   }
@@ -62,15 +52,13 @@ export class Notification {
     id: string,
     userId: string,
     data: Record<string, any>,
-    isEnabled: boolean,
     createdAt: Date,
     viewedAt ?: Date
   ): Notification {
     return new Notification(
       UUID.from( id ),
-      UUID.from( userId ),
+      ValidString.from( userId ),
       data,
-      ValidBool.from( isEnabled ),
       ValidDate.from( createdAt ),
       viewedAt ? ValidDate.from( viewedAt ) : undefined
     )
@@ -80,13 +68,12 @@ export class Notification {
     id: string,
     userId: string,
     data: Record<string, any>,
-    isEnabled: boolean,
     createdAt: Date | string,
     viewedAt: Date | string | null
   ): Notification | Errors {
     const errors = []
 
-    const vid = wrapType<UUID, InvalidUUIDException>(
+    const vid = wrapType(
       () => UUID.from( id ) )
 
     if ( vid instanceof BaseException ) {
@@ -94,16 +81,10 @@ export class Notification {
     }
 
     const vuserId = wrapType(
-      () => UUID.from( userId ) )
+      () => ValidString.from( userId ) )
 
     if ( vuserId instanceof BaseException ) {
       errors.push( vuserId )
-    }
-
-    const visEnabled = wrapType( () => ValidBool.from( isEnabled ) )
-
-    if ( visEnabled instanceof BaseException ) {
-      errors.push( visEnabled )
     }
 
     const vviewedAt = wrapTypeDefault(
@@ -130,7 +111,6 @@ export class Notification {
       vid as UUID,
       vuserId as UUID,
       data,
-      visEnabled as ValidBool,
       vcreatedAt as ValidDate,
       vviewedAt as ValidDate | undefined
     )

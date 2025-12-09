@@ -25,10 +25,50 @@ import {
 import {
   extractOperator
 }                                   from "@/modules/shared/infrastructure/prisma_query_utils"
+import {
+  DataAlreadyExistException
+} from "@/modules/shared/domain/exceptions/data_already_exist_exception"
+import {
+  NotificationContent
+}                                   from "@/modules/notification/domain/notification_content"
 
 export class PrismaNotificationData implements NotificationRepository {
   constructor( private readonly db: PrismaClient ) {
   }
+
+  async addBulk( notification: NotificationContent,
+    ids : string[] ): Promise<Either<BaseException, boolean>> {
+    try {
+      await this.db.$transaction( [
+        this.db.notificationContent.create( {
+          data: {
+            id       : notification.id.toString(),
+            data     : notification.data,
+            createdAt: notification.createdAt.toString()
+          }
+        } ),
+        this.db.notification.createMany( {
+          data: ids.map( userId => (
+            {
+              notificationId: notification.id.toString(),
+              userId        : userId
+            }
+          ) )
+        } )
+      ] )
+      return right( true )
+    }
+    catch ( e: any ) {
+      const code = e.code
+      if ( code ) {
+        if ( code === "P2002" ) {
+          return left( new DataAlreadyExistException() )
+        }
+      }
+      return left( new InfrastructureException() )
+    }
+  }
+
 
   async search( query: Record<string, any>, limit: ValidInteger,
     skip ?: ValidString, sortBy ?: ValidString,
@@ -51,14 +91,21 @@ export class PrismaNotificationData implements NotificationRepository {
         where  : where,
         orderBy: orderBy,
         skip   : offset,
-        take   : limit.value
+        take   : limit.value,
+        include:{
+          notification:true
+        }
       } )
 
       const result: Notification[] = []
-      for ( const e of response ) {
-        const mapped = Notification.fromPrimitives( e.id.toString(),
-          e.userId.toString(), e.data as Record<string, any>, e.isEnabled,
-          e.createdAt, e.viewedAt )
+      for ( const item of response ) {
+        const mapped = Notification.fromPrimitives(
+          item.notificationId.toString(),
+          item.userId.toString(),
+          item.notification.data as Record<string, any>,
+          item.notification.createdAt,
+          item.viewedAt
+        )
         if ( mapped instanceof Errors ) {
           return left( mapped.values )
         }
@@ -157,34 +204,16 @@ export class PrismaNotificationData implements NotificationRepository {
     return jsonArrayQuery
   }
 
-  async send( notification: Notification,
-    tokens: string[] ): Promise<Either<BaseException, boolean>> {
-    try {
-      await this.db.notification.create( {
-        data: {
-          id       : notification.id.toString(),
-          userId   : notification.userId.toString(),
-          data     : notification.data,
-          viewedAt : notification.viewedAt?.toString(),
-          isEnabled: notification.isEnabled.value,
-          createdAt: notification.createdAt.toString()
-        }
-      } )
-      return right( true )
-    }
-    catch ( e ) {
-      return left( new InfrastructureException() )
-    }
-  }
-
   async update( notification: Notification ): Promise<Either<BaseException, boolean>> {
     try {
       await this.db.notification.update( {
         where: {
-          id: notification.id.toString()
+          notificationId_userId: {
+            notificationId: notification.id.toString(),
+            userId        : notification.userId.toString()
+          }
         },
         data : {
-          data    : notification.data,
           viewedAt: notification.viewedAt?.toString()
         }
       } )
