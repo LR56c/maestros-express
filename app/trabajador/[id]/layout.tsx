@@ -9,12 +9,12 @@ import {
 }                                             from "@/modules/worker/application/transform_worker_profile"
 import {
   WorkerScheduleMapper
-}                                             from "@/modules/worker_schedule/application/worker_schedule_mapper"
+}               from "@/modules/worker_schedule/application/worker_schedule_mapper"
 import CalendarSchedule
-                                              from "@/components/form/calendar_schedule/calendar_schedule"
+  , { Horario } from "@/components/form/calendar_schedule/calendar_schedule"
 import {
   RequestChatDialog
-}                                             from "@/components/request_chat_dialog"
+}               from "@/components/request_chat_dialog"
 import { createClientServer }                 from "@/utils/supabase/server"
 import { redirect }                           from "next/navigation"
 import WorkerHistories
@@ -54,7 +54,17 @@ export default async function TrabajadorLayout( {
     return redirect( "/404" )
   }
 
-  const schedules = schedulesResult.right.map( WorkerScheduleMapper.toDTO )
+  const schedules : Horario[] = schedulesResult.right.map( WorkerScheduleMapper.toDTO ).map(
+    ( schedule ) => ( {      ...schedule,
+      id : schedule.id.toString(),
+      week_day: schedule.week_day,
+      status: schedule.status,
+      start_date: schedule.start_date,
+      end_date: schedule.end_date,
+      recurrent_start_date: schedule.recurrent_start_date ?? undefined,
+      recurrent_end_date: schedule.recurrent_end_date ?? undefined
+    } )
+  )
 
   const transformProfile = new TransformWorkerProfile()
   const transformResult  = await transformProfile.execute(

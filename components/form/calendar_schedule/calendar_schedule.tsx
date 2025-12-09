@@ -60,7 +60,7 @@ import {
   validateSchedule
 }                                                           from "@/modules/worker_schedule/utils/validation"
 
-interface Horario {
+export interface Horario {
   id: string
   week_day: number
   status: string
