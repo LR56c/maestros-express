@@ -59,10 +59,10 @@ export async function GET( request: NextRequest ) {
     await searchReport()
   ).execute(
     data.right.query,
-    data.right.limit,
-    data.right.skip,
-    data.right.sort_by,
-    data.right.sort_type
+    data.right.limit ?? undefined,
+    data.right.skip ?? undefined,
+    data.right.sort_by ?? undefined,
+    data.right.sort_type ?? undefined,
   )
 
   if ( isLeft( result ) ) {

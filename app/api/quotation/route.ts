@@ -62,10 +62,10 @@ export async function GET( request: NextRequest ) {
 
   const result = await (await searchQuotation()).execute(
     data.right.query,
-    data.right.limit,
-    data.right.skip,
-    data.right.sort_by,
-    data.right.sort_type
+    data.right.limit ?? undefined,
+    data.right.skip ?? undefined,
+    data.right.sort_by ?? undefined,
+    data.right.sort_type ?? undefined,
   )
   console.log( "Quotation Search Result:", result )
 

@@ -65,9 +65,9 @@ export async function GET( request: NextRequest ) {
   ).execute(
     data.right.query,
     data.right.limit ?? 10,
-    data.right.skip,
-    data.right.sort_by,
-    data.right.sort_type
+    data.right.skip ?? undefined,
+    data.right.sort_by ?? undefined,
+    data.right.sort_type ?? undefined,
   )
 
   if ( isLeft( result ) ) {

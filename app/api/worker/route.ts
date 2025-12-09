@@ -55,10 +55,11 @@ export async function GET( request: NextRequest ) {
   const result = await (
     await searchWorker()
   ).execute( data.right.query,
-    data.right.limit,
-    data.right.skip,
-    data.right.sort_by,
-    data.right.sort_type )
+    data.right.limit ?? undefined,
+    data.right.skip ?? undefined,
+    data.right.sort_by ?? undefined,
+    data.right.sort_type ?? undefined,
+    )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
