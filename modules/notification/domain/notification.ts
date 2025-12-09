@@ -1,17 +1,17 @@
-import { ValidDate }                 from "../../shared/domain/value_objects/valid_date.js"
+import { ValidDate }                 from "../../shared/domain/value_objects/valid_date"
 import {
   Errors
-}                                    from "../../shared/domain/exceptions/errors.js"
-import { wrapType, wrapTypeDefault } from "../../shared/utils/wrap_type.js"
+}                                    from "../../shared/domain/exceptions/errors"
+import { wrapType, wrapTypeDefault } from "../../shared/utils/wrap_type"
 import {
   InvalidDateException
-}                                    from "../../shared/domain/exceptions/invalid_date_exception.js"
+}                                    from "../../shared/domain/exceptions/invalid_date_exception"
 import {
   BaseException
-}                                    from "../../shared/domain/exceptions/base_exception.js"
+}                                    from "../../shared/domain/exceptions/base_exception"
 import {
   UUID
-}                                    from "../../shared/domain/value_objects/uuid.js"
+}                                    from "../../shared/domain/value_objects/uuid"
 import {
   ValidString
 }                                    from "../../shared/domain/value_objects/valid_string"

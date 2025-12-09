@@ -1,59 +1,43 @@
-import {
-  NotificationRepository
-}                              from "@/modules/notification/domain/notification_repository"
-import type { Either }         from "fp-ts/Either"
-import { isLeft, left, right } from "fp-ts/Either"
+import { type Either }                 from "fp-ts/lib/Either"
+import { isLeft, left, right }         from "fp-ts/lib/Either"
 import {
   BaseException
-}                              from "@/modules/shared/domain/exceptions/base_exception"
-import { wrapTypeDefault }     from "@/modules/shared/utils/wrap_type"
-import {
-  ValidDate
-}                              from "@/modules/shared/domain/value_objects/valid_date"
-import {
-  ValidInteger
-}                              from "@/modules/shared/domain/value_objects/valid_integer"
-import {
-  Notification
-}                              from "@/modules/notification/domain/notification"
+}                                      from "../../shared/domain/exceptions/base_exception"
+import { NotificationUpdateDTO }       from "./notification_update_dto"
+import { Notification }                from "../domain/notification"
+import { wrapTypeDefault }             from "../../shared/utils/wrap_type"
 import {
   ValidBool
-}                              from "@/modules/shared/domain/value_objects/valid_bool"
+}                                      from "../../shared/domain/value_objects/valid_bool"
 import {
-  DataNotFoundException
-}                              from "@/modules/shared/domain/exceptions/data_not_found_exception"
+  ValidDate
+}                                      from "../../shared/domain/value_objects/valid_date"
 import {
-  NotificationUpdateDTO
-}                              from "@/modules/notification/application/notification_update_dto"
+  InfrastructureException
+}                                      from "../../shared/domain/exceptions/infrastructure_exception"
+import {
+  ensureUserNotificationExist
+}                                      from "@/modules/notification/utils/ensure_notification_exist"
+import {
+  NotificationRepository
+}                                      from "@/modules/notification/domain/notification_repository"
 
 export class UpdateNotification {
-  constructor( private readonly repo: NotificationRepository ) {
-  }
-
-  private async ensureNotificationExist( id: string ): Promise<Either<BaseException[], Notification>> {
-    const existResult = await this.repo.search( {
-      id: id
-    }, ValidInteger.from( 1 ) )
-
-    if ( isLeft( existResult ) ) {
-      return left( existResult.left )
-    }
-
-    if ( existResult.right.length > 0 &&
-      existResult.right[0]!.id.toString() !== id )
-    {
-      return left( [new DataNotFoundException()] )
-    }
-    return right( existResult.right[0]! )
+  constructor( private readonly dao: NotificationRepository ) {
   }
 
 
-  async execute( dto : NotificationUpdateDTO): Promise<Either<BaseException[], Notification>> {
-    const notificationResult = await this.ensureNotificationExist( dto.id )
+  async execute(userId :string, dto : NotificationUpdateDTO): Promise<Either<BaseException[], Notification>> {
+    const notificationResult = await ensureUserNotificationExist(this.dao, dto.id, userId )
 
     if ( isLeft( notificationResult ) ) {
       return left( notificationResult.left )
     }
+
+    if( notificationResult.right.userId.toString() !== userId ) {
+      return left( [new InfrastructureException("You can only update your own notifications")] )
+    }
+
     const viewedAt = wrapTypeDefault( undefined,
       ( value ) => ValidBool.from( value ), dto.viewed_at )
 
@@ -67,12 +51,11 @@ export class UpdateNotification {
       notification.id,
       notification.userId,
       notification.data,
-      notification.isEnabled,
       notification.createdAt,
       !viewedAt ? undefined : ValidDate.now()
     )
 
-    const result = await this.repo.update( newNotification )
+    const result = await this.dao.update( newNotification )
 
     if ( isLeft( result ) ) {
       return left( [result.left] )

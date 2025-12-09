@@ -1,15 +1,15 @@
-import {
-  NotificationRepository
-}                       from "@/modules/notification/domain/notification_repository"
-import type { Either }  from "fp-ts/Either"
-import { isLeft, left } from "fp-ts/Either"
+import { type Either }     from "fp-ts/lib/Either"
+import { isLeft, left }    from "fp-ts/lib/Either"
 import {
   BaseException
-}                       from "@/modules/shared/domain/exceptions/base_exception"
-import { Notification } from "@/modules/notification/domain/notification"
+}                          from "../../shared/domain/exceptions/base_exception"
 import {
   genericEnsureSearch
-}                       from "@/modules/shared/utils/generic_ensure_search"
+}                          from "../../shared/utils/generic_ensure_search"
+import { Notification }    from "../domain/notification"
+import {
+  NotificationRepository
+} from "@/modules/notification/domain/notification_repository"
 
 export class SearchNotifications {
   constructor( private readonly repo: NotificationRepository ) {

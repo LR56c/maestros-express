@@ -1,38 +1,45 @@
-import {
-  NotificationRepository
-}                              from "@/modules/notification/domain/notification_repository"
-import type { Either }         from "fp-ts/Either"
-import { isLeft, left, right } from "fp-ts/Either"
+import { type Either,isLeft, left, right }     from "fp-ts/lib/Either"
 import {
   BaseException
-}                              from "@/modules/shared/domain/exceptions/base_exception"
-import {
-  type NotificationRequest
-}                              from "@/modules/notification/application/notification_request"
-import {
-  Notification
-}                              from "@/modules/notification/domain/notification"
-import { wrapType }            from "@/modules/shared/utils/wrap_type"
-import {
-  ValidInteger
-}                              from "@/modules/shared/domain/value_objects/valid_integer"
+}                                  from "../../shared/domain/exceptions/base_exception"
+import { wrapType }                from "../../shared/utils/wrap_type"
 import {
   ValidString
-}                              from "@/modules/shared/domain/value_objects/valid_string"
-import {
-  DataAlreadyExistException
-}                              from "@/modules/shared/domain/exceptions/data_already_exist_exception"
+}                                  from "../../shared/domain/value_objects/valid_string"
+import { NotificationRequest }     from "./notification_request"
 import {
   Errors
-}                              from "@/modules/shared/domain/exceptions/errors"
+}                                  from "../../shared/domain/exceptions/errors"
+import { ensureNotificationExist } from "../utils/ensure_notification_exist"
+import { containError }            from "../../shared/utils/contain_error"
+import {
+  DataNotFoundException
+}                                  from "../../shared/domain/exceptions/data_not_found_exception"
+import { NotificationRepository }  from "../domain/notification_repository"
+import { NotificationDataDTO }     from "./notification_data_dto"
+import { NotificationContent }     from "../domain/notification_content"
+import {
+  InfrastructureException
+}                                  from "../../shared/domain/exceptions/infrastructure_exception"
 
 export class SendNotification {
-  constructor( private readonly repo: NotificationRepository ) {
+  constructor(
+    private readonly repo: NotificationRepository,
+    private readonly dao: NotificationRepository
+  )
+  {
   }
 
-  private async validateNotificationData( json: Record<string, any> ): Promise<Either<BaseException[], Record<string, any>>> {
+  private async validateNotificationData( json: Record<string, any> ): Promise<Either<BaseException[], NotificationDataDTO>> {
     const errors = []
-    const title  = wrapType( () => ValidString.from( json.title ) )
+
+    const icon = wrapType( () => ValidString.from( json.icon ) )
+
+    if ( icon instanceof BaseException ) {
+      errors.push( icon )
+    }
+
+    const title = wrapType( () => ValidString.from( json.title ) )
 
     if ( title instanceof BaseException ) {
       errors.push( title )
@@ -62,6 +69,9 @@ export class SendNotification {
     }
 
     return right( {
+      icon             : (
+        icon as ValidString
+      ).value,
       title            : (
         title as ValidString
       ).value,
@@ -77,41 +87,30 @@ export class SendNotification {
     } )
   }
 
-  private async ensureNotificationExist( id: string ): Promise<Either<BaseException[], boolean>> {
-    const existResult = await this.repo.search( {
-      id: id
-    }, ValidInteger.from( 1 ) )
 
-    if ( isLeft( existResult ) ) {
-      return left( existResult.left )
-    }
+  async execute( dto: NotificationRequest ): Promise<Either<BaseException[], boolean>> {
 
-    if ( existResult.right.length > 0 &&
-      existResult.right[0]!.id.toString() === id )
+    if ( !dto.ids || dto.ids.length === 0 || !dto.tokens ||
+      dto.tokens.length === 0 )
     {
-      return left( [new DataAlreadyExistException()] )
+      return left( [new InfrastructureException( "Ids or tokens are empty" )] )
     }
-    return right( true )
-  }
-
-
-  async execute( dto: NotificationRequest ): Promise<Either<BaseException[], Notification>> {
 
     const data = await this.validateNotificationData( dto.data )
-
     if ( isLeft( data ) ) {
       return left( data.left )
     }
 
-    const notificationNotExist = await this.ensureNotificationExist( dto.id )
-
-    if ( isLeft( notificationNotExist ) ) {
-      return left( notificationNotExist.left )
+    const existResult = await ensureNotificationExist( this.dao,
+      dto.id )
+    if ( isLeft( existResult ) ) {
+      if ( !containError( existResult.left, new DataNotFoundException() ) ) {
+        return left( existResult.left )
+      }
     }
 
-    const notification = Notification.create(
+    const notification = NotificationContent.create(
       dto.id,
-      dto.user_id,
       data.right
     )
 
@@ -119,12 +118,17 @@ export class SendNotification {
       return left( notification.values )
     }
 
-    const result = await this.repo.send( notification, dto.tokens )
+    const resultNotifications = await this.repo.addBulk( notification, dto.ids )
+    if ( isLeft( resultNotifications ) ) {
+      return left( [resultNotifications.left] )
+    }
+
+    const result = await this.dao.addBulk( notification, dto.ids )
 
     if ( isLeft( result ) ) {
       return left( [result.left] )
     }
 
-    return right( notification )
+    return right( true )
   }
 }

@@ -1,13 +1,13 @@
-import { ValidDate } from "../../shared/domain/value_objects/valid_date.js"
-import { Errors }    from "../../shared/domain/exceptions/errors.js"
-import { wrapType }  from "../../shared/utils/wrap_type.js"
+import { ValidDate } from "../../shared/domain/value_objects/valid_date"
+import { Errors }    from "../../shared/domain/exceptions/errors"
+import { wrapType }  from "../../shared/utils/wrap_type"
 import {
   InvalidDateException
-}                    from "../../shared/domain/exceptions/invalid_date_exception.js"
+}                    from "../../shared/domain/exceptions/invalid_date_exception"
 import {
   BaseException
-}                    from "../../shared/domain/exceptions/base_exception.js"
-import { UUID }      from "../../shared/domain/value_objects/uuid.js"
+}                    from "../../shared/domain/exceptions/base_exception"
+import { UUID }      from "../../shared/domain/value_objects/uuid"
 
 export class NotificationContent {
   private constructor(
