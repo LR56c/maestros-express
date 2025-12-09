@@ -25,7 +25,6 @@ import {
 export class SendNotification {
   constructor(
     private readonly repo: NotificationRepository,
-    private readonly dao: NotificationRepository
   )
   {
   }
@@ -101,7 +100,7 @@ export class SendNotification {
       return left( data.left )
     }
 
-    const existResult = await ensureNotificationExist( this.dao,
+    const existResult = await ensureNotificationExist( this.repo,
       dto.id )
     if ( isLeft( existResult ) ) {
       if ( !containError( existResult.left, new DataNotFoundException() ) ) {
@@ -123,7 +122,7 @@ export class SendNotification {
       return left( [resultNotifications.left] )
     }
 
-    const result = await this.dao.addBulk( notification, dto.ids )
+    const result = await this.repo.addBulk( notification, dto.ids )
 
     if ( isLeft( result ) ) {
       return left( [result.left] )
