@@ -1,5 +1,5 @@
-import { type Either }   from "fp-ts/lib/Either.js"
-import { BaseException } from "../../shared/domain/exceptions/base_exception.js"
+import { type Either }   from "fp-ts/lib/Either"
+import { BaseException } from "../../shared/domain/exceptions/base_exception"
 import {
   ValidInteger
 } from "@/modules/shared/domain/value_objects/valid_integer"

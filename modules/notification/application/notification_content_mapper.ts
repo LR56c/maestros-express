@@ -1,14 +1,14 @@
-import { Errors }                      from "../../shared/domain/exceptions/errors.js"
-import { wrapType }                    from "../../shared/utils/wrap_type.js"
+import { Errors }                      from "../../shared/domain/exceptions/errors"
+import { wrapType }                    from "../../shared/utils/wrap_type"
 import {
   BaseException
-}                                      from "../../shared/domain/exceptions/base_exception.js"
+}                                      from "../../shared/domain/exceptions/base_exception"
 import {
   UUID
-}                                      from "../../shared/domain/value_objects/uuid.js"
+}                                      from "../../shared/domain/value_objects/uuid"
 import {
   ValidDate
-}                                      from "../../shared/domain/value_objects/valid_date.js"
+}                                      from "../../shared/domain/value_objects/valid_date"
 import { NotificationContent }         from "../domain/notification_content"
 import { NotificationContentResponse } from "./notification_content_response"
 
@@ -23,7 +23,7 @@ export class NotificationContentMapper {
 
   static toJSON( notification: NotificationContentResponse ): Record<string, any> {
     return {
-      id        : notification.id.toString(),
+      id        : notification.id,
       data      : notification.data,
       created_at: notification.created_at
     }

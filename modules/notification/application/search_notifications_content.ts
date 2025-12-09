@@ -1,11 +1,11 @@
-import { type Either }            from "fp-ts/lib/Either.js"
-import { isLeft, left }           from "fp-ts/lib/Either.js"
+import { type Either }            from "fp-ts/lib/Either"
+import { isLeft, left }           from "fp-ts/lib/Either"
 import {
   BaseException
-}                                 from "../../shared/domain/exceptions/base_exception.js"
+}                                 from "../../shared/domain/exceptions/base_exception"
 import {
   genericEnsureSearch
-}                                 from "../../shared/utils/generic_ensure_search.js"
+}                                 from "../../shared/utils/generic_ensure_search"
 import { type PaginatedResult }        from "../../shared/domain/paginated_result"
 import { NotificationContentDAO } from "../domain/notification_content_dao"
 import { NotificationContent }    from "../domain/notification_content"

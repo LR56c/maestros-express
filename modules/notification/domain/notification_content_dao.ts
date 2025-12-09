@@ -1,13 +1,13 @@
 import {
   ValidInteger
-}                          from "../../shared/domain/value_objects/valid_integer.js"
+}                          from "../../shared/domain/value_objects/valid_integer"
 import {
   ValidString
-}                          from "../../shared/domain/value_objects/valid_string.js"
-import { type Either }     from "fp-ts/lib/Either.js"
+}                          from "../../shared/domain/value_objects/valid_string"
+import { type Either }     from "fp-ts/lib/Either"
 import {
   BaseException
-}                          from "../../shared/domain/exceptions/base_exception.js"
+}                          from "../../shared/domain/exceptions/base_exception"
 import { type PaginatedResult } from "../../shared/domain/paginated_result"
 import { NotificationContent } from "./notification_content"
 

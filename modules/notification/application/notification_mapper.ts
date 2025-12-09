@@ -1,21 +1,21 @@
-import { Notification }              from "../domain/notification.js"
-import { type NotificationResponse } from "./notification_response.js"
+import { Notification }              from "../domain/notification"
+import { type NotificationResponse } from "./notification_response"
 import {
   Errors
-}                                    from "../../shared/domain/exceptions/errors.js"
-import { wrapType, wrapTypeDefault } from "../../shared/utils/wrap_type.js"
+}                                    from "../../shared/domain/exceptions/errors"
+import { wrapType, wrapTypeDefault } from "../../shared/utils/wrap_type"
 import {
   BaseException
-}                                    from "../../shared/domain/exceptions/base_exception.js"
+}                                    from "../../shared/domain/exceptions/base_exception"
 import {
   ValidString
-}                                    from "../../shared/domain/value_objects/valid_string.js"
+}                                    from "../../shared/domain/value_objects/valid_string"
 import {
   UUID
-}                                    from "../../shared/domain/value_objects/uuid.js"
+}                                    from "../../shared/domain/value_objects/uuid"
 import {
   ValidDate
-}                                    from "../../shared/domain/value_objects/valid_date.js"
+}                                    from "../../shared/domain/value_objects/valid_date"
 
 export class NotificationMapper {
   static toResponse( notification: Notification ): NotificationResponse {
