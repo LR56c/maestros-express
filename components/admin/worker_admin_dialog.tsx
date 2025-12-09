@@ -91,7 +91,6 @@ const certificatesOptions = ( id: string ) => (
 )
 
 
-
 const zonesOptions = ( id: string ) => (
   {
     queryKey: ["zone", id],
@@ -126,12 +125,16 @@ const schedulesOptions = ( id: string ) => (
   }
 )
 
-export function WorkerAdminDialog( { worker, onUpdate }: WorkerAdminDialogProps ) {
+export function WorkerAdminDialog( {
+  worker,
+  onUpdate
+}: WorkerAdminDialogProps )
+{
   const { isPending, data } = useQuery(
     schedulesOptions( worker.user.user_id ) )
 
-  const location              = worker.location.slice( 1, -1 )
-  const [latitude, longitude] = location.split( "," ).map( parseFloat )
+  const location                = worker.location.slice( 1, -1 )
+  const [latitude, longitude]   = location.split( "," ).map( parseFloat )
   const { mutateAsync, status } = useMutation( {
     mutationFn: async () => {
       const response = await fetch( "/api/o/worker/verify", {
@@ -139,7 +142,7 @@ export function WorkerAdminDialog( { worker, onUpdate }: WorkerAdminDialogProps 
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify( { user: worker.user } )
+        body   : JSON.stringify( { user: worker.user } )
       } )
       if ( !response.ok ) {
         return undefined
@@ -164,13 +167,17 @@ export function WorkerAdminDialog( { worker, onUpdate }: WorkerAdminDialogProps 
   return (
     <div className="flex flex-col space-y-4 overflow-y-scroll">
       <div className="flex gap-4">
-        <div
-          className="size-24 rounded-full bg-muted flex items-center justify-center">
-          <img
-            src={ worker.user.avatar }
-            alt={ worker.user.full_name }
-            className="rounded-full object-cover w-full h-full"/>
-        </div>
+        {
+          worker.user.avatar ?
+            <div
+              className="size-24 rounded-full bg-muted flex items-center justify-center">
+              <img
+                src={ worker.user.avatar }
+                alt={ worker.user.full_name }
+                className="rounded-full object-cover w-full h-full"/>
+            </div>
+            : null
+        }
         <div className="flex flex-col space-y-2">
           <div className="flex space-y-2">
             <p>{ worker.user.full_name }</p>
@@ -252,7 +259,7 @@ function StoriesSection( { id }: { id: string } ) {
   const stories = data as StoryDTO[]
 
   return stories.map( ( story: StoryDTO ) => (
-    <div key={story.id} className="flex flex-col space-y-2">
+    <div key={ story.id } className="flex flex-col space-y-2">
       <Label>Historias</Label>
       <Card>
         <CardHeader>

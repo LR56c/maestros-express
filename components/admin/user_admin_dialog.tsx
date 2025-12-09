@@ -36,7 +36,7 @@ export function UserAdminDialog( {
     ["PENDING", "Pendiente"],
     ["VERIFIED", "Verificado"]
   ] )
-  const inputRolesMap = new Map<string, any>( [
+  const inputRolesMap  = new Map<string, any>( [
     ["ADMIN", "Administrador"],
     ["WORKER", "Trabajador"],
     ["CLIENT", "Cliente"]
@@ -44,35 +44,38 @@ export function UserAdminDialog( {
 
   const methods = useForm( {
     resolver: zodResolver( userResponseSchema.extend( {
-      role_name: z.string(),
+      role_name  : z.string(),
       status_name: z.string()
     } ) ),
-    values: {
-      username: user?.username || "",
-      email: user?.email || "",
-      role: user?.role || "",
-      status: user?.status || "",
-      user_id: user?.user_id || "",
-      full_name: user?.full_name || "",
-      avatar: user?.avatar || "",
-      role_name: user ? inputRolesMap.get(user.role) || "" : "",
-      status_name: user ? inputStatusMap.get(user.status) || "" : ""
+    values  : {
+      username   : user?.username || "",
+      email      : user?.email || "",
+      role       : user?.role || "",
+      status     : user?.status || "",
+      user_id    : user?.user_id || "",
+      full_name  : user?.full_name || "",
+      avatar     : user?.avatar || "",
+      role_name  : user ? inputRolesMap.get( user.role ) || "" : "",
+      status_name: user ? inputStatusMap.get( user.status ) || "" : ""
     }
   } )
 
   const { handleSubmit, reset } = methods
 
-  const onSubmit         = async ( data: any ) => {
+  const onSubmit = async ( data: any ) => {
     onSave( data )
     reset()
   }
 
 
   const inputStatus: SelectInputValue[] = Array.from( inputStatusMap.entries() )
-                                              .map( ( [label, value] ) =>
-                                                (
-                                                  { value: label, label: value }
-                                                ) )
+                                               .map( ( [label, value] ) =>
+                                                 (
+                                                   {
+                                                     value: label,
+                                                     label: value
+                                                   }
+                                                 ) )
 
   const inputRoles: SelectInputValue[] = Array.from( inputRolesMap.entries() )
                                               .map( ( [label, value] ) =>
@@ -89,13 +92,17 @@ export function UserAdminDialog( {
         <DialogContent className="sm:max-w-md w-full">
           <DialogTitle>{ title }</DialogTitle>
           <div className="flex gap-4">
-            <div
-              className="size-24 rounded-full bg-muted flex items-center justify-center">
-              <img
-                src={ user.avatar }
-                alt={ user.full_name }
-                className="rounded-full object-cover w-full h-full"/>
-            </div>
+            {
+              user.avatar ?
+                <div
+                  className="size-24 rounded-full bg-muted flex items-center justify-center">
+                  <img
+                    src={ user.avatar }
+                    alt={ user.full_name }
+                    className="rounded-full object-cover w-full h-full"/>
+                </div>
+                : null
+            }
             <div className="flex flex-col space-y-2">
               <p>Usuario: { user.username }</p>
               <p>Nombre: { user.full_name }</p>
