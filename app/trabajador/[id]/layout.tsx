@@ -76,13 +76,15 @@ export default async function TrabajadorLayout( {
       <div className="flex justify-center p-4 w-full h-full">
         <div className="flex flex-col max-w-md gap-2">
           <div className="flex gap-4 items-center">
-            <div
-              className="size-24 rounded-full bg-muted flex items-center justify-center">
-              <img
-                src={ worker.avatar }
-                alt={ worker.full_name }
-                className="rounded-full object-cover w-full h-full"/>
-            </div>
+            { worker.avatar ?
+              <div
+                className="size-24 rounded-full bg-muted flex items-center justify-center">
+                <img
+                  src={ worker.avatar }
+                  alt={ worker.full_name }
+                  className="rounded-full object-cover w-full h-full"/>
+              </div>
+              : null }
             <div className="flex flex-col gap-4">
               <p className="capitalize">{ worker.full_name }</p>
               { worker.specialities.length > 0 ? worker.specialities.map(
@@ -95,8 +97,10 @@ export default async function TrabajadorLayout( {
             </div>
           </div>
           { user && user.id === worker.user_id ?
-            <Link className="w-full" href={ `/trabajador/${ worker.user_id }/editar` }>
-              <Button className="w-full" variant="outline">Editar perfil</Button>
+            <Link className="w-full"
+                  href={ `/trabajador/${ worker.user_id }/editar` }>
+              <Button className="w-full" variant="outline">Editar
+                perfil</Button>
             </Link>
             : null }
           {
@@ -116,16 +120,16 @@ export default async function TrabajadorLayout( {
             workerId={ worker.user_id }
             clientId={ user.id }
           /> : null }
-          <WorkerHistories workerId={worker.user_id}/>
+          <WorkerHistories workerId={ worker.user_id }/>
           <WorkerTabs worker={ worker }/>
-          { !Array.isArray(children) && children && (
+          { !Array.isArray( children ) && children && (
             <div
               className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
               { worker.taxes.map(
                 ( tax ) => (
-                  <WorkerTax key={ tax.id } tax={tax}></WorkerTax>
+                  <WorkerTax key={ tax.id } tax={ tax }></WorkerTax>
                 )
-              )}
+              ) }
             </div>
           ) }
           { children }
