@@ -51,31 +51,38 @@ export function QuotationDialog( {
   const [isOpen, setIsOpen] = useState( false )
 
   const methods = useForm( {
-    resolver     : zodResolver( quotationRequestSchema.extend({
-      same_format : z.boolean().refine( ( value ) => value, {
+    resolver     : zodResolver( quotationRequestSchema.extend( {
+      same_format: z.boolean().refine( ( value ) => value, {
         message: "Todos los elementos deben tener el mismo formato de moneda"
-      } ),
-    }) ),
+      } )
+    } ) ),
     defaultValues: {
-      id       : UUID.create().toString(),
-      user_id  : userId,
-      chat_id  : chatId,
-      worker_id: workerId,
-      same_format: true,
+      id         : UUID.create().toString(),
+      user_id    : userId,
+      chat_id    : chatId,
+      worker_id  : workerId,
+      same_format: true
     }
   } )
 
-  const { handleSubmit, reset, watch, setValue, formState: {errors} } = methods
-  const sameFormatError = errors.same_format
+  const {
+          handleSubmit,
+          reset,
+          watch,
+          setValue,
+          formState: { errors }
+        }                = methods
+  const sameFormatError  = errors.same_format
   const quotationDetails = watch( "details" )
 
   useEffect( () => {
-    if( !quotationDetails || quotationDetails.length === 0 ) {
+    if ( !quotationDetails || quotationDetails.length === 0 ) {
       return
     }
-    const valueFormat = quotationDetails[0]?.value_format
-    const allSameFormat = quotationDetails.every( ( item: any ) => item.value_format === valueFormat )
-    setValue( "same_format", allSameFormat)
+    const valueFormat   = quotationDetails[0]?.value_format
+    const allSameFormat = quotationDetails.every(
+      ( item: any ) => item.value_format === valueFormat )
+    setValue( "same_format", allSameFormat )
   }, [quotationDetails] )
 
   const { mutateAsync, status } = useMutation( {
@@ -105,10 +112,10 @@ export function QuotationDialog( {
       return
     }
 
-    const json = JSON.stringify({
-      id: quotationResult.id,
-      name: data.title,
-    })
+    const json = JSON.stringify( {
+      id  : quotationResult.id,
+      name: data.title
+    } )
     onCreated( json, "QUOTATION" )
     setIsOpen( false )
     reset()
@@ -142,7 +149,7 @@ export function QuotationDialog( {
                 { quotationDetails[0]?.value_format }&nbsp;
                 { quotationDetails.reduce( ( acc, item ) => (
                   acc + (
-                    item.value || 0
+                    Number( item.value instanceof String ? item.value : 0 )
                   )
                 ), 0 ) }
               </p>
