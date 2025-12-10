@@ -51,7 +51,7 @@ export class UpdatePhoneFormat {
       format.regex,
       country,
       exist.right.createdAt.toString(),
-      format.example
+      format.example ?? undefined
     )
 
     if ( updatedFormat instanceof Errors ) {
