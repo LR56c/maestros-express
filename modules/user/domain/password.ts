@@ -61,7 +61,7 @@ export class Password {
 
     if ( !parseValue.success ) {
       const errors = []
-      for ( let e of parseValue.error.errors ) {
+      for ( let e of parseValue.error.issues ) {
         if ( e.message === "lowercase" ) {
           errors.push( new PasswordInsufficientLowercaseException() )
         }
