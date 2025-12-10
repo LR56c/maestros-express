@@ -51,7 +51,7 @@ export class AddQuotation {
         e.name,
         e.value,
         e.value_format,
-        e.description,
+        e.description ?? undefined,
       )
 
       if ( detail instanceof Errors ) {
@@ -72,7 +72,7 @@ export class AddQuotation {
       QuotationStatusEnum.PENDING,
       details[0]!.valueFormat.value,
       details,
-      dto.estimated_time
+      dto.estimated_time ?? undefined,
     )
 
     if ( newQuotation instanceof Errors ) {

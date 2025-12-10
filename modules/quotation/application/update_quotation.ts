@@ -45,7 +45,7 @@ export class UpdateQuotation {
           e.name,
           e.value,
           e.value_format,
-          e.description
+          e.description ?? undefined
         )
 
         if ( detail instanceof Errors ) {
@@ -100,7 +100,7 @@ export class UpdateQuotation {
       details[0]!.valueFormat.value,
       oldQuotation.createdAt.toString(),
       details,
-      quotation.estimated_time
+      quotation.estimated_time ?? undefined
     )
 
     if ( updatedQuotation instanceof Errors ) {
