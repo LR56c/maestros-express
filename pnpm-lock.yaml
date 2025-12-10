@@ -112,7 +112,7 @@ importers:
         version: 0.4.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       openai:
         specifier: ^5.8.2
-        version: 5.8.2(ws@8.18.2)(zod@3.25.64)
+        version: 5.8.2(ws@8.18.2)(zod@4.1.13)
       pigeon-maps:
         specifier: ^0.22.1
         version: 0.22.1(react@19.1.0)
@@ -150,11 +150,8 @@ importers:
         specifier: ^11.1.0
         version: 11.1.0
       zod:
-        specifier: ^3.25.64
-        version: 3.25.64
-      zod-validation-error:
-        specifier: ^3.5.2
-        version: 3.5.2(zod@3.25.64)
+        specifier: ^4.1.12
+        version: 4.1.13
       zustand:
         specifier: ^5.0.5
         version: 5.0.5(@types/react@19.1.8)(react@19.1.0)
@@ -3110,14 +3107,8 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
-  zod-validation-error@3.5.2:
-    resolution: {integrity: sha512-mdi7YOLtram5dzJ5aDtm1AG9+mxRma1iaMrZdYIpFO7epdKBUwLHIxTF8CPDeCQ828zAXYtizrKlEJAtzgfgrw==}
-    engines: {node: '>=18.0.0'}
-    peerDependencies:
-      zod: ^3.25.0
-
-  zod@3.25.64:
-    resolution: {integrity: sha512-hbP9FpSZf7pkS7hRVUrOjhwKJNyampPgtXKc3AN6DsWtoHsg2Sb4SQaS4Tcay380zSwd2VPo9G9180emBACp5g==}
+  zod@4.1.13:
+    resolution: {integrity: sha512-AvvthqfqrAhNH9dnfmrfKzX5upOdjUVJYFqNSlkmGf64gRaTzlPwz99IHYnVs28qYAybvAlBV+H7pn0saFY4Ig==}
 
   zustand@5.0.5:
     resolution: {integrity: sha512-mILtRfKW9xM47hqxGIxCv12gXusoY/xTSHBYApXozR0HmQv299whhBeeAcRy+KrPPybzosvJBCOmVjq6x12fCg==}
@@ -5576,10 +5567,10 @@ snapshots:
       define-properties: 1.2.1
       es-object-atoms: 1.1.1
 
-  openai@5.8.2(ws@8.18.2)(zod@3.25.64):
+  openai@5.8.2(ws@8.18.2)(zod@4.1.13):
     optionalDependencies:
       ws: 8.18.2
-      zod: 3.25.64
+      zod: 4.1.13
 
   optionator@0.9.4:
     dependencies:
@@ -6217,11 +6208,7 @@ snapshots:
 
   yocto-queue@0.1.0: {}
 
-  zod-validation-error@3.5.2(zod@3.25.64):
-    dependencies:
-      zod: 3.25.64
-
-  zod@3.25.64: {}
+  zod@4.1.13: {}
 
   zustand@5.0.5(@types/react@19.1.8)(react@19.1.0):
     optionalDependencies:
