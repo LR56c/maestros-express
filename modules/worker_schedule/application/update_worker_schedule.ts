@@ -39,8 +39,8 @@ export class UpdateWorkerSchedule {
       schedule.start_date,
       schedule.end_date,
       oldSchedule.createdAt.toString(),
-      schedule.recurrent_start_date,
-      schedule.recurrent_end_date
+      schedule.recurrent_start_date ?? undefined,
+      schedule.recurrent_end_date ?? undefined
     )
 
     if ( updatedSchedule instanceof Errors ) {

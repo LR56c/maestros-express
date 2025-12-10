@@ -61,8 +61,8 @@ export class UpsertSchedules {
           schedule.start_date,
           schedule.end_date,
           existingSchedule.createdAt.toString(),
-          schedule.recurrent_start_date,
-          schedule.recurrent_end_date,
+          schedule.recurrent_start_date ?? undefined,
+          schedule.recurrent_end_date ?? undefined,
         )
         if ( updatedSchedule instanceof Errors ) {
           return left( updatedSchedule.values )
@@ -77,8 +77,8 @@ export class UpsertSchedules {
           schedule.status,
           schedule.start_date,
           schedule.end_date,
-          schedule.recurrent_start_date,
-          schedule.recurrent_end_date,
+          schedule.recurrent_start_date ?? undefined,
+          schedule.recurrent_end_date ?? undefined,
         )
         if ( newSchedule instanceof Errors ) {
           return left( newSchedule.values )

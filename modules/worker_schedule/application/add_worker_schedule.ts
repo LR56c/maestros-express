@@ -46,8 +46,8 @@ export class AddWorkerSchedule {
       dto.status,
       dto.start_date,
       dto.end_date,
-      dto.recurrent_start_date,
-      dto.recurrent_end_date,
+      dto.recurrent_start_date ?? undefined,
+      dto.recurrent_end_date ?? undefined,
     )
 
     if ( newSchedule instanceof Errors ) {
