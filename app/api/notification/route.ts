@@ -34,14 +34,15 @@ export async function POST( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await (await sendNotification()).execute( data.right )
+  const result = await (
+    await sendNotification()
+  ).execute( data.right )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )
   }
 
-  return NextResponse.json( NotificationMapper.toResponse( result.right ),
-    { status: 201 } )
+  return NextResponse.json( { status: 201 } )
 }
 
 export async function GET( request: NextRequest ) {
@@ -62,12 +63,14 @@ export async function GET( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await (await searchNotifications()).execute(
+  const result = await (
+    await searchNotifications()
+  ).execute(
     data.right.query,
     data.right.limit ?? 10,
     data.right.skip ?? undefined,
     data.right.sort_by ?? undefined,
-    data.right.sort_type ?? undefined,
+    data.right.sort_type ?? undefined
   )
 
   if ( isLeft( result ) ) {
@@ -79,6 +82,13 @@ export async function GET( request: NextRequest ) {
 }
 
 export async function PUT( request: NextRequest ) {
+  const { searchParams } = new URL( request.url )
+  const id               = searchParams.get( "id" )
+
+  if ( !id ) {
+    return NextResponse.json( { status: 400 } )
+  }
+
   const body = await request.json()
   const data = parseData( notificationUpdateSchema, body )
 
@@ -86,7 +96,9 @@ export async function PUT( request: NextRequest ) {
     return NextResponse.json( { error: data.left.message }, { status: 400 } )
   }
 
-  const result = await (await updateNotification()).execute( data.right  )
+  const result = await (
+    await updateNotification()
+  ).execute( id, data.right )
 
   if ( isLeft( result ) ) {
     return NextResponse.json( { status: 500 } )

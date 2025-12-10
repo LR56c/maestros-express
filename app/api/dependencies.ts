@@ -353,6 +353,12 @@ import {
 import {
   RemoveAuth
 }                       from "@/modules/user/application/remove_auth"
+import {
+  SearchNotificationContents
+} from "@/modules/notification/application/search_notifications_content"
+import {
+  PrismaNotificationContentData
+} from "@/modules/notification/infrastructure/persistance/prisma_notification_content_data"
 
 export async function ai() {
   return new OpenAI( {
@@ -665,6 +671,11 @@ export async function upsertPackages() {
 }
 
 const notificationConfigData = new PrismaNotificationConfigData( prisma )
+const notificationContentData = new PrismaNotificationContentData( prisma )
+
+export async function searchNotificationContent() {
+  return new SearchNotificationContents( notificationContentData )
+}
 
 export async function addNotificationConfig() {
   return new AddNotificationConfig( notificationConfigData )
