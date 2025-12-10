@@ -58,7 +58,7 @@ export class AddPhoneFormat {
       format.prefix,
       format.regex,
       country,
-      format.example
+      format.example ?? undefined
     )
 
     if ( newFormat instanceof Errors ) {
