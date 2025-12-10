@@ -14,9 +14,6 @@ import type {
   NotificationConfigDTO
 }                                 from "@/modules/notification_config/application/notification_config_dto"
 import {
-  ValidJSON
-}                                 from "@/modules/shared/application/json_schema"
-import {
   UUID
 }                                 from "@/modules/shared/domain/value_objects/uuid"
 
@@ -56,12 +53,6 @@ export class NotificationConfigMapper {
       errors.push( userId )
     }
 
-    const deviceData = wrapType( () => ValidJSON.from( json.device_data ) )
-
-    if ( deviceData instanceof BaseException ) {
-      errors.push( deviceData )
-    }
-
     const deviceToken = wrapType( () => ValidString.from( json.device_token ) )
 
     if ( deviceToken instanceof BaseException ) {
@@ -86,9 +77,7 @@ export class NotificationConfigMapper {
       user_id            : (
         userId as UUID
       ).toString(),
-      device_data        : (
-        deviceData as ValidJSON
-      ).value,
+      device_data        : json.device_data,
       device_token       : (
         deviceToken as ValidString
       ).value,
