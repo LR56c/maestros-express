@@ -37,7 +37,7 @@ export function WorkerCard( {
       </div>
       <div className="flex items-center gap-2 overflow-x-auto max-w-42 h-12">
         { worker.specialities.map( ( speciality, index ) => (
-          <Badge>
+          <Badge key={speciality.id} className="capitalize">
             { speciality.name }
           </Badge>
         ) ) }

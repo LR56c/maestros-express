@@ -80,6 +80,7 @@ export default function Home() {
         },
         body   : JSON.stringify( values )
       } )
+      console.log('response',response)
       if ( !response.ok ) {
         return undefined
       }
@@ -218,8 +219,8 @@ export default function Home() {
                     className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     {
                       data.workers.map( ( worker: any ) => (
-                        <Link href={ `/trabajador/${ worker.user_id }` }>
-                          <WorkerCard key={ worker.user_id } worker={ worker }/>
+                        <Link key={ worker.user_id } href={ `/trabajador/${ worker.user_id }` }>
+                          <WorkerCard worker={ worker }/>
                         </Link>
                       ) )
                     }
@@ -244,8 +245,8 @@ export default function Home() {
                   className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                   {
                     items.map( ( worker: any ) => (
-                      <Link href={ `/trabajador/${ worker.user_id }` }>
-                        <WorkerCard key={ worker.user_id } worker={ worker }/>
+                      <Link key={ worker.user_id } href={ `/trabajador/${ worker.user_id }` }>
+                        <WorkerCard worker={ worker }/>
                       </Link>
                     ) )
                   }
